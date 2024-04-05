@@ -88,8 +88,8 @@ for result in data["results"]:
 
             replace_text_in_file(curDir + "/main.tf" , "@@@unpriv", result["name"])
             replace_text_in_file(curDir + "/vars.tf" , "@@@vmid", result["custom_fields"]["vmid"])
-            replace_text_in_file(curDir + "/vars.tf" , "@@@nfs", result["custom_fields"]["nfs"])
-            replace_text_in_file(curDir + "/vars.tf" , "@@@vm_name", result["custom_fields"]["unpriv"])
+            replace_text_in_file(curDir + "/vars.tf" , "@@@nfs", str(result["custom_fields"]["nfs"]))
+            replace_text_in_file(curDir + "/vars.tf" , "@@@vm_name", str(result["custom_fields"]["unpriv"]))
             replace_text_in_file(curDir + "/vars.tf" , "@@@vm_ip", result["primary_ip4"]["address"].split("/")[0])
             replace_text_in_file(curDir + "/vars.tf" , "@@@pve_node", result["device"]["name"])
             replace_text_in_file(curDir + "/vars.tf" , "@@@cores", str(result["vcpus"]))
