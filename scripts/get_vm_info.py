@@ -87,7 +87,10 @@ for result in data["results"]:
             replace_text_in_file(curDir + "/main.tf" , "@@@vm_name", result["name"])
             replace_text_in_file(curDir + "/vars.tf" , "@@@unpriv", str(result["custom_fields"]["unpriv"]))
             replace_text_in_file(curDir + "/vars.tf" , "@@@vmid", result["custom_fields"]["vmid"])
-            replace_text_in_file(curDir + "/vars.tf" , "@@@nfs", str(result["custom_fields"]["nfs"]))
+            if result["custom_fields"]["nfs"]:
+                replace_text_in_file(curDir + "/main.tf" , "@@@nfs", "mount = \"nfs\"")   
+            else:
+                replace_text_in_file(curDir + "/main.tf" , "@@@nfs", "")   
             replace_text_in_file(curDir + "/vars.tf" , "@@@vm_name", str(result["custom_fields"]["unpriv"]))
             replace_text_in_file(curDir + "/vars.tf" , "@@@vm_ip", result["primary_ip4"]["address"].split("/")[0])
             replace_text_in_file(curDir + "/vars.tf" , "@@@pve_node", result["device"]["name"])
