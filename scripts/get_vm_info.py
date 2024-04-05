@@ -50,9 +50,9 @@ for result in data["results"]:
         replace_text_in_file(curDir + "/vars-template.tf" , "@@@vm_name", result["name"])
         replace_text_in_file(curDir + "/vars-template.tf" , "@@@vm_ip", result["primary_ip4"]["address"].split("/")[0])
         replace_text_in_file(curDir + "/vars-template.tf" , "@@@pve_node", result["device"]["name"])
-        replace_text_in_file(curDir + "/vars-template.tf" , "@@@cores", result["vcpus"])
-        replace_text_in_file(curDir + "/vars-template.tf" , "@@@memory", result["memory"])
-        replace_text_in_file(curDir + "/vars-template.tf" , "@@@storage", result["disk"])      
+        replace_text_in_file(curDir + "/vars-template.tf" , "@@@cores", str(result["vcpus"]))
+        replace_text_in_file(curDir + "/vars-template.tf" , "@@@memory", str(result["memory"]))
+        replace_text_in_file(curDir + "/vars-template.tf" , "@@@storage", str(result["disk"]))
         
         vm_results = {
             "ip": result["primary_ip4"]["address"].split("/")[0],
