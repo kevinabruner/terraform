@@ -14,7 +14,7 @@ provider "proxmox" {
   pm_tls_insecure = false
 }
 
-resource "proxmox_lxc" var.vm_name {
+resource "proxmox_lxc" "var.vm_name" {
     count = 1
     features {
         nesting = true
