@@ -73,6 +73,7 @@ for result in data["results"]:
                      
         os.mkdir(curDir)                    
         
+        print('results:', result["custom_fields"]['VMorContainer'])
 
         if result["custom_fields"]['VMorContainer'] == "ct":
                     
