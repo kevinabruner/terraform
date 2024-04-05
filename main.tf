@@ -14,6 +14,5 @@ provider "proxmox" {
   pm_tls_insecure = false
 }
 
-module "test" {
-  source = "/home/kevin/terraform/vms/"
-}
+
+###generated###
