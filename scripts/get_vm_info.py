@@ -70,7 +70,7 @@ for result in data["results"]:
         shutil.copy(gitDir + '/vars.template', curDir)        
 
         
-        moduleLine = "module \"test\" { source = \"/home/kevin/terraform/vms/" + result["name"] + "\" }"
+        moduleLine = "module \"" + result["name"] + "\" { source = \"/home/kevin/terraform/vms/" + result["name"] + "\" }"
         with open(gitDir + '/main.tf', 'a') as file:
             file.write(moduleLine + '\n')
 
