@@ -1,0 +1,27 @@
+variable "vm_name" {
+    default = "@@@vm_name"
+}
+variable "vm_ip" {
+    default = "@@@vm_ip"
+}
+variable "password" {
+    default = "obo74Cle"
+}
+variable "vm_pool" {
+    default = "personal"
+}
+variable "pve_node" {
+    default = "@@@pve_node"
+}
+variable "cores" {
+    default = "@@@cores"
+}
+variable "memory" {
+    default = "@@@memory"
+}
+variable "vmid" {
+    default = "@@@vmid"
+}
+variable "storage" {
+    default = "@@@storageG"
+}

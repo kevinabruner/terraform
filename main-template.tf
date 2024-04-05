@@ -14,7 +14,7 @@ provider "proxmox" {
   pm_tls_insecure = false
 }
 
-resource "proxmox_lxc" "vm_name" {
+resource "proxmox_lxc" "@@@vm_name" {
     count = 1
     features {
         nesting = true
@@ -28,12 +28,12 @@ resource "proxmox_lxc" "vm_name" {
     }
     rootfs {
         storage = "ceph"
-        size    = "8G"
+        size    = "var.storage"
     }
     ostemplate = "truenas-nfs:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
     password = var.password
     pool = var.vm_pool
-    target_node = var.vm_node
+    target_node = var.pve_node
     unprivileged = true
     cores = var.cores
     memory = var.memory    

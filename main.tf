@@ -15,5 +15,5 @@ provider "proxmox" {
 }
 
 module "test" {
-  source = "./vms/test"
+  source = "/home/kevin/terraform/vms/"
 }

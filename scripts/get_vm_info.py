@@ -1,5 +1,19 @@
 
 import requests
+import os
+import shutil
+
+def replace_text_in_file(file_path, old_text, new_text):
+    # Read the content of the file
+    with open(file_path, 'r') as file:
+        file_content = file.read()
+
+    # Replace the old text with the new text
+    modified_content = file_content.replace(old_text, new_text)
+
+    # Write the modified content back to the file
+    with open(file_path, 'w') as file:
+        file.write(modified_content)
 
 # Set your token
 TOKEN = "18a09ac581f3b2679df0f538698e2893aac493a7"
@@ -13,6 +27,8 @@ headers = {
     "Accept": "application/json; indent=4"
 }
 
+gitDir="/home/kevin/terraform"
+
 # Send the GET request
 response = requests.get(url, headers=headers)
 
@@ -20,8 +36,14 @@ data = response.json()
 
 all_vms = {"vm_results": []}
 
-for result in data["results"]:
+for result in data["results"]:    
     if result["primary_ip4"]:
+        curDir = gitDir + '/vms/' + result["name"]
+        os.makedirs(curDir)        
+
+        shutil.copy(gitDir + '/main-template.tf', curDir)
+        shutil.copy(gitDir + '/vars-template.tf', curDir)
+
         vm_results = {
             "ip": result["primary_ip4"]["address"].split("/")[0],
             "name": result["name"],
@@ -39,6 +61,3 @@ for result in data["results"]:
 
 print(all_vms)
 
-# Write the output to a JSON file
-#with open("output.json", "w") as outfile:
-#    json.dump(output, outfile, indent=4)
