@@ -21,11 +21,11 @@ provider "proxmox" {
   pm_tls_insecure = false
 }
 
-resource "proxmox_lxc" "lxc-test" {
+resource "proxmox_lxc" "lxc-test2" {
     features {
         nesting = true
     }
-    hostname = "terraform-new-container"
+    hostname = "terraform-new-container2"
     network {
         name = "eth0"
         bridge = "vmbr0"
