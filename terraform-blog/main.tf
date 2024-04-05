@@ -14,16 +14,16 @@ provider "proxmox" {
   pm_tls_insecure = false
 }
 
-resource "proxmox_lxc" "lxc-test2" {
+resource "proxmox_lxc" var.vm_name {
     count = 0
     features {
         nesting = true
     }
-    hostname = "terraform-new-container2"
+    hostname = var.vm_name
     network {
-        name = "eth0"
+        name = "net0"
         bridge = "vmbr0"
-        ip = "dhcp"
+        ip = var.vm_ip
         ip6 = "dhcp"
     }
     rootfs {
@@ -31,11 +31,11 @@ resource "proxmox_lxc" "lxc-test2" {
         size    = "8G"
     }
     ostemplate = "truenas-nfs:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
-    password = "obo74Cle"
-    pool = "HA-3"
-    target_node = "pve"
+    password = var.password
+    pool = var.vm_pool
+    target_node = var.vm_node
     unprivileged = true
-    cores = 1
-    memory = 1024    
-    vmid = 145
+    cores = var.cores
+    memory = var.memory    
+    vmid = var.vmid
 }
