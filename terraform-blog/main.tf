@@ -15,7 +15,7 @@ provider "proxmox" {
 }
 
 resource "proxmox_lxc" var.vm_name {
-    count = 0
+    count = 1
     features {
         nesting = true
     }
