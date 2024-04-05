@@ -7,21 +7,22 @@ import shutil
 def truncate_file_after_marker(file_path, marker):
     try:
         with open(file_path, 'r+') as file:
-            # Find the position of the marker
-            file_content = file.read()
-            marker_index = file_content.find(marker)
+            lines = file.readlines()
+            marker_index = -1
 
-            # If the marker is found, truncate the file from that position onwards
-            with open(file_path, 'r+') as file:
-                file_content = file.read()
-                marker_index = file_content.find(marker)
+            # Find the marker line
+            for i, line in enumerate(lines):
+                if marker in line:
+                    marker_index = i
+                    break
 
-                # If the marker is found, truncate the file after the marker
-                if marker_index != -1:
-                    file.seek(marker_index + len(marker))
-                    file.truncate()
+            # If the marker line is found, truncate the file after that line
+            if marker_index != -1:
+                file.seek(0)
+                file.truncate()
+                file.writelines(lines[:marker_index+1])
 
-        print(f"File '{file_path}' truncated after marker '{marker}'")
+        print(f"File '{file_path}' truncated after marker line '{marker}'")
     except FileNotFoundError:
         print(f"File '{file_path}' not found.")
     except Exception as e:
