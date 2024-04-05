@@ -1,5 +1,5 @@
 variable "vm_name" {
-    default = "@@@vm_name"
+    default = " @@vm_name"
 }
 variable "vm_ip" {
     default = "@@@vm_ip"
