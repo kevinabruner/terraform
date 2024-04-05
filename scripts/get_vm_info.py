@@ -71,9 +71,7 @@ for result in data["results"]:
         if os.path.exists(curDir):
             shutil.rmtree(curDir)
                      
-        os.mkdir(curDir)                    
-        
-        print('results:', result["custom_fields"]['VMorContainer'][0])
+        os.mkdir(curDir)                                    
 
         if result["custom_fields"]['VMorContainer'][0] == "ct":
                     
