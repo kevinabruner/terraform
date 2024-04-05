@@ -85,7 +85,7 @@ for result in data["results"]:
 
 
             replace_text_in_file(curDir + "/main.tf" , "@@@name", result["name"])
-            replace_text_in_file(curDir + "/vars.tf" , "@@@unpriv", result["custom_fields"]["unpriv"])
+            replace_text_in_file(curDir + "/vars.tf" , "@@@unpriv", str(result["custom_fields"]["unpriv"]))
             replace_text_in_file(curDir + "/vars.tf" , "@@@vmid", result["custom_fields"]["vmid"])
             replace_text_in_file(curDir + "/vars.tf" , "@@@nfs", str(result["custom_fields"]["nfs"]))
             replace_text_in_file(curDir + "/vars.tf" , "@@@vm_name", str(result["custom_fields"]["unpriv"]))
