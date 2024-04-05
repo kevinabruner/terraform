@@ -43,5 +43,5 @@ resource "proxmox_lxc" "lxc-test2" {
     unprivileged = true
     cores = 1
     memory = 1024    
-    vmid = 45
+    vmid = 145
 }
