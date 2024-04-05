@@ -77,8 +77,8 @@ for result in data["results"]:
         if result["custom_fields"]['VMorContainer'] == "ct":
                     
             # Copy and rename the template files
-            shutil.copy(os.path.join(gitDir, '/main.template'), os.path.join(curDir, '/main.tf'))
-            shutil.copy(os.path.join(gitDir, '/vars.template'), os.path.join(curDir, '/vars.tf'))
+            shutil.copy(gitDir + '/main.template', curDir + '/main.tf')
+            shutil.copy(os.path.join(gitDir, 'vars.template'), os.path.join(curDir, 'vars.tf'))
             
             moduleLine = "module \"" + result["name"] + "\" { source = \"/home/kevin/terraform/vms/" + result["name"] + "\" }"
             with open(gitDir + '/main.tf', 'a') as file:
