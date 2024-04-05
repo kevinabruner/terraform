@@ -12,7 +12,7 @@ provider "proxmox" {
   pm_api_url = "https://pve.thejfk.ca/api2/json"
   
   # api token id is in the form of: <username>@pam!<tokenId>
-  pm_api_token_id = "terraform@pam!main_terraform
+  pm_api_token_id = "terraform@pam!main_terraform"
   
   # this is the full secret wrapped in quotes. don't worry, I've already deleted this from my proxmox cluster by the time you read this post
   pm_api_token_secret = "b01b0155-c025-4b3a-b173-cb6b1bf9eb17"
@@ -64,7 +64,7 @@ resource "proxmox_vm_qemu" "test_server" {
   # in this case, since we are only adding a single VM, the IP will
   # be 10.98.1.91 since count.index starts at 0. this is how you can create
   # multiple VMs and have an IP assigned to each (.91, .92, .93, etc.)
-  
+
   ipconfig0 = "ip=192.168.11.19${count.index + 1}/24,gw=192.168.11.1"
   
   # sshkeys set using variables. the variable contains the text of the key.
