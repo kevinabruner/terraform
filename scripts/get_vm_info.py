@@ -65,8 +65,10 @@ all_vms = {"vm_results": []}
 for result in data["results"]:    
     if result["primary_ip4"]:
         curDir = gitDir + '/vms/' + result["name"]
-                
-        os.makedirs(curDir)        
+
+        if os.path.exists(directory_path):
+            shutil.rmtree(directory)
+            os.makedirs(curDir)        
 
         shutil.copy(gitDir + '/main.template', curDir)
         shutil.copy(gitDir + '/vars.template', curDir)
