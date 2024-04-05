@@ -60,8 +60,8 @@ for result in data["results"]:
     if result["primary_ip4"]:
         curDir = gitDir + '/vms/' + result["name"]
 
-        if os.path.exists(directory_path):
-            shutil.rmtree(directory)
+        if os.path.exists(curDir):
+            shutil.rmtree(curDir)
             os.makedirs(curDir)        
 
         shutil.copy(gitDir + '/main.template', curDir)
