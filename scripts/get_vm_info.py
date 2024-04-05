@@ -85,6 +85,7 @@ for result in data["results"]:
 
 
             replace_text_in_file(curDir + "/main.tf" , "@@@vm_name", result["name"])
+            replace_text_in_file(curDir + "/vars.tf" , "@@@vm_name", result["name"])
             replace_text_in_file(curDir + "/vars.tf" , "@@@unpriv", str(result["custom_fields"]["unpriv"]).lower())
             replace_text_in_file(curDir + "/vars.tf" , "@@@vmid", result["custom_fields"]["vmid"])
             if result["custom_fields"]["nfs"]:
