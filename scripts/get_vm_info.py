@@ -56,6 +56,8 @@ data = response.json()
 
 all_vms = {"vm_results": []}
 
+truncate_file_after_marker(gitDir + '/main.tf', '###generated###')
+
 for result in data["results"]:    
     if result["primary_ip4"]:
         curDir = gitDir + '/vms/' + result["name"]
@@ -65,9 +67,7 @@ for result in data["results"]:
             os.makedirs(curDir)        
 
         shutil.copy(gitDir + '/main.template', curDir)
-        shutil.copy(gitDir + '/vars.template', curDir)
-
-        truncate_file_after_marker(gitDir + '/main.tf', '###generated###')
+        shutil.copy(gitDir + '/vars.template', curDir)        
 
         
         moduleLine = "module \"test\" { source = \"/home/kevin/terraform/vms/" + result["name"] + "\" }"
