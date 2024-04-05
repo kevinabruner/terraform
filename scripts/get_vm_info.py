@@ -92,7 +92,7 @@ for result in data["results"]:
             else:
                 replace_text_in_file(curDir + "/main.tf" , "@@@nfs", "")   
             replace_text_in_file(curDir + "/vars.tf" , "@@@vm_name", str(result["custom_fields"]["unpriv"]))
-            replace_text_in_file(curDir + "/vars.tf" , "@@@vm_ip", result["primary_ip4"]["address"].split("/")[0])
+            replace_text_in_file(curDir + "/vars.tf" , "@@@vm_ip", result["primary_ip4"]["address"])
             replace_text_in_file(curDir + "/vars.tf" , "@@@pve_node", result["device"]["name"])
             replace_text_in_file(curDir + "/vars.tf" , "@@@cores", str(result["vcpus"]))
             replace_text_in_file(curDir + "/vars.tf" , "@@@memory", str(result["memory"]))
