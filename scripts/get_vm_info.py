@@ -73,21 +73,22 @@ for result in data["results"]:
                      
         os.mkdir(curDir)                    
 
-        shutil.copy(gitDir + '/main.template', curDir)
-        shutil.copy(gitDir + '/vars.template', curDir)        
+        # Copy and rename the template files
+        shutil.copy(os.path.join(gitDir, 'main.template'), os.path.join(curDir, 'main.tf'))
+        shutil.copy(os.path.join(gitDir, 'vars.template'), os.path.join(curDir, 'vars.tf'))
         
         moduleLine = "module \"" + result["name"] + "\" { source = \"/home/kevin/terraform/vms/" + result["name"] + "\" }"
         with open(gitDir + '/main.tf', 'a') as file:
             file.write(moduleLine + '\n')
 
 
-        replace_text_in_file(curDir + "/main.template" , "@@@vm_name", result["name"])
-        replace_text_in_file(curDir + "/vars.template" , "@@@vm_name", result["name"])
-        replace_text_in_file(curDir + "/vars.template" , "@@@vm_ip", result["primary_ip4"]["address"].split("/")[0])
-        replace_text_in_file(curDir + "/vars.template" , "@@@pve_node", result["device"]["name"])
-        replace_text_in_file(curDir + "/vars.template" , "@@@cores", str(result["vcpus"]))
-        replace_text_in_file(curDir + "/vars.template" , "@@@memory", str(result["memory"]))
-        replace_text_in_file(curDir + "/vars.template" , "@@@storage", str(result["disk"]))
+        replace_text_in_file(curDir + "/main.tf" , "@@@vm_name", result["name"])
+        replace_text_in_file(curDir + "/vars.tf" , "@@@vm_name", result["name"])
+        replace_text_in_file(curDir + "/vars.tf" , "@@@vm_ip", result["primary_ip4"]["address"].split("/")[0])
+        replace_text_in_file(curDir + "/vars.tf" , "@@@pve_node", result["device"]["name"])
+        replace_text_in_file(curDir + "/vars.tf" , "@@@cores", str(result["vcpus"]))
+        replace_text_in_file(curDir + "/vars.tf" , "@@@memory", str(result["memory"]))
+        replace_text_in_file(curDir + "/vars.tf" , "@@@storage", str(result["disk"]))
 
         
         
