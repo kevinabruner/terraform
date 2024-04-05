@@ -22,12 +22,6 @@ def truncate_file_after_marker(file_path, marker):
     except Exception as e:
         print(f"An error occurred: {e}")
 
-# Example usage:
-file_path = "example.txt"  # Replace with your file path
-marker = "###generated###"
-
-truncate_file_after_marker(file_path, marker)
-
 
 def replace_text_in_file(file_path, old_text, new_text):
     # Read the content of the file
