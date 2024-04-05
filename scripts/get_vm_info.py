@@ -71,6 +71,8 @@ for result in data["results"]:
         if os.path.exists(curDir):
             shutil.rmtree(curDir)
             os.mkdir(curDir)        
+        else:
+            os.mkdir(curDir)                    
 
         shutil.copy(gitDir + '/main.template', curDir)
         shutil.copy(gitDir + '/vars.template', curDir)        
