@@ -32,7 +32,7 @@ resource "proxmox_lxc" "lxc-test" {
         ip = "dhcp"
         ip6 = "dhcp"
     }
-    ostemplate = "shared:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
+    ostemplate = "truenas-nfs:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
     password = "rootroot"
     pool = "HA-3"
     target_node = "pve"
