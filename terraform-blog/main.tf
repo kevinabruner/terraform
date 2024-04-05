@@ -23,6 +23,7 @@ provider "proxmox" {
 
 # resource is formatted to be "[type]" "[entity_name]" so in this case
 # we are looking to create a proxmox_vm_qemu entity named test_server
+
 resource "proxmox_vm_qemu" "test_server" {
   count = 1 # just want 1 for now, set to 0 and apply to destroy VM
   name = "test-vm-${count.index + 1}" #count.index starts at 0, so + 1 means this VM will be named test-vm-1 in proxmox

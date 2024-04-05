@@ -5,5 +5,5 @@ variable "proxmox_host" {
     default = "pve"
 }
 variable "template_name" {
-    default = "ubuntu-2004-cloudinit-template"
+    default = "ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
 }
