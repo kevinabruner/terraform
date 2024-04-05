@@ -41,4 +41,6 @@ resource "proxmox_lxc" "lxc-test" {
     pool = "HA-3"
     target_node = "pve"
     unprivileged = true
+    cores = 1
+    memory = 1024    
 }
