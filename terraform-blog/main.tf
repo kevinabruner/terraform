@@ -14,6 +14,6 @@ provider "proxmox" {
   pm_tls_insecure = false
 }
 
-module "vm1" {
+module "test" {
   source = "./vms/test"
 }
