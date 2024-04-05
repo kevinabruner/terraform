@@ -15,6 +15,7 @@ provider "proxmox" {
 }
 
 resource "proxmox_lxc" "lxc-test2" {
+    count = 0
     features {
         nesting = true
     }
