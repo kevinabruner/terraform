@@ -5,7 +5,7 @@ import requests
 TOKEN = "18a09ac581f3b2679df0f538698e2893aac493a7"
 
 # Define the URL
-url = "https://netbox.thejfk.ca/api/ipam/ip-addresses/?limit=1000"
+url = "https://netbox.thejfk.ca/api/virtualization/virtual-machines/?limit=1000"
 
 # Set the headers
 headers = {
@@ -18,7 +18,7 @@ response = requests.get(url, headers=headers)
 
 data = response.json()
 
-output = {"vm_results": []}
+all_vms = {"vm_results": []}
 
 for result in data["results"]:
     if result["primary_ip4"]:
@@ -35,10 +35,9 @@ for result in data["results"]:
                 "disk": result["disk"],
             }
         }
-        output["vm_results"].append(vm_results)
+        all_vms["vm_results"].append(vm_results)
 
-
-print(output)
+print(all_vms)
 
 # Write the output to a JSON file
 #with open("output.json", "w") as outfile:
