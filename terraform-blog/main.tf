@@ -35,6 +35,6 @@ resource "proxmox_lxc" "lxc-test" {
     ostemplate = "shared:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
     password = "rootroot"
     pool = "terraform"
-    target_node = "node-01"
+    target_node = "pve"
     unprivileged = true
 }
