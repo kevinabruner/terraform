@@ -12,9 +12,14 @@ def truncate_file_after_marker(file_path, marker):
             marker_index = file_content.find(marker)
 
             # If the marker is found, truncate the file from that position onwards
-            if marker_index != -1:
-                file.seek(marker_index)
-                file.truncate()
+            with open(file_path, 'r+') as file:
+                file_content = file.read()
+                marker_index = file_content.find(marker)
+
+                # If the marker is found, truncate the file after the marker
+                if marker_index != -1:
+                    file.seek(marker_index + len(marker))
+                    file.truncate()
 
         print(f"File '{file_path}' truncated after marker '{marker}'")
     except FileNotFoundError:
@@ -68,7 +73,6 @@ for result in data["results"]:
 
         shutil.copy(gitDir + '/main.template', curDir)
         shutil.copy(gitDir + '/vars.template', curDir)        
-
         
         moduleLine = "module \"" + result["name"] + "\" { source = \"/home/kevin/terraform/vms/" + result["name"] + "\" }"
         with open(gitDir + '/main.tf', 'a') as file:
