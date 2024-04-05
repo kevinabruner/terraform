@@ -25,3 +25,9 @@ variable "vmid" {
 variable "storage" {
     default = "@@@storageG"
 }
+variable "unpriv" {
+    default = "@@@unpriv"
+}
+variable "nfs" {
+    default = "@@@nfs"
+}

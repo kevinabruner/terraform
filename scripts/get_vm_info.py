@@ -67,28 +67,33 @@ truncate_file_after_marker(gitDir + '/main.tf', '###generated###')
 for result in data["results"]:    
     if result["primary_ip4"]:
         curDir = gitDir + '/vms/' + result["name"]
-
+ 
         if os.path.exists(curDir):
             shutil.rmtree(curDir)
                      
         os.mkdir(curDir)                    
-
-        # Copy and rename the template files
-        shutil.copy(os.path.join(gitDir, 'main.template'), os.path.join(curDir, 'main.tf'))
-        shutil.copy(os.path.join(gitDir, 'vars.template'), os.path.join(curDir, 'vars.tf'))
         
-        moduleLine = "module \"" + result["name"] + "\" { source = \"/home/kevin/terraform/vms/" + result["name"] + "\" }"
-        with open(gitDir + '/main.tf', 'a') as file:
-            file.write(moduleLine + '\n')
+
+        if result["custom_fields"]['VMorContainer'] == "ct":
+                    
+            # Copy and rename the template files
+            shutil.copy(os.path.join(gitDir, 'main.template'), os.path.join(curDir, 'main.tf'))
+            shutil.copy(os.path.join(gitDir, 'vars.template'), os.path.join(curDir, 'vars.tf'))
+            
+            moduleLine = "module \"" + result["name"] + "\" { source = \"/home/kevin/terraform/vms/" + result["name"] + "\" }"
+            with open(gitDir + '/main.tf', 'a') as file:
+                file.write(moduleLine + '\n')
 
 
-        replace_text_in_file(curDir + "/main.tf" , "@@@vm_name", result["name"])
-        replace_text_in_file(curDir + "/vars.tf" , "@@@vm_name", result["name"])
-        replace_text_in_file(curDir + "/vars.tf" , "@@@vm_ip", result["primary_ip4"]["address"].split("/")[0])
-        replace_text_in_file(curDir + "/vars.tf" , "@@@pve_node", result["device"]["name"])
-        replace_text_in_file(curDir + "/vars.tf" , "@@@cores", str(result["vcpus"]))
-        replace_text_in_file(curDir + "/vars.tf" , "@@@memory", str(result["memory"]))
-        replace_text_in_file(curDir + "/vars.tf" , "@@@storage", str(result["disk"]))
+            replace_text_in_file(curDir + "/main.tf" , "@@@unpriv", result["name"])
+            replace_text_in_file(curDir + "/vars.tf" , "@@@vmid", result["custom_fields"]["vmid"])
+            replace_text_in_file(curDir + "/vars.tf" , "@@@nfs", result["custom_fields"]["nfs"])
+            replace_text_in_file(curDir + "/vars.tf" , "@@@vm_name", result["custom_fields"]["unpriv"])
+            replace_text_in_file(curDir + "/vars.tf" , "@@@vm_ip", result["primary_ip4"]["address"].split("/")[0])
+            replace_text_in_file(curDir + "/vars.tf" , "@@@pve_node", result["device"]["name"])
+            replace_text_in_file(curDir + "/vars.tf" , "@@@cores", str(result["vcpus"]))
+            replace_text_in_file(curDir + "/vars.tf" , "@@@memory", str(result["memory"]))
+            replace_text_in_file(curDir + "/vars.tf" , "@@@storage", str(result["disk"]))
 
         
         

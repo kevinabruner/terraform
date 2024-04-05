@@ -18,6 +18,7 @@ resource "proxmox_lxc" "@@@vm_name" {
     count = 1
     features {
         nesting = true
+        nfs = var.nfs
     }
     hostname = var.vm_name
     network {
@@ -34,7 +35,7 @@ resource "proxmox_lxc" "@@@vm_name" {
     password = var.password
     pool = var.vm_pool
     target_node = var.pve_node
-    unprivileged = true
+    unprivileged = var.unpriv
     cores = var.cores
     memory = var.memory    
     vmid = var.vmid
