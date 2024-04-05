@@ -73,9 +73,9 @@ for result in data["results"]:
                      
         os.mkdir(curDir)                    
         
-        print('results:', result["custom_fields"]['VMorContainer'])
+        print('results:', result["custom_fields"]['VMorContainer'][0])
 
-        if result["custom_fields"]['VMorContainer'] == "ct":
+        if result["custom_fields"]['VMorContainer'][0] == "ct":
                     
             # Copy and rename the template files
             shutil.copy(gitDir + '/main.template', curDir + '/main.tf')
