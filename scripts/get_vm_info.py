@@ -46,6 +46,14 @@ for result in data["results"]:
         shutil.copy(gitDir + '/main-template.tf', curDir)
         shutil.copy(gitDir + '/vars-template.tf', curDir)
 
+        replace_text_in_file(curDir + "/main-template.tf" , "@@@vm_name", result["name"])
+        replace_text_in_file(curDir + "/vars-template.tf" , "@@@vm_name", result["name"])
+        replace_text_in_file(curDir + "/vars-template.tf" , "@@@vm_ip", result["primary_ip4"]["address"].split("/")[0])
+        replace_text_in_file(curDir + "/vars-template.tf" , "@@@pve_node", result["device"]["name"])
+        replace_text_in_file(curDir + "/vars-template.tf" , "@@@cores", result["vcpus"])
+        replace_text_in_file(curDir + "/vars-template.tf" , "@@@memory", result["memory"])
+        replace_text_in_file(curDir + "/vars-template.tf" , "@@@storage", result["disk"])      
+        
         vm_results = {
             "ip": result["primary_ip4"]["address"].split("/")[0],
             "name": result["name"],
@@ -61,5 +69,4 @@ for result in data["results"]:
         }
         all_vms["vm_results"].append(vm_results)
 
-print(all_vms)
 
