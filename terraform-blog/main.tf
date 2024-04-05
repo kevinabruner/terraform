@@ -32,6 +32,10 @@ resource "proxmox_lxc" "lxc-test" {
         ip = "dhcp"
         ip6 = "dhcp"
     }
+    rootfs {
+        storage = "ceph"
+        size    = "8G"
+    }
     ostemplate = "truenas-nfs:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
     password = "rootroot"
     pool = "HA-3"
