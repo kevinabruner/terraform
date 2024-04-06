@@ -5,6 +5,14 @@ import shutil
 import ipaddress
 
 
+def get_gateway(ip_string): 
+    ip_network = ipaddress.ip_network(ip_string, strict=False)
+    # Check if the IP address is in the correct format (e.g., 192.168.x.x/24)
+    if ip_network.version == 4:
+        parts = ip_string.split('.')        
+        gateway = f"{parts[0]}.{parts[1]}.{parts[2]}.1"
+        return gateway
+
 def truncate_file_after_marker(file_path, marker):
     try:
         with open(file_path, 'r+') as file:
@@ -67,24 +75,6 @@ truncate_file_after_marker(gitDir + '/main.tf', '###generated###')
 
 
 
-
-def get_gateway(ip_string):
-    try:
-        ip_network = ipaddress.ip_network(ip_string, strict=False)
-        # Check if the IP address is in the correct format (e.g., 192.168.x.x/24)
-        if ip_network.version == 4:
-            parts = ip_string.split('.')
-            subnet = parts[2]
-            gateway = f"{parts[0]}.{parts[1]}.{subnet}.1"
-            return gateway
-        else:
-            raise ValueError("Invalid IPv4 address format")
-    except ValueError as e:
-        print(f"Error: {e}")
-        return None
-
-
-
 for result in data["results"]:    
     if result["primary_ip4"]:
         curDir = gitDir + '/vms/' + result["name"]
@@ -104,19 +94,27 @@ for result in data["results"]:
             with open(gitDir + '/main.tf', 'a') as file:
                 file.write(moduleLine + '\n')
                 
-
-            # Example usage:            
-                                    
-            replace_text_in_file(curDir + "/vars.tf" , "@@@vm_gw", get_gateway(result["primary_ip4"]["address"]))
-
-            replace_text_in_file(curDir + "/main.tf" , "@@@vm_name", result["name"])
-            replace_text_in_file(curDir + "/vars.tf" , "@@@vm_name", result["name"])
-            replace_text_in_file(curDir + "/vars.tf" , "@@@unpriv", str(result["custom_fields"]["unpriv"]).lower())
-            replace_text_in_file(curDir + "/vars.tf" , "@@@vmid", result["custom_fields"]["vmid"])
+                    
+            ###adds a line if NFS is needed
             if result["custom_fields"]["nfs"]:
                 replace_text_in_file(curDir + "/main.tf" , "@@@nfs", "mount = \"nfs\"")   
             else:
                 replace_text_in_file(curDir + "/main.tf" , "@@@nfs", "")               
+            
+
+            ###adds a line if there is a vlan tag
+            if result["custom_fields"]["vlan"]:
+                vlanId = result["custom_fields"]["vlan"]["vid"]
+                replace_text_in_file(curDir + "/main.tf" , "@@@vlan", "tag = \"" + vlanId + "\"")   
+            else:
+                replace_text_in_file(curDir + "/main.tf" , "@@@vlan", "")               
+
+            ###generic variable replacements
+            replace_text_in_file(curDir + "/vars.tf" , "@@@vm_gw", get_gateway(result["primary_ip4"]["address"]))
+            replace_text_in_file(curDir + "/main.tf" , "@@@vm_name", result["name"])
+            replace_text_in_file(curDir + "/vars.tf" , "@@@vm_name", result["name"])
+            replace_text_in_file(curDir + "/vars.tf" , "@@@unpriv", str(result["custom_fields"]["unpriv"]).lower())
+            replace_text_in_file(curDir + "/vars.tf" , "@@@vmid", result["custom_fields"]["vmid"])                                    
             replace_text_in_file(curDir + "/vars.tf" , "@@@vm_ip", result["primary_ip4"]["address"])
             replace_text_in_file(curDir + "/vars.tf" , "@@@pve_node", result["device"]["name"])
             replace_text_in_file(curDir + "/vars.tf" , "@@@cores", str(result["vcpus"]))
