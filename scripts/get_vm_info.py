@@ -90,9 +90,12 @@ for result in data["results"]:
             shutil.copy(gitDir + '/main.template', curDir + '/main.tf')
             shutil.copy(os.path.join(gitDir, 'vars.template'), os.path.join(curDir, 'vars.tf'))
             
-            moduleLine = "module \"" + result["name"] + "\" { source = \"/home/kevin/terraform/vms/" + result["name"] + "\" }"
-            with open(gitDir + '/main.tf', 'a') as file:
-                file.write(moduleLine + '\n')
+
+            # adds as a module to the main.tf file only if the vm is marked as active
+            if result['status']['value'] == 'active':
+                moduleLine = "module \"" + result["name"] + "\" { source = \"/home/kevin/terraform/vms/" + result["name"] + "\" }"
+                with open(gitDir + '/main.tf', 'a') as file:
+                    file.write(moduleLine + '\n')
                 
                     
             ###adds a line if NFS is needed
