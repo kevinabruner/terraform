@@ -44,7 +44,7 @@ resource "proxmox_lxc" "@@@vm_name" {
     memory = var.memory    
     vmid = var.vmid
     
-    ssh_public_keys = <<-EOT    
+    ssh_public_keys =<<-EOT    
         ssh-ed25519 b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZWQyNTUxOQAAACAEO+Qp38YjBnm4/+yEePgv+fQDEEjDklKHso4au2gzOAAAAKDH7uJLx+7iSwAAAAtzc2gtZWQyNTUxOQAAACAEO+Qp38YjBnm4/+yEePgv+fQDEEjDklKHso4au2gzOAAAAEA9CsyKpFzb9JJLCODL7QjQQ1nvY2xFHvFqIc+LU/kaNgQ75CnfxiMGebj/7IR4+C/59AMQSMOSUoeyjhq7aDM4AAAAGGtldmluLmEuYnJ1bmVyQGdtYWlsLmNvbQECAwQF kevin
       EOT
 }
