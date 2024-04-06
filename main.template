@@ -22,8 +22,9 @@ resource "proxmox_lxc" "@@@vm_name" {
     }
     hostname = var.vm_name
     network {
-        name = "net0"
+        name = "eth0"
         bridge = "vmbr0"
+        gw = var.vm_gw
         ip = var.vm_ip
         ip6 = "dhcp"
     }
