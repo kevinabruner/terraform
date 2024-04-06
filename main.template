@@ -23,19 +23,25 @@ resource "proxmox_vm_qemu" "@@@vm_name" {
         bridge = "vmbr0"                        
         link_down = false
         firewall = false
-        model = "e1000"
+        model = "virtio"
         @@@vlan
-    }
-    rootfs {
-        storage = "ceph"
-        size    = var.storage
-    }
+    }    
     iso = "truenas-nfs:ubuntu-22.04.2-live-server-amd64.iso"    
     pool = var.vm_pool
     target_node = var.pve_node    
     cores = var.cores
     memory = var.memory    
     vmid = var.vmid
-        
+    
+    scsihw = "virtio-scsi-pci"
+    bootdisk = "scsi0"
+    disk {
+      slot = 0    
+      size = "var.storage"
+      type = "scsi"
+      storage = "ceph"
+      iothread = 1
+    }
+  
 }
 
