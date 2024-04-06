@@ -26,7 +26,7 @@ resource "proxmox_vm_qemu" "@@@vm_name" {
         model = "virtio"
         @@@vlan
     }    
-    clone = "8000"
+    clone = "ubuntu-cloud"
     pool = var.vm_pool
     target_node = var.pve_node    
     cores = var.cores
