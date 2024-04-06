@@ -2,6 +2,7 @@
 import requests
 import os
 import shutil
+import ipaddress
 
 
 def truncate_file_after_marker(file_path, marker):
@@ -64,6 +65,26 @@ all_vms = {"vm_results": []}
 
 truncate_file_after_marker(gitDir + '/main.tf', '###generated###')
 
+
+
+
+def get_gateway(ip_string):
+    try:
+        ip_network = ipaddress.ip_network(ip_string, strict=False)
+        # Check if the IP address is in the correct format (e.g., 192.168.x.x/24)
+        if ip_network.version == 4:
+            parts = ip_string.split('.')
+            subnet = parts[2]
+            gateway = f"{parts[0]}.{parts[1]}.{subnet}.1"
+            return gateway
+        else:
+            raise ValueError("Invalid IPv4 address format")
+    except ValueError as e:
+        print(f"Error: {e}")
+        return None
+
+
+
 for result in data["results"]:    
     if result["primary_ip4"]:
         curDir = gitDir + '/vms/' + result["name"]
@@ -82,7 +103,11 @@ for result in data["results"]:
             moduleLine = "module \"" + result["name"] + "\" { source = \"/home/kevin/terraform/vms/" + result["name"] + "\" }"
             with open(gitDir + '/main.tf', 'a') as file:
                 file.write(moduleLine + '\n')
+                
 
+            # Example usage:            
+                                    
+            replace_text_in_file(curDir + "/vars.tf" , "@@@vm_gw", get_gateway(result["primary_ip4"]))
 
             replace_text_in_file(curDir + "/main.tf" , "@@@vm_name", result["name"])
             replace_text_in_file(curDir + "/vars.tf" , "@@@vm_name", result["name"])
