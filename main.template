@@ -30,11 +30,9 @@ resource "proxmox_vm_qemu" "@@@vm_name" {
         storage = "ceph"
         size    = var.storage
     }
-    iso = "truenas-nfs:ubuntu-22.04.2-live-server-amd64.iso"
-    password = var.password
+    iso = "truenas-nfs:ubuntu-22.04.2-live-server-amd64.iso"    
     pool = var.vm_pool
-    target_node = var.pve_node
-    unprivileged = var.unpriv
+    target_node = var.pve_node    
     cores = var.cores
     memory = var.memory    
     vmid = var.vmid
