@@ -6,6 +6,8 @@ terraform {
     }
   }
 }
+  
+
 
 provider "proxmox" {  
   pm_api_url = "https://pve.thejfk.ca/api2/json"    
@@ -42,23 +44,18 @@ resource "proxmox_lxc" "@@@vm_name" {
     memory = var.memory    
     vmid = var.vmid
     
-    disk {
-      type    = "scsi"
-      media   = "cdrom"
-      storage = local.iso_storage_pool
-      volume  = proxmox_cloud_init_disk.ci.id
-      size    = proxmox_cloud_init_disk.ci.size
-    }
+    ssh_public_keys = <<-EOT    
+        ssh-ed25519 b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZWQyNTUxOQAAACAEO+Qp38YjBnm4/+yEePgv+fQDEEjDklKHso4au2gzOAAAAKDH7uJLx+7iSwAAAAtzc2gtZWQyNTUxOQAAACAEO+Qp38YjBnm4/+yEePgv+fQDEEjDklKHso4au2gzOAAAAEA9CsyKpFzb9JJLCODL7QjQQ1nvY2xFHvFqIc+LU/kaNgQ75CnfxiMGebj/7IR4+C/59AMQSMOSUoeyjhq7aDM4AAAAGGtldmluLmEuYnJ1bmVyQGdtYWlsLmNvbQECAwQF kevin@jfkhome
+    EOT
 }
 
-locals {
-  vm_name          = "@@@vm_name"
+locals {  
   pve_node         = "var.vm_pool"
   iso_storage_pool = "truenas-nfs"
 }
 
 resource "proxmox_cloud_init_disk" "ci" {
-  name      = local.vm_name
+  name      = "@@@vm_name"
   pve_node  = local.pve_node
   storage   = local.iso_storage_pool
 
