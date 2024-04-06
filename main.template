@@ -15,7 +15,7 @@ provider "proxmox" {
 }
 
 resource "proxmox_lxc" "@@@vm_name" {
-    count = 1
+    count = @@@count
     features {
         nesting = true
         @@@nfs
