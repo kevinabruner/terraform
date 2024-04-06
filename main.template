@@ -21,7 +21,7 @@ resource "proxmox_vm_qemu" "@@@vm_name" {
     name = var.vm_name
     network {        
         bridge = "vmbr0"                        
-        link_down false
+        link_down = false
         firewall = false
         model = "e1000"
         @@@vlan
