@@ -37,7 +37,7 @@ resource "proxmox_vm_qemu" "@@@vm_name" {
     bootdisk = "scsi0"
     disk {
       slot = 0    
-      size = "var.storage"
+      size = var.storage
       type = "scsi"
       storage = "ceph"
       iothread = 1
