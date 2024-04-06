@@ -49,39 +49,3 @@ resource "proxmox_lxc" "@@@vm_name" {
     EOT
 }
 
-locals {  
-  pve_node         = "var.vm_pool"
-  iso_storage_pool = "truenas-nfs"
-}
-
-resource "proxmox_cloud_init_disk" "ci" {
-  name      = "@@@vm_name"
-  pve_node  = local.pve_node
-  storage   = local.iso_storage_pool
-
-  meta_data = yamlencode({
-    instance_id    = sha1(local.vm_name)
-    local-hostname = local.vm_name
-  })
-
-  user_data = <<EOT
-#cloud-config
-users:
-  - kevin
-ssh_authorized_keys:
-  - ssh-rsa b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
-QyNTUxOQAAACAEO+Qp38YjBnm4/+yEePgv+fQDEEjDklKHso4au2gzOAAAAKDH7uJLx+7i
-SwAAAAtzc2gtZWQyNTUxOQAAACAEO+Qp38YjBnm4/+yEePgv+fQDEEjDklKHso4au2gzOA
-AAAEA9CsyKpFzb9JJLCODL7QjQQ1nvY2xFHvFqIc+LU/kaNgQ75CnfxiMGebj/7IR4+C/5
-9AMQSMOSUoeyjhq7aDM4AAAAGGtldmluLmEuYnJ1bmVyQGdtYWlsLmNvbQECAwQF
-
-EOT
-
-  network_config = yamlencode({
-    version = 1
-    config = [{
-      type = "physical"
-      name = "eth0"      
-    }]
-  })
-}
