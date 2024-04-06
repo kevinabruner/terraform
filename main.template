@@ -19,13 +19,11 @@ provider "proxmox" {
 resource "proxmox_vm_qemu" "@@@vm_name" {
     count = @@@count    
     name = var.vm_name
-    network {
-        name = "eth0"
-        bridge = "vmbr0"
-        gw = var.vm_gw  
-        ip = var.vm_ip
-        ip6 = "dhcp"
+    network {        
+        bridge = "vmbr0"                        
         link_down false
+        firewall = false
+        model = "e1000"
         @@@vlan
     }
     rootfs {
