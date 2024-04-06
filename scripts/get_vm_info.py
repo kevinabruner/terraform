@@ -107,7 +107,7 @@ for result in data["results"]:
 
             # Example usage:            
                                     
-            replace_text_in_file(curDir + "/vars.tf" , "@@@vm_gw", get_gateway(result["primary_ip4"]))
+            replace_text_in_file(curDir + "/vars.tf" , "@@@vm_gw", get_gateway(result["primary_ip4"]["address"]))
 
             replace_text_in_file(curDir + "/main.tf" , "@@@vm_name", result["name"])
             replace_text_in_file(curDir + "/vars.tf" , "@@@vm_name", result["name"])
