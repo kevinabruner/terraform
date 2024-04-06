@@ -41,13 +41,4 @@ resource "proxmox_lxc" "@@@vm_name" {
     cores = var.cores
     memory = var.memory    
     vmid = var.vmid
-    script {
-      content = <<-EOF
-      #!/bin/bash
-      useradd -m -s /bin/bash kevin
-      echo 'kevin:obo74Cle' | chpasswd
-      usermod -aG sudo newuser
-      
-      EOF
-    }
 }
