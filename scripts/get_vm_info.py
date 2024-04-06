@@ -4,7 +4,7 @@ import os
 import shutil
 import ipaddress
 
-
+ 
 def get_gateway(ip_string): 
     ip_network = ipaddress.ip_network(ip_string, strict=False)
     # Check if the IP address is in the correct format (e.g., 192.168.x.x/24)
@@ -84,7 +84,7 @@ for result in data["results"]:
                      
         os.mkdir(curDir)                                    
 
-        if result["custom_fields"]['VMorContainer'][0] == "ct":
+        if result["custom_fields"]['VMorContainer'][0] == "vm":
                     
             # Copy and rename the template files
             shutil.copy(gitDir + '/main.template', curDir + '/main.tf')

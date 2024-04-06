@@ -16,26 +16,23 @@ provider "proxmox" {
   pm_tls_insecure = false
 }
 
-resource "proxmox_lxc" "@@@vm_name" {
-    count = @@@count
-    features {
-        nesting = true
-        @@@nfs
-    }
-    hostname = var.vm_name
+resource "proxmox_vm_qemu" "@@@vm_name" {
+    count = @@@count    
+    name = var.vm_name
     network {
         name = "eth0"
         bridge = "vmbr0"
         gw = var.vm_gw  
         ip = var.vm_ip
         ip6 = "dhcp"
+        link_down false
         @@@vlan
     }
     rootfs {
         storage = "ceph"
         size    = var.storage
     }
-    ostemplate = "truenas-nfs:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
+    iso = "truenas-nfs:ubuntu-22.04.2-live-server-amd64.iso"
     password = var.password
     pool = var.vm_pool
     target_node = var.pve_node
