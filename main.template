@@ -27,6 +27,7 @@ resource "proxmox_lxc" "@@@vm_name" {
         gw = var.vm_gw  
         ip = var.vm_ip
         ip6 = "dhcp"
+        @@@vlan
     }
     rootfs {
         storage = "ceph"

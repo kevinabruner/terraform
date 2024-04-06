@@ -107,9 +107,9 @@ for result in data["results"]:
 
             ###adds a line if there is a vlan tag
             if result["custom_fields"]["vlan"]:
-                print(f'vlan: {result["custom_fields"]["vlan"]}')
-                vlanId = str(result["custom_fields"]["vlan"]["vid"])
                 
+                vlanId = str(result["custom_fields"]["vlan"])
+                print(f'vlan: {vlanId}')
                 replace_text_in_file(curDir + "/main.tf" , "@@@vlan", "tag = \"" + vlanId + "\"")   
             else:
                 replace_text_in_file(curDir + "/main.tf" , "@@@vlan", "")               
