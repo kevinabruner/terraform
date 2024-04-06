@@ -45,3 +45,47 @@ resource "proxmox_vm_qemu" "@@@vm_name" {
   
 }
 
+resource "proxmox_cloud_init_disk" "ci" {
+  name      = var.vm_name
+  pve_node  = var.pve_node    
+  storage   = "truenas-nfs"
+
+  meta_data = yamlencode({
+    instance_id    = sha1(var.vm_name)
+    local-hostname = var.vm_name
+  })
+
+  user_data = <<EOT
+#cloud-config
+users:
+  - default
+ssh_authorized_keys:
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDCfKdycPd96nMVRwU166yImlMSlgjlClJP/JpDx6fUx4xECkpxfiRWyBELTmyFp1loC0ABLL6p86GQEeriABsuOkb9zwOiUTxvJEfwuVPKULvE3kt0nZrQQd0KpGFZ2qbhlTNAUVshU0eYGONevh9AwvjkGLZxakiwIl0XF1X/RzbotYmT7D4hA7yy2/8I97hMTL7a5xSLNMJpfd6rNzq9GwX/o4b06iJjlkyMmgUJevWst4ATb9XAgkJwuuPjXM9dSJi5MwjWYkwH0zCJvutPJ5Z28oy7M1R3+oCbGh+7xNmcOhrCcceV4Z5sq3uYOy/kRR3osCU2pFgirs9TxPwqLHTTiPlcxOvAaACNK9tQDSqI+XwNecBKt4NgvbavI4WgcilqAe3lmUlMskJllEwUi3QrnSGP53LaHu2PRxrPTLfLZI5DKReKzB29FE7ZsMiOCbcTB4SJrBRmxfVB7VSNepqqmLh3RyHb0vRWidKshsz9PXb1Zynpn7nGcbMKxFE= kevin@ansible
+EOT
+
+  network_config = yamlencode({
+    version = 1
+    config = [{
+      type = "physical"
+      name = "eth0"
+      subnets = [{
+        type            = "static"
+        address         = var.vm_ip
+        gateway         = var.vm_gw
+        dns_nameservers = ["192.168.11.90", "192.168.11.91","192.168.11.92"]
+      }]
+    }]
+  })
+}
+
+resource "proxmox_vm_qemu" "vm" {
+
+  // Define a disk block with media type cdrom which reference the generated cloud-init disk
+  disk {
+    type    = "scsi"
+    media   = "cdrom"
+    storage = "truenas-nfs"
+    volume  = proxmox_cloud_init_disk.ci.id
+    size    = proxmox_cloud_init_disk.ci.size
+  }
+}
