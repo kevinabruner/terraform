@@ -106,7 +106,7 @@ nmXAeOxmsXYcsAAAAOcm9vdEB0ZXJyYWZvcm0BAgMEBQ==
 EOF
 
   os_type   = "cloud-init"
-  ipconfig0 = "ip=var.vm_ip,gw=var.vm_gw"
+  ipconfig0 = "ip=${var.vm_ip},gw=${var.vm_gw}"
 
   /*
     sshkeys and other User-Data parameters are specified with a custom config file.
