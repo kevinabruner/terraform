@@ -37,3 +37,6 @@ variable "nfs" {
 variable "working_directory" {
     default = "truenas-nfs"
 }
+variable "ssh_public_key" {
+    default = "AAAAB3NzaC1yc2EAAAADAQABAAABgQDCfKdycPd96nMVRwU166yImlMSlgjlClJP/JpDx6fUx4xECkpxfiRWyBELTmyFp1loC0ABLL6p86GQEeriABsuOkb9zwOiUTxvJEfwuVPKULvE3kt0nZrQQd0KpGFZ2qbhlTNAUVshU0eYGONevh9AwvjkGLZxakiwIl0XF1X/RzbotYmT7D4hA7yy2/8I97hMTL7a5xSLNMJpfd6rNzq9GwX/o4b06iJjlkyMmgUJevWst4ATb9XAgkJwuuPjXM9dSJi5MwjWYkwH0zCJvutPJ5Z28oy7M1R3+oCbGh+7xNmcOhrCcceV4Z5sq3uYOy/kRR3osCU2pFgirs9TxPwqLHTTiPlcxOvAaACNK9tQDSqI+XwNecBKt4NgvbavI4WgcilqAe3lmUlMskJllEwUi3QrnSGP53LaHu2PRxrPTLfLZI5DKReKzB29FE7ZsMiOCbcTB4SJrBRmxfVB7VSNepqqmLh3RyHb0vRWidKshsz9PXb1Zynpn7nGcbMKxFE="
+}
