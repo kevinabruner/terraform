@@ -88,13 +88,11 @@ for result in data["results"]:
         os.mkdir(curDir)                                    
 
         if result["custom_fields"]['VMorContainer'][0] == "vm":
-
-            os.mkdir(curDir + "/files")                                    
+            
 
             # Copy and rename the template files
             shutil.copy(gitDir + '/main.template', curDir + '/main.tf')
-            shutil.copy(os.path.join(gitDir, 'vars.template'), os.path.join(curDir, 'vars.tf'))
-            shutil.copy(gitDir + '/cloud-init.cloud_config.template', curDir + '/files/cloud-init.cloud_config.tftpl')
+            shutil.copy(os.path.join(gitDir, 'vars.template'), os.path.join(curDir, 'vars.tf'))            
                         
                         
             moduleLine = "module \"" + result["name"] + "\" { source = \"/home/kevin/terraform/vms/" + result["name"] + "\" }"
