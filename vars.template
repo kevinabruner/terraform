@@ -34,3 +34,6 @@ variable "unpriv" {
 variable "nfs" {
     default = "@@@nfs"
 }
+variable "working_directory" {
+    default = "truenas-nfs"
+}
