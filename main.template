@@ -32,8 +32,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   # The destination resource pool for the new VM
 #  pool = var.vm_pool
 
-  disk {
-    id = 0
+  disk {    
     type = "virtio"
     storage = "ceph"
     storage_type = "directory"
