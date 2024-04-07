@@ -33,7 +33,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   # The destination resource pool for the new VM
 #  pool = var.vm_pool
 
-  
+  scsihw  = virtio-scsi-pci
   cores   = var.cores
   sockets = 1
   memory  = var.memory  
