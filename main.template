@@ -34,8 +34,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
 
   disk {    
     type = "virtio"
-    storage = "ceph"
-    storage_type = "directory"
+    storage = "ceph"    
     size = "${var.storage}G"
   }
   cores   = var.cores
