@@ -42,7 +42,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   disks {
     scsi {
       scsi0 {    
-        storage = "ceph:vm-${var.vmid}-disk-0"
+        target = "ceph:vm-${var.vmid}-disk-0"
       }
     }    
   }
