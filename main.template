@@ -93,7 +93,7 @@ EOF
   */
   cicustom                = "user=truenas-nfs:snippets/user_data_vm-0.yml"
   /* Create the Cloud-Init drive on the "local-lvm" storage */
-  cloudinit_cdrom_storage = "truenas-nfs"
+  cloudinit_cdrom_storage = "ceph"
 
   provisioner "remote-exec" {
     inline = [
