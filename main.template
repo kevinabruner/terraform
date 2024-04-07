@@ -18,8 +18,6 @@ provider "proxmox" {
 
 
 
-
-
 # Modify path for templatefile and use the recommended extention of .tftpl for syntax hylighting in code editors.
 resource "local_file" "cloud_init_user_data_file" {
   count    = @@@count
