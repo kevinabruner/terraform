@@ -39,16 +39,14 @@ resource "proxmox_vm_qemu" @@@vm_name {
     size = "${var.storage}G"
   }
 
- disks {
+  disks {
     scsi {
-      scsi0 {
-        passthrough {
-          
-        }
-      }            
+      scsi0 {    
+        storage = "ceph:vm-${var.vmid}-disk-0"
+      }
     }    
   }
-
+  
   scsihw  = "virtio-scsi-pci"
   cores   = var.cores
   sockets = 1
