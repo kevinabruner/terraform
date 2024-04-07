@@ -19,46 +19,6 @@ provider "proxmox" {
 
 
 
-/* Uses Cloud-Init options from Proxmox 5.2 */
-resource "proxmox_vm_qemu" "cloudinit-test" {
-  name        = var.vm_name
-  desc        = "tf description"
-  target_node = var.pve_node
-
-  clone = "ubuntu-cloud"
-
-  # The destination resource pool for the new VM
-  pool = "var.vm_pool"
-
-  storage = "ceph"
-  cores   = var.cores
-  sockets = 1
-  memory  = var.memory
-  disk_gb = var.storage
-  nic     = "virtio"
-  bridge  = "vmbr0"
-
-  ssh_user        = "root"
-  ssh_private_key = <<EOF
------BEGIN RSA PRIVATE KEY-----
-private ssh key root
------END RSA PRIVATE KEY-----
-EOF
-
-  os_type   = "cloud-init"
-  ipconfig0 = "ip=var.vm_ip,gw=var.vm_gw"
-
-  sshkeys = <<EOF
-ssh-rsa AABB3NzaC1kj...key1
-ssh-rsa AABB3NzaC1kj...key2
-EOF
-
-  provisioner "remote-exec" {
-    inline = [
-      "ip a"
-    ]
-  }
-}
 
 # Modify path for templatefile and use the recommended extention of .tftpl for syntax hylighting in code editors.
 resource "local_file" "cloud_init_user_data_file" {
