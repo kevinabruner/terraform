@@ -41,7 +41,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   cores   = var.cores
   sockets = 1
   memory  = var.memory  
-  nic     = "virtio"
+  nic     = "virtio"  
   bridge  = "vmbr0"
 
   ssh_user        = "root"
