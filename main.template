@@ -93,8 +93,7 @@ EOF
     sshkeys and other User-Data parameters are specified with a custom config file.
     In this example each VM has its own config file, previously generated and uploaded to
     the snippets folder in the local storage in the Proxmox VE server.
-  */
-  cicustom                = "user=truenas-nfs:snippets/user_data_vm-0.yml"
+  */  
   /* Create the Cloud-Init drive on the "local-lvm" storage */
   cloudinit_cdrom_storage = "ceph"
 
