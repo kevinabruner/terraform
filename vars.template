@@ -41,7 +41,7 @@ variable "nfs" {
     default = "@@@nfs"
 }
 variable "working_directory" {
-    default = "@@@curDir"
+    default = "/mnt/pve/truenas-nfs"
 }
 variable "ssh_public_key" {
     default = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDkRH2ABxOmqv18QuQKQ8+EwVKIJjcSICnIj1R1LKvuq66ka4VcTzQpFDHCXyqCnElNJTILC1p0l3JrqAyrR1fq8PR8z9kKtyjTof7C3GzbslhtbA0NQvkyHflnj+zySohZzqLvk1zYpGUelQWXWD9ZSMmM5O4fY+wtECV3D7tA01rqFuBSCv4R/5FODtIX5V9gMrZHG8MqeBuZo31xIW00M4Nfvv1/ED1EvR+02pmUgl55IRcfG1RJ/QbeKNpzlXVXoYPFTD7xeY0kq9Yi1vtWdF01TWLPhJDSqkdOLvXL6GEVuZ/jh7Bt/AQe9RS0wM3n0GLqL0oRMqnLsV0+03WQhWqN4rbMv9iFQ4ueG+WXQDLuGLR1iRVm9i1OdQyF9O8uFCKVLXxhNXgDghqFXsDDxwWGbWwCwdWypwa2bLC9IiXYOLR1xee8SxMrF51CGwTbK1gJfr5Z0dqRN4ppFrn5e5o2gnUNG21TJtrPDnYOVHrM81hvrKxD5GKxwAMTig0= root@terraform"
