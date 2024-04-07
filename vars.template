@@ -29,7 +29,7 @@ variable "vmid" {
     default = "@@@vmid"
 }
 variable "storage" {
-    default = "@@@storageG"
+    default = "@@@storage"
 }
 variable "unpriv" {
     default = "@@@unpriv"
