@@ -93,11 +93,6 @@ EOF
   /* Create the Cloud-Init drive on the "local-lvm" storage */
   cloudinit_cdrom_storage = "truenas-nfs"
 
-  provisioner "remote-exec" {
-    inline = [
-      "ip a"
-    ]
-  }
 }
 
 
