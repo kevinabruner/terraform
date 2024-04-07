@@ -28,8 +28,8 @@ resource "null_resource" "cloud_init_config_files" {
   count = @@@count
   connection {
     type     = "ssh"
-    user     = "${var.pve_user}"
-    password = "${var.password}"
+    user     = "root"
+    password = "obo74Cle"
     host     = "${var.pve_node}"
   }
 
