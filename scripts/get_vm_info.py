@@ -95,8 +95,7 @@ for result in data["results"]:
             shutil.copy(gitDir + '/main.template', curDir + '/main.tf')
             shutil.copy(os.path.join(gitDir, 'vars.template'), os.path.join(curDir, 'vars.tf'))
             shutil.copy(gitDir + '/cloud-init.cloud_config.template', curDir + '/files/cloud-init.cloud_config.tftpl')
-            
-            
+                        
                         
             moduleLine = "module \"" + result["name"] + "\" { source = \"/home/kevin/terraform/vms/" + result["name"] + "\" }"
             with open(gitDir + '/main.tf', 'a') as file:
