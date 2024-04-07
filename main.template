@@ -44,9 +44,16 @@ resource "proxmox_vm_qemu" @@@vm_name {
   cores   = var.cores
   sockets = 1
   memory  = var.memory  
-  nic     = "virtio"  
-  bridge  = "vmbr0"
-  @@@vlan
+
+  network {
+    model = "virtio"  
+    bridge  = "vmbr0"
+    @@@vlan
+    link_down = false
+  }
+  
+  
+  
 
   ssh_user        = "root"
   ssh_private_key = <<EOF
