@@ -52,7 +52,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   clone = "ubuntu-cloud"
 
   # The destination resource pool for the new VM
-  pool = var.vm_pool
+#  pool = var.vm_pool
 
   storage = "ceph"
   cores   = var.cores
