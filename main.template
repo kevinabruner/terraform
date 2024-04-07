@@ -19,22 +19,6 @@ provider "proxmox" {
 
 
 
-
-resource "null_resource" "cloud_init_config_files" {
-  count = @@@count
-  connection {
-    type     = "ssh"
-    user     = "root"
-    password = "obo74Cle"
-    host     = "${var.pve_node}"
-  }
-
-  provisioner "file" {
-    source      = local_file.cloud_init_user_data_file[0].filename
-    destination = "/mnt/pve/truenas-nfs/snippets/user_data_vm-0.yml"
-  } 
-}
-
 /* Configure Cloud-Init User-Data with custom config file */
 resource "proxmox_vm_qemu" @@@vm_name {
   depends_on = [
