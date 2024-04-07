@@ -39,6 +39,16 @@ resource "proxmox_vm_qemu" @@@vm_name {
     size = "${var.storage}G"
   }
 
+ disks {
+    scsi {
+      scsi0 {
+        passthrough {
+          
+        }
+      }            
+    }    
+  }
+
   scsihw  = "virtio-scsi-pci"
   cores   = var.cores
   sockets = 1
@@ -89,7 +99,7 @@ nmXAeOxmsXYcsAAAAOcm9vdEB0ZXJyYWZvcm0BAgMEBQ==
 -----END RSA PRIVATE KEY-----
 EOF
 
-  os_type   = "cloud-init"
+  os_type   = "ubuntu"
   ipconfig0 = "ip=${var.vm_ip},gw=${var.vm_gw}"
 
   /*
