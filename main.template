@@ -17,7 +17,6 @@ provider "proxmox" {
 }
 
 
-
 # Modify path for templatefile and use the recommended extention of .tftpl for syntax hylighting in code editors.
 resource "local_file" "cloud_init_user_data_file" {
   count    = @@@count
@@ -63,7 +62,7 @@ resource "proxmox_vm_qemu" "cloudinit-test" {
   nic     = "virtio"
   bridge  = "vmbr0"
 
-  ssh_user        = "root"
+  ssh_user        = "kevin"
   ssh_private_key = <<EOF
 -----BEGIN RSA PRIVATE KEY-----
 private ssh key root
