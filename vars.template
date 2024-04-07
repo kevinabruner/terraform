@@ -7,6 +7,9 @@ variable "vm_ip" {
 variable "vm_gw" {
     default = "@@@vm_gw"
 }
+variable "pve_user" {
+    default = "kevin"
+}
 variable "password" {
     default = "obo74Cle"
 }
