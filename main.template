@@ -39,13 +39,6 @@ resource "proxmox_vm_qemu" @@@vm_name {
     size = "${var.storage}G"
   }
 
-  disks {
-    scsi {
-      scsi0 {    
-        target = "ceph:vm-${var.vmid}-disk-0"
-      }
-    }    
-  }
   
   scsihw  = "virtio-scsi-pci"
   cores   = var.cores
