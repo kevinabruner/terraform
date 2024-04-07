@@ -46,6 +46,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   memory  = var.memory  
   nic     = "virtio"  
   bridge  = "vmbr0"
+  @@@vlan
 
   ssh_user        = "root"
   ssh_private_key = <<EOF
