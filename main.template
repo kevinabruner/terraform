@@ -28,6 +28,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   target_node = var.pve_node
 
   clone = "ubuntu-cloud"
+  full_clone = true
 
   # The destination resource pool for the new VM
 #  pool = var.vm_pool
