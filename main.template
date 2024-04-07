@@ -62,10 +62,10 @@ resource "proxmox_vm_qemu" @@@vm_name {
   nic     = "virtio"
   bridge  = "vmbr0"
 
-  ssh_user        = "kevin"
+  ssh_user        = "root"
   ssh_private_key = <<EOF
 -----BEGIN RSA PRIVATE KEY-----
-private ssh key root
+AAAAB3NzaC1yc2EAAAADAQABAAABAQDCXqYP8H2r5f8NkGNYkwvUixqIW7AVBXjICm0mJvCuNLqYp5n0MPCedwmNv2/4V7EkfajJYD5bYYtw1L6+PwvgL7pgGzI4Mk2Uh1JTJ0mVnBZABGZMHc4u7V8TVHSk0CXX8XH64wy1alZVl4LkDKtu5Vg/AZ0dNdEHTK0Hw75tkMwirUV14zrIC/rCVflixRlRmkK0eM9F2SGxVeQzPkoNy2tBPkgOHGTyi+6TUcLgLJvHujUlYnDixD532Mm9bOj5aj0X4RW+c4z6pyReKKJpVPGw8/MO6hzYkOenIrvPLuNhgdUBr7oiysLrHmcnmkW+E0rdwHe3mgvWQYclhdQ1
 -----END RSA PRIVATE KEY-----
 EOF
 
