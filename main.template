@@ -38,7 +38,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
       virtio1{
         disk{                
           backup = true          
-          size = 10
+          size = var.storage
           storage = "ceph"
         }
       }
