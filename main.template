@@ -36,6 +36,10 @@ resource "proxmox_vm_qemu" @@@vm_name {
   disks {    
     sata{
       sata0{                
+        backup = true
+        iothread = virtio
+        size = 10
+        storage = "ceph"
       }
     }
   }
