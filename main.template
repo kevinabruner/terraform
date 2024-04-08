@@ -35,8 +35,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
 
   disks {    
     sata{
-      sata0{
-        type = "virtio"
+      sata0{        
         storage = "ceph"    
         size = "${var.storage}"
       }
