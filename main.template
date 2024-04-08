@@ -43,6 +43,9 @@ resource "proxmox_vm_qemu" @@@vm_name {
         }
       }
     }
+    passthrough{
+
+    }
   }
 
   
@@ -118,7 +121,7 @@ EOF
 
   provisioner "remote-exec" {
     inline = [
-      "ip a"
+      "pve.jfkhome
     ]
   }
 }
