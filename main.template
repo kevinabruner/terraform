@@ -50,8 +50,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   sockets = 1
   memory  = var.memory  
 
-  network {
-    iothread = "virtio"  
+  network {    
     bridge  = "vmbr0"
     @@@vlan
     link_down = false
