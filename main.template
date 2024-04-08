@@ -51,6 +51,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   memory  = var.memory  
 
   network {    
+    model = 'virtio'
     bridge  = "vmbr0"
     @@@vlan
     link_down = false
