@@ -35,11 +35,13 @@ resource "proxmox_vm_qemu" @@@vm_name {
 
   disks {    
     virtio{
-      disk{                
-        backup = true
-        iothread = virtio
-        size = 10
-        storage = "ceph"
+      virtio1{
+        disk{                
+          backup = true
+          iothread = virtio
+          size = 10
+          storage = "ceph"
+        }
       }
     }
   }
