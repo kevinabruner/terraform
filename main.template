@@ -35,7 +35,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
 
   disks {    
     sata{
-      ide0{                
+      virtio{                
         backup = true
         iothread = virtio
         size = 10
