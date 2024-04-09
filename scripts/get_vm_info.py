@@ -103,6 +103,7 @@ for vm in vms["results"]:
             
             #get the interface and then it's mac address
             interface = et_phone_home(f'http://netbox.thejfk.ca/api/virtualization/interfaces/{vm["id"]}]')
+            print(interface)
             mac_address = interface['mac_address']
                                                         
             #counts of 1 for active, zero for everything else
