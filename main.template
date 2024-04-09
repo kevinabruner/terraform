@@ -31,11 +31,14 @@ resource "proxmox_vm_qemu" @@@vm_name {
  # pool = var.vm_pool
 
   
-  ##Add this back in for additional storage!!!!
-  #disks {    
-  #  virtio{
-          format = "raw"          
-          storage = "ceph"                  
+  ##existing boot disk
+  disks {    
+    scsi{
+      scsi0{
+        disk{
+          backup               = true
+          format               = "raw"          
+          storage              = "ceph"                  
           iothread             = false 
           linked_disk_id       = -1           
           readonly             = false 
