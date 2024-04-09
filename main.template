@@ -22,7 +22,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   desc        = "tf description"
   target_node = var.pve_node
   agent       = 0
-  qemu_os     = "ubuntu"
+  
 
   clone = "ubuntu-cloud"
   full_clone = true
