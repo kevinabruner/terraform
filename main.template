@@ -20,7 +20,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   vmid        = var.vmid
   name        = var.vm_name
   desc        = "tf description"
-  target_node = var.pve_node
+  #target_node = var.pve_node
   agent       = 0
 
   clone = "ubuntu-cloud"
