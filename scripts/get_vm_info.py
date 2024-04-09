@@ -72,7 +72,7 @@ gitDir="/home/kevin/terraform"
 truncate_file_after_marker(gitDir + '/main.tf', '###generated###')
    
 #ensure that the working directory exists and is empty
-workingDir='f{gitDir}/vms'
+workingDir= gitDir + '/vms'
 if os.path.exists(workingDir):
     shutil.rmtree(workingDir)                
 os.mkdir(workingDir)
