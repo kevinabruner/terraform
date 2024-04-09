@@ -6,6 +6,26 @@ terraform {
     }
   }
 }
+
+  
+##existing boot disk
+disks {    
+  scsi{
+    scsi0{
+      disk{
+        backup               = true
+        format               = "raw"          
+        storage              = "ceph"                  
+        iothread             = false           
+        readonly             = false 
+        replicate            = true 
+        size                 = var.storage
+                  
+      }
+    }
+  }    
+}
+
   
 provider "proxmox" {  
   pm_api_url = "https://pve.thejfk.ca/api2/json"    
