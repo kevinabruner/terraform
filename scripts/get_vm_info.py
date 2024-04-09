@@ -118,7 +118,6 @@ for vm in vms["results"]:
             replace_text_in_file(curDir + "/vars.tf" , "@@@vm_gw", get_gateway(vm["primary_ip4"]["address"]))
             replace_text_in_file(curDir + "/main.tf" , "@@@vm_name", vm["name"])
             replace_text_in_file(curDir + "/vars.tf" , "@@@vm_name", vm["name"])
-            replace_text_in_file(curDir + "/vars.tf" , "@@@unpriv", str(vm["custom_fields"]["unpriv"]).lower())
             replace_text_in_file(curDir + "/vars.tf" , "@@@vmid", vm["custom_fields"]["vmid"])                                    
             replace_text_in_file(curDir + "/vars.tf" , "@@@vm_ip", vm["primary_ip4"]["address"])
             replace_text_in_file(curDir + "/vars.tf" , "@@@pve_node", vm["device"]["name"])
