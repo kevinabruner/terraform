@@ -22,6 +22,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   desc        = "tf description"
   target_node = var.pve_node
   agent       = 0
+  qemu_os     = "ubuntu"
 
   clone = "ubuntu-cloud"
   full_clone = true
@@ -33,15 +34,19 @@ resource "proxmox_vm_qemu" @@@vm_name {
   ##Add this back in for additional storage!!!!
   #disks {    
   #  virtio{
-  #    virtio1{
-  #      disk{                
-  #        backup = true          
-  #        size = var.storage
-  #        storage = "ceph"
-  #      }
-  #    }
-  #  }    
-  #}
+          format = "raw"          
+          storage = "ceph"                  
+          iothread             = false 
+          linked_disk_id       = -1           
+          readonly             = false 
+          replicate            = true 
+          size                 = 0                 
+        }
+      }
+    }    
+  }
+
+  ciuser = "kevin"
 
   scsihw  = "virtio-scsi-pci"
   bootdisk = "scsi0"
