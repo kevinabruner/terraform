@@ -118,21 +118,8 @@ EOF
   
 
   os_type   = "ubuntu"
-  ipconfig0 = "ip=${var.vm_ip},gw=${var.vm_gw}"
-
-  /*
-    sshkeys and other User-Data parameters are specified with a custom config file.
-    In this example each VM has its own config file, previously generated and uploaded to
-    the snippets folder in the local storage in the Proxmox VE server.
-  */  
-  /* Create the Cloud-Init drive on the "local-lvm" storage */
-  cloudinit_cdrom_storage = "ceph"
-
-  provisioner "remote-exec" {
-    inline = [
-      "pve.jfkhome"
-    ]
-  }
+  ipconfig0 = "ip=,gw=${var.vm_gw}"
+  
 }
 
 
