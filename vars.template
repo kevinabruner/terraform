@@ -16,9 +16,6 @@ variable "pve_user" {
 variable "password" {
     default = "obo74Cle"
 }
-variable "vm_pool" {
-    default = "personal"
-}
 variable "pve_node" {
     default = "@@@pve_node"
 }
