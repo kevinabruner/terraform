@@ -42,7 +42,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
           iothread             = false           
           readonly             = false 
           replicate            = true 
-          size                 = 0                 
+                    
         }
       }
     }    
