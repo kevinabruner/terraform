@@ -34,17 +34,19 @@ resource "proxmox_vm_qemu" @@@vm_name {
   # The destination resource pool for the new VM
 #  pool = var.vm_pool
 
-  disks {    
-    virtio{
-      virtio1{
-        disk{                
-          backup = true          
-          size = var.storage
-          storage = "ceph"
-        }
-      }
-    }    
-  }
+  
+  ##Add this back in for additional storage!!!!
+  #disks {    
+  #  virtio{
+  #    virtio1{
+  #      disk{                
+  #        backup = true          
+  #        size = var.storage
+  #        storage = "ceph"
+  #      }
+  #    }
+  #  }    
+  #}
 
   
   scsihw  = "virtio-scsi-pci"
