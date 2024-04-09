@@ -7,9 +7,6 @@ variable "name" {
 variable "vm_ip" {
     default = "@@@vm_ip"
 }
-variable "vm_macaddr" {
-    default = "@@@vm_macaddr"
-}
 variable "vm_gw" {
     default = "@@@vm_gw"
 }
