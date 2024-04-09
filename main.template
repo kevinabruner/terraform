@@ -49,8 +49,8 @@ resource "proxmox_vm_qemu" @@@vm_name {
   #}
 
   
-  scsihw  = "virtio-scsi-pci"
-  bootdisk = "scsi0"
+  #scsihw  = "virtio-scsi-pci"
+  #bootdisk = "scsi0"
   cores   = var.cores
   sockets = 1
   memory  = var.memory  
