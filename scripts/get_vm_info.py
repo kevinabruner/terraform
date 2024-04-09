@@ -5,7 +5,6 @@ import shutil
 import ipaddress
 import requests
 
- 
 def get_gateway(ip_string): 
     ip_network = ipaddress.ip_network(ip_string, strict=False)
     # Check if the IP address is in the correct format (e.g., 192.168.x.x/24)
@@ -66,7 +65,6 @@ def et_phone_home(url):
     response = requests.get(url, headers=headers)
     return response.json()
 
-
 #define the terraform directory and empty the terraform configuration file
 gitDir="/home/kevin/terraform"
 truncate_file_after_marker(gitDir + '/main.tf', '###generated###')
@@ -102,8 +100,8 @@ for vm in vms["results"]:
                 file.write(moduleLine + '\n')                
             
             #get the interface and then it's mac address
-            interface = et_phone_home('http://netbox.thejfk.ca/api/virtualization/interfaces/' + str(vm["id"]))            
-            mac_address = interface['mac_address']
+            #interface = et_phone_home('http://netbox.thejfk.ca/api/virtualization/interfaces/' + str(vm["id"]))            
+            #mac_address = interface['mac_address']
                                                         
             #counts of 1 for active, zero for everything else
             if vm['status']['value'] == 'active':
@@ -126,7 +124,7 @@ for vm in vms["results"]:
 
             ###generic variable replacements
             replace_text_in_file(curDir + "/vars.tf" , "@@@curDir", curDir)            
-            replace_text_in_file(curDir + "/vars.tf" , "@@@vm_macaddr", mac_address)
+            #replace_text_in_file(curDir + "/vars.tf" , "@@@vm_macaddr", mac_address)
             replace_text_in_file(curDir + "/vars.tf" , "@@@vm_gw", get_gateway(vm["primary_ip4"]["address"]))
             replace_text_in_file(curDir + "/main.tf" , "@@@vm_name", vm["name"])
             replace_text_in_file(curDir + "/vars.tf" , "@@@vm_name", vm["name"])
