@@ -39,8 +39,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
           backup               = true
           format               = "raw"          
           storage              = "ceph"                  
-          iothread             = false 
-          linked_disk_id       = -1           
+          iothread             = false           
           readonly             = false 
           replicate            = true 
           size                 = 0                 
