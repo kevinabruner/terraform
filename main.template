@@ -55,6 +55,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
 
   network {    
     model = "virtio"
+    macaddr = var.vm_macaddr
     bridge  = "vmbr0"
     @@@vlan
     link_down = false
