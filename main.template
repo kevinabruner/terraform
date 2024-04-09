@@ -30,25 +30,6 @@ resource "proxmox_vm_qemu" @@@vm_name {
   # The destination resource pool for the new VM
  # pool = var.vm_pool
 
-  
-  ##existing boot disk
-  disks {    
-    scsi{
-      scsi0{
-        disk{
-          backup               = true
-          format               = "raw"          
-          storage              = "ceph"                  
-          iothread             = false           
-          readonly             = false 
-          replicate            = true 
-          size                 = 9
-                    
-        }
-      }
-    }    
-  }
-
 
 
   scsihw  = "virtio-scsi-pci"
