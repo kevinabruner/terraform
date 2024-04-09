@@ -118,7 +118,8 @@ EOF
   
 
   os_type   = "ubuntu"
-  ipconfig0 = "ip=,gw=${var.vm_gw}"
+  ipconfig0 = "ip=${var.vm_ip},gw=${var.vm_gw}"
+
   
 }
 
