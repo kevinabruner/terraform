@@ -6,12 +6,10 @@ import ipaddress
 import requests
 
 def get_gateway(ip_string): 
-    ip_network = ipaddress.ip_network(ip_string, strict=False)
-    # Check if the IP address is in the correct format (e.g., 192.168.x.x/24)
-    if ip_network.version == 4:
-        parts = ip_string.split('.')        
-        gateway = f"{parts[0]}.{parts[1]}.{parts[2]}.1"
-        return gateway
+    ip_network = ipaddress.ip_network(ip_string, strict=False)    
+    parts = ip_string.split('.')        
+    gateway = f"{parts[0]}.{parts[1]}.{parts[2]}.1"
+    return gateway
 
 def truncate_file_after_marker(file_path, marker):
     try:
@@ -49,8 +47,6 @@ def replace_text_in_file(file_path, old_text, new_text):
     # Write the modified content back to the file
     with open(file_path, 'w') as file:
         file.write(modified_content)
-
-
 
 def et_phone_home(url):
     # Set your token
@@ -107,13 +103,7 @@ for vm in vms["results"]:
             if vm['status']['value'] == 'active':
                 replace_text_in_file(curDir + "/main.tf" , "@@@count", "1")   
             else:
-                replace_text_in_file(curDir + "/main.tf" , "@@@count", "0")   
-            
-            ###adds a line if NFS is needed
-            if vm["custom_fields"]["nfs"]:
-                replace_text_in_file(curDir + "/main.tf" , "@@@nfs", "mount = \"nfs\"")   
-            else:
-                replace_text_in_file(curDir + "/main.tf" , "@@@nfs", "")               
+                replace_text_in_file(curDir + "/main.tf" , "@@@count", "0")                   
             
             ###adds a line if there is a vlan tag
             if vm["custom_fields"]["vlan"]:                
@@ -123,8 +113,7 @@ for vm in vms["results"]:
                 replace_text_in_file(curDir + "/main.tf" , "@@@vlan", "")               
 
             ###generic variable replacements
-            replace_text_in_file(curDir + "/vars.tf" , "@@@curDir", curDir)            
-            #replace_text_in_file(curDir + "/vars.tf" , "@@@vm_macaddr", mac_address)
+            replace_text_in_file(curDir + "/vars.tf" , "@@@curDir", curDir)                        
             replace_text_in_file(curDir + "/vars.tf" , "@@@vm_gw", get_gateway(vm["primary_ip4"]["address"]))
             replace_text_in_file(curDir + "/main.tf" , "@@@vm_name", vm["name"])
             replace_text_in_file(curDir + "/vars.tf" , "@@@vm_name", vm["name"])
