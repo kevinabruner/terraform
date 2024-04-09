@@ -65,8 +65,8 @@ resource "proxmox_vm_qemu" @@@vm_name {
   
   
   
-
-  ssh_user        = "root"
+  
+  ssh_user        = "kevin"
   ssh_private_key = <<EOF
 -----BEGIN RSA PRIVATE KEY-----
 b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn
