@@ -113,10 +113,17 @@ for vm in vms["results"]:
             else:
                 replace_text_in_file(curDir + "/main.tf" , "@@@vlan", "")               
 
+            ###adds a line if there is a pool tag
+            if vm["custom_fields"]["proxmox_pool"]:                
+                vlanId = str(vm["custom_fields"]["vlan"][0]['vid'])                
+                replace_text_in_file(curDir + "/main.tf" , "@@@vm_pool", "pool = \"" + vm["custom_fields"]["vlan"][0]['vid'] + "\"")   
+            else:
+                replace_text_in_file(curDir + "/main.tf" , "@@@vm_pool", "")               
+
             ###generic variable replacements
+            replace_text_in_file(curDir + "/main.tf" , "@@@vm_name", vm["name"])            
             replace_text_in_file(curDir + "/vars.tf" , "@@@curDir", curDir)                        
-            replace_text_in_file(curDir + "/vars.tf" , "@@@vm_gw", get_gateway(vm["primary_ip4"]["address"]))
-            replace_text_in_file(curDir + "/main.tf" , "@@@vm_name", vm["name"])
+            replace_text_in_file(curDir + "/vars.tf" , "@@@vm_gw", get_gateway(vm["primary_ip4"]["address"]))            
             replace_text_in_file(curDir + "/vars.tf" , "@@@vm_name", vm["name"])
             replace_text_in_file(curDir + "/vars.tf" , "@@@vmid", vm["custom_fields"]["vmid"])                                    
             replace_text_in_file(curDir + "/vars.tf" , "@@@vm_ip", vm["primary_ip4"]["address"])
