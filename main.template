@@ -68,6 +68,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   lifecycle {
     ignore_changes = [
       qemu_os
+      onboot
     ]
   }
 }
