@@ -41,7 +41,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   }
   
   onboot = true
-  clone = "ubuntu-cloud"
+  @@@image
   full_clone = true  
   #@@@vm_pool
   scsihw  = "virtio-scsi-pci"
