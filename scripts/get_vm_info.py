@@ -121,11 +121,13 @@ for vm in vms["results"]:
                 replace_text_in_file(curDir + "/main.tf" , "@@@vm_pool", "")               
 
             ###adds a line if there is a pool tag
-            if vm["custom_fields"]["template"]:                
+            if vm["custom_fields"]["template"]:                                
                 templateId = str(vm["custom_fields"]["template"])                
+                if templateId == "ubuntu-2204-cloud" 
+                    templateId = "ubuntu-cloud"
                 replace_text_in_file(curDir + "/main.tf" , "@@@image", "clone = \"" + vm["custom_fields"]["template"] + "\"")   
             else:
-                replace_text_in_file(curDir + "/main.tf" , "@@@image", "clone = \"ubuntu-2204-cloud\"")   
+                replace_text_in_file(curDir + "/main.tf" , "@@@image", "clone = \"ubuntu-cloud\"")   
 
             ###generic variable replacements
             replace_text_in_file(curDir + "/main.tf" , "@@@vm_name", vm["name"])            
