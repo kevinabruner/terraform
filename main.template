@@ -71,7 +71,8 @@ resource "proxmox_vm_qemu" @@@vm_name {
       qemu_os,
       onboot,
       hagroup,
-      hastate
+      hastate,
+      vm_state
     ]
   }
 }
