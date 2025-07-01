@@ -125,7 +125,7 @@ for vm in vms["results"]:
                 templateId = str(vm["custom_fields"]["template"])                
                 if templateId == "ubuntu-2204-cloud":
                     templateId = "ubuntu-cloud"
-                replace_text_in_file(curDir + "/main.tf" , "@@@image", "clone = \"" + vm["custom_fields"]["template"] + "\"")   
+                replace_text_in_file(curDir + "/main.tf" , "@@@image", "clone = \"" + templateId + "\"")   
             else:
                 replace_text_in_file(curDir + "/main.tf" , "@@@image", "clone = \"ubuntu-cloud\"")   
 
