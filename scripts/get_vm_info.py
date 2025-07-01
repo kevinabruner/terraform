@@ -123,7 +123,7 @@ for vm in vms["results"]:
             ###adds a line if there is a pool tag
             if vm["custom_fields"]["template"]:                                
                 templateId = str(vm["custom_fields"]["template"])                
-                if templateId == "ubuntu-2204-cloud" 
+                if templateId == "ubuntu-2204-cloud":
                     templateId = "ubuntu-cloud"
                 replace_text_in_file(curDir + "/main.tf" , "@@@image", "clone = \"" + vm["custom_fields"]["template"] + "\"")   
             else:
