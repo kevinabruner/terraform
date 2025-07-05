@@ -129,6 +129,11 @@ for vm in vms["results"]:
             else:
                 replace_text_in_file(curDir + "/main.tf" , "@@@image", "clone = \"ubuntu-cloud\"")   
 
+            if vm["disk"] > 1000:
+                diskSize = vm["disk"]/1000
+            else:
+                diskSize = vm["disk"]
+
             ###generic variable replacements
             replace_text_in_file(curDir + "/main.tf" , "@@@vm_name", vm["name"])            
             replace_text_in_file(curDir + "/vars.tf" , "@@@curDir", curDir)                        
@@ -139,7 +144,7 @@ for vm in vms["results"]:
             replace_text_in_file(curDir + "/vars.tf" , "@@@pve_node", vm["device"]["name"])
             replace_text_in_file(curDir + "/vars.tf" , "@@@cores", str(vm["vcpus"]))
             replace_text_in_file(curDir + "/vars.tf" , "@@@memory", str(vm["memory"]))
-            replace_text_in_file(curDir + "/vars.tf" , "@@@storage", str(vm["disk"]/1000))
+            replace_text_in_file(curDir + "/vars.tf" , "@@@storage", str(diskSize))
 
         
         
