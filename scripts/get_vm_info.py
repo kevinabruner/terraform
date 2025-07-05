@@ -139,7 +139,7 @@ for vm in vms["results"]:
             replace_text_in_file(curDir + "/vars.tf" , "@@@pve_node", vm["device"]["name"])
             replace_text_in_file(curDir + "/vars.tf" , "@@@cores", str(vm["vcpus"]))
             replace_text_in_file(curDir + "/vars.tf" , "@@@memory", str(vm["memory"]))
-            replace_text_in_file(curDir + "/vars.tf" , "@@@storage", str(vm["disk"]))
+            replace_text_in_file(curDir + "/vars.tf" , "@@@storage", str(vm["disk"]/1000))
 
         
         
