@@ -114,12 +114,10 @@ for vm in vms["results"]:
                 replace_text_in_file(curDir + "/main.tf" , "@@@vlan", "")               
 
             ###adds a line if there is a pool tag
-            if vm["custom_fields"]["proxmox_pool"]:         
-                print("found a pool")       
+            if vm["custom_fields"]["proxmox_pool"]:                         
                 vlanId = str(vm["custom_fields"]["proxmox_pool"])                
                 replace_text_in_file(curDir + "/main.tf" , "@@@vm_pool", "pool = \"" + vm["custom_fields"]["proxmox_pool"] + "\"")   
-            else:
-                print("NO pool")       
+            else:                
                 replace_text_in_file(curDir + "/main.tf" , "@@@vm_pool", "")               
 
             ###adds a line if there is a template tag
