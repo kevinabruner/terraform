@@ -60,8 +60,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   cpu {
     type = "host"
     cores   = var.cores
-    sockets = 1
-    numa = false
+    sockets = 1    
   }
 
   onboot = true
