@@ -51,6 +51,11 @@ resource "proxmox_vm_qemu" @@@vm_name {
       }
     }
   }
+
+  serial {
+    id = 0
+    type = "socket"
+  }
   
   onboot = true
   @@@image
