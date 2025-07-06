@@ -38,6 +38,13 @@ resource "proxmox_vm_qemu" @@@vm_name {
         }
       }
     }    
+    ide {
+      ide3 {
+        cloudinit {
+          storage = "ceph"
+        }
+      }
+    }
   }
   
   onboot = true
@@ -54,16 +61,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   ciuser = var.pve_user
   cipassword = var.password
 
-  disks {
-    ide {
-      ide3 {
-        cloudinit {
-          storage = "ceph"
-        }
-      }
-    }
-  }
-
+ 
   
   network {    
     model = "virtio"    
