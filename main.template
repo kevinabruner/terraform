@@ -69,6 +69,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
  
   
   network {    
+    id = 0
     model = "virtio"    
     bridge  = "vmbr0"
     @@@vlan
