@@ -114,13 +114,13 @@ for vm in vms["results"]:
                 replace_text_in_file(curDir + "/main.tf" , "@@@vlan", "")               
 
             ###adds a line if there is a pool tag
-            if vm["custom_fields"]["proxmox_pool"]:                
+            if vm["custom_fields"]["proxmox_pool"]:                         
                 vlanId = str(vm["custom_fields"]["proxmox_pool"])                
                 replace_text_in_file(curDir + "/main.tf" , "@@@vm_pool", "pool = \"" + vm["custom_fields"]["proxmox_pool"] + "\"")   
-            else:
+            else:                
                 replace_text_in_file(curDir + "/main.tf" , "@@@vm_pool", "")               
 
-            ###adds a line if there is a pool tag
+            ###adds a line if there is a template tag
             if vm["custom_fields"]["template"]:                                
                 templateId = str(vm["custom_fields"]["template"])                
                 if templateId == "ubuntu-2204-cloud":
@@ -129,10 +129,10 @@ for vm in vms["results"]:
             else:
                 replace_text_in_file(curDir + "/main.tf" , "@@@image", "clone = \"ubuntu-cloud\"")   
 
-            if vm["disk"] > 1000:
-                diskSize = vm["disk"]/1000
+            if vm["disk"] >= 1000:
+                diskSize = f'{int(vm["disk"] / 1000)}G'
             else:
-                diskSize = vm["disk"]
+                diskSize = f'{int(vm["disk"])}M'
 
             ###generic variable replacements
             replace_text_in_file(curDir + "/main.tf" , "@@@vm_name", vm["name"])            
