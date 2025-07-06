@@ -131,10 +131,10 @@ for vm in vms["results"]:
             else:
                 replace_text_in_file(curDir + "/main.tf" , "@@@image", "clone = \"ubuntu-cloud\"")   
 
-            if vm["disk"] > 1000:
-                diskSize = vm["disk"]/1000
+            if vm["disk"] >= 1000:
+                diskSize = f'{int(vm["disk"] / 1000)}G'
             else:
-                diskSize = vm["disk"]
+                diskSize = f'{int(vm["disk"])}M'
 
             ###generic variable replacements
             replace_text_in_file(curDir + "/main.tf" , "@@@vm_name", vm["name"])            
