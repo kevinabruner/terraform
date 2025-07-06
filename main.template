@@ -44,6 +44,11 @@ resource "proxmox_vm_qemu" @@@vm_name {
           storage = "ceph"
         }
       }
+      ide2{
+        cdrom{
+          passthrough = false
+        }
+      }
     }
   }
   
