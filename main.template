@@ -56,15 +56,20 @@ resource "proxmox_vm_qemu" @@@vm_name {
     id = 0
     type = "socket"
   }
-  
+  cpu{
+    cores   = var.cores
+    sockets = 1
+    type = "host"
+  }
+
   onboot = true
   @@@image
   full_clone = true  
   @@@vm_pool
   scsihw  = "virtio-scsi-pci"
   bootdisk = "scsi0"
-  cores   = var.cores
-  sockets = 1
+  
+  
   memory  = var.memory  
   os_type   = "ubuntu"
   ipconfig0 = "ip=${var.vm_ip},gw=${var.vm_gw}"
