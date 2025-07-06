@@ -53,7 +53,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   ipconfig0 = "ip=${var.vm_ip},gw=${var.vm_gw}"
   ciuser = var.pve_user
   cipassword = var.password
-  cloudinit_cdrom_storage = "ceph"
+  iso_storage_pool = "ceph"
   network {    
     model = "virtio"    
     bridge  = "vmbr0"
