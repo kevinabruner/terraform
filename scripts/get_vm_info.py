@@ -41,8 +41,6 @@ def get_vm_interfaces_with_ips(vm_name):
     return result
 
 
-
-
 def get_gateway(ip_string): 
     ip_network = ipaddress.ip_network(ip_string, strict=False)    
     parts = ip_string.split('.')        
@@ -88,7 +86,7 @@ def replace_text_in_file(file_path, old_text, new_text):
 
 def et_phone_home(url):
     # Set your token
-    TOKEN = "example"    
+    TOKEN = "18a09ac581f3b2679df0f538698e2893aac493a7"    
 
     # Set the headers
     headers = {
