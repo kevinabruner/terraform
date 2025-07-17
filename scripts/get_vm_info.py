@@ -8,7 +8,7 @@ import requests
 def get_vm_interfaces(vm_name):
     # Step 1: Find the VM by name
     vm_resp = requests.get(
-        f"{NETBOX_URL}/virtualization/virtual-machines/",
+        f"https://netbox.thejfk.ca/virtualization/virtual-machines/",
         headers=HEADERS,
         params={"name": vm_name}
     )
@@ -18,7 +18,7 @@ def get_vm_interfaces(vm_name):
 
     # Step 2: Get interfaces for the VM
     iface_resp = requests.get(
-        f"{NETBOX_URL}/virtualization/interfaces/",
+        f"https://netbox.thejfk.ca/virtualization/interfaces/",
         headers=HEADERS,
         params={"virtual_machine_id": vm_id}
     )
@@ -30,7 +30,7 @@ def get_vm_interfaces(vm_name):
     for iface in interfaces:
         iface_id = iface["id"]
         ip_resp = requests.get(
-            f"{NETBOX_URL}/ipam/ip-addresses/",
+            f"https://netbox.thejfk.ca/ipam/ip-addresses/",
             headers=HEADERS,
             params={"interface_id": iface_id}
         )
