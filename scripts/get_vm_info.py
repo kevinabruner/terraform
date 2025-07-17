@@ -123,7 +123,7 @@ for vm in vms["results"]:
                     bridge = "vmbr3"
                 }"""
                 
-                ip_addr = vm["custom_fields"]["FAST_IP"]["address"].split('/')[0]
+                ip_addr = vm["custom_fields"]["FAST_IP"]["address"]
                 fast_ip_text = f'ipconfig1 = "ip={ip_addr}"'
                 replace_text_in_file(curDir + "/main.tf", "@@@fastip", fast_ip_text)
 
