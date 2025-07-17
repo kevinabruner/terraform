@@ -96,12 +96,7 @@ for vm in vms["results"]:
             with open(gitDir + '/main.tf', 'a') as file:
                 file.write(moduleLine + '\n')    
 
-                        
-            
-            #get the interface and then it's mac address
-            #interface = et_phone_home('http://netbox.thejfk.ca/api/virtualization/interfaces/' + str(vm["id"]))            
-            #mac_address = interface['mac_address']
-                                                        
+                         
             #counts of 1 for active, zero for everything else
             if vm['status']['value'] == 'active':
                 replace_text_in_file(curDir + "/main.tf" , "@@@count", "1")   
@@ -121,13 +116,18 @@ for vm in vms["results"]:
                 tag = {vlanId}
             }}"""
 
-            if vm["interface_count"] == 2:
+            if vm["custom_fields"]["FAST_IP"]:
                 networkString += """\nnetwork {
                     id = 1
                     model = "virtio"
                     bridge = "vmbr3"
                 }"""
+                
+                replace_text_in_file(curDir + "/main.tf" , "@@@fastip", "pool = \"" + ["custom_fields"]["FAST_IP"]["address"].split('/')[0] + "\"")   
+            else:                
+                replace_text_in_file(curDir + "/main.tf" , "@@@fastip", "")       
 
+            
             ###adds a line if there is a pool tag
             if vm["custom_fields"]["proxmox_pool"]:                         
                 vlanId = str(vm["custom_fields"]["proxmox_pool"])                
