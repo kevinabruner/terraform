@@ -123,7 +123,7 @@ for vm in vms["results"]:
                     bridge = "vmbr3"
                 }"""
                 
-                replace_text_in_file(curDir + "/main.tf" , "@@@fastip", "pool = \"" + ["custom_fields"]["FAST_IP"]["address"].split('/')[0] + "\"")   
+                replace_text_in_file(curDir + "/main.tf" , "@@@fastip", "ipconfig1 = \"" + ["custom_fields"]["FAST_IP"]["address"].split('/')[0] + "\"")   
             else:                
                 replace_text_in_file(curDir + "/main.tf" , "@@@fastip", "")       
 
