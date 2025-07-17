@@ -122,11 +122,11 @@ for vm in vms["results"]:
             }}"""
 
             if vm["interface_count"] == 2:
-                networkString += """\nnetwork{{
+                networkString += """\nnetwork {
                     id = 1
                     model = virtio
                     bridge = vmbr3
-                }}"""
+                }"""
 
             ###adds a line if there is a pool tag
             if vm["custom_fields"]["proxmox_pool"]:                         
