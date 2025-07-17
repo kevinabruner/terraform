@@ -94,7 +94,9 @@ for vm in vms["results"]:
             #adds a line for each VM as a sub-module in the main module's configuration file             
             moduleLine = "module \"" + vm["name"] + "\" { source = \"/home/kevin/terraform/vms/" + vm["name"] + "\" }"
             with open(gitDir + '/main.tf', 'a') as file:
-                file.write(moduleLine + '\n')                
+                file.write(moduleLine + '\n')    
+
+                        
             
             #get the interface and then it's mac address
             #interface = et_phone_home('http://netbox.thejfk.ca/api/virtualization/interfaces/' + str(vm["id"]))            
@@ -109,9 +111,22 @@ for vm in vms["results"]:
             ###adds a line if there is a vlan tag
             if vm["custom_fields"]["vlan"]:                
                 vlanId = str(vm["custom_fields"]["vlan"][0]['vid'])                
-                replace_text_in_file(curDir + "/main.tf" , "@@@vlan", "tag = \"" + vlanId + "\"")   
             else:
-                replace_text_in_file(curDir + "/main.tf" , "@@@vlan", "")               
+                vlanId = "0"
+
+            networkString = f"""network {{
+                id = 0
+                model = "virtio"
+                bridge = "vmbr0"
+                tag = {vlanId}
+            }}"""
+
+            if vm["interface_count"] == 2:
+                networkString += """\nnetwork{{
+                    id = 1
+                    model = virtio
+                    bridge = vmbr3
+                }}"""
 
             ###adds a line if there is a pool tag
             if vm["custom_fields"]["proxmox_pool"]:                         
@@ -135,7 +150,8 @@ for vm in vms["results"]:
                 diskSize = f'{int(vm["disk"])}M'
 
             ###generic variable replacements
-            replace_text_in_file(curDir + "/main.tf" , "@@@vm_name", vm["name"])            
+            replace_text_in_file(curDir + "/main.tf" , "@@@vm_name", vm["name"]) 
+            replace_text_in_file(curDir + "/main.tf" , "@@@network", networkString)                       
             replace_text_in_file(curDir + "/vars.tf" , "@@@curDir", curDir)                        
             replace_text_in_file(curDir + "/vars.tf" , "@@@vm_gw", get_gateway(vm["primary_ip4"]["address"]))            
             replace_text_in_file(curDir + "/vars.tf" , "@@@vm_name", vm["name"])
@@ -145,7 +161,6 @@ for vm in vms["results"]:
             replace_text_in_file(curDir + "/vars.tf" , "@@@cores", str(vm["vcpus"]))
             replace_text_in_file(curDir + "/vars.tf" , "@@@memory", str(vm["memory"]))
             replace_text_in_file(curDir + "/vars.tf" , "@@@storage", str(diskSize))
-
         
         
                 
