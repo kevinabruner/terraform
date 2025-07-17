@@ -87,14 +87,19 @@ def replace_text_in_file(file_path, old_text, new_text):
 def et_phone_home(url, params=None):
     # Set your token
     TOKEN = "18a09ac581f3b2679df0f538698e2893aac493a7"    
-
-    # Set the headers
     headers = {
         "Authorization": f"Token {TOKEN}",
         "Accept": "application/json; indent=4"
     }
-    # Send the GET request
-    response = requests.get(url, headers=headers)
+
+    if params is None:
+        params = {}
+
+    # Add limit=1000 if not already set
+    params.setdefault("limit", 1000)
+
+    response = requests.get(url, headers=headers, params=params)
+    response.raise_for_status()
     return response.json()
 
 #define the terraform directory and empty the terraform configuration file
