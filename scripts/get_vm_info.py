@@ -5,42 +5,6 @@ import shutil
 import ipaddress
 import requests
 
-def get_vm_interfaces(vm_name):
-    # Step 1: Get the VM
-    vm_data = et_phone_home(
-        "https://netbox.thejfk.ca/api/virtualization/virtual-machines/",
-        params={"name": vm_name}
-    )
-    if not vm_data["results"]:
-        print(f"No virtual machine found with name: {vm_name}")
-        return
-
-    vm = vm_data["results"][0]
-    vm_id = vm["id"]
-
-    # Step 2: Get interfaces for that VM
-    interfaces_data = et_phone_home(
-        "https://netbox.thejfk.ca/api/virtualization/interfaces/",
-        params={"virtual_machine_id": vm_id}
-    )
-    interfaces = interfaces_data["results"]
-
-    # Step 3: For each interface, get associated IPs
-    result = {}
-    for iface in interfaces:
-        iface_id = iface["id"]
-        iface_name = iface["name"]
-
-        ip_data = et_phone_home(
-            "https://netbox.thejfk.ca/api/ipam/ip-addresses/",
-            params={"interface_id": iface_id}
-        )
-        ips = [ip["address"] for ip in ip_data["results"]]
-        result[iface_name] = ips
-
-    return result
-
-
 def get_gateway(ip_string): 
     ip_network = ipaddress.ip_network(ip_string, strict=False)    
     parts = ip_string.split('.')        
@@ -84,22 +48,17 @@ def replace_text_in_file(file_path, old_text, new_text):
     with open(file_path, 'w') as file:
         file.write(modified_content)
 
-def et_phone_home(url, params=None):
+def et_phone_home(url):
     # Set your token
     TOKEN = "18a09ac581f3b2679df0f538698e2893aac493a7"    
+
+    # Set the headers
     headers = {
         "Authorization": f"Token {TOKEN}",
         "Accept": "application/json; indent=4"
     }
-
-    if params is None:
-        params = {}
-
-    # Add limit=1000 if not already set
-    params.setdefault("limit", 1000)
-
-    response = requests.get(url, headers=headers, params=params)
-    response.raise_for_status()
+    # Send the GET request
+    response = requests.get(url, headers=headers)
     return response.json()
 
 #define the terraform directory and empty the terraform configuration file
@@ -117,12 +76,6 @@ vms = et_phone_home("https://netbox.thejfk.ca/api/virtualization/virtual-machine
 
 #iterates through the vms
 for vm in vms["results"]:    
-
-    # Example usage
-    vm_interfaces = get_vm_interfaces(vm["name"])
-    for iface, ips in vm_interfaces.items():
-        print(f"{iface}: {', '.join(ips)}")
-
     if vm["primary_ip4"]:
         curDir = gitDir + '/vms/' + vm["name"]
  
