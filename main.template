@@ -74,6 +74,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   memory  = var.memory  
   os_type   = "ubuntu"
   ipconfig0 = "ip=${var.vm_ip},gw=${var.vm_gw}"
+  @@@fastip
   ciuser = var.pve_user
   cipassword = var.password
 
