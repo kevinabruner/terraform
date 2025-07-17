@@ -76,6 +76,12 @@ vms = et_phone_home("https://netbox.thejfk.ca/api/virtualization/virtual-machine
 
 #iterates through the vms
 for vm in vms["results"]:    
+
+    # Example usage
+    vm_interfaces = get_vm_interfaces(vm["name"])
+    for iface, ips in vm_interfaces.items():
+        print(f"{iface}: {', '.join(ips)}")
+
     if vm["primary_ip4"]:
         curDir = gitDir + '/vms/' + vm["name"]
  
@@ -164,5 +170,40 @@ for vm in vms["results"]:
         
         
                 
+def get_vm_interfaces(vm_name):
+    # Step 1: Find the VM by name
+    vm_resp = requests.get(
+        f"{NETBOX_URL}/virtualization/virtual-machines/",
+        headers=HEADERS,
+        params={"name": vm_name}
+    )
+    vm_resp.raise_for_status()
+    vm = vm_resp.json()["results"][0]
+    vm_id = vm["id"]
+
+    # Step 2: Get interfaces for the VM
+    iface_resp = requests.get(
+        f"{NETBOX_URL}/virtualization/interfaces/",
+        headers=HEADERS,
+        params={"virtual_machine_id": vm_id}
+    )
+    iface_resp.raise_for_status()
+    interfaces = iface_resp.json()["results"]
+
+    # Step 3: Get IPs for each interface
+    result = {}
+    for iface in interfaces:
+        iface_id = iface["id"]
+        ip_resp = requests.get(
+            f"{NETBOX_URL}/ipam/ip-addresses/",
+            headers=HEADERS,
+            params={"interface_id": iface_id}
+        )
+        ip_resp.raise_for_status()
+        ips = [ip["address"] for ip in ip_resp.json()["results"]]
+        result[iface["name"]] = ips
+
+    return result
+
 
 
