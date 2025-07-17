@@ -5,40 +5,41 @@ import shutil
 import ipaddress
 import requests
 
-def get_vm_interfaces(vm_name):
-    # Step 1: Find the VM by name
-    vm_resp = requests.get(
-        f"https://netbox.thejfk.ca/virtualization/virtual-machines/",
-        headers=HEADERS,
+def get_vm_interfaces_with_ips(vm_name):
+    # Step 1: Get the VM
+    vm_data = et_phone_home(
+        "https://netbox.thejfk.ca/api/virtualization/virtual-machines/",
         params={"name": vm_name}
     )
-    vm_resp.raise_for_status()
-    vm = vm_resp.json()["results"][0]
+    if not vm_data["results"]:
+        print(f"No virtual machine found with name: {vm_name}")
+        return
+
+    vm = vm_data["results"][0]
     vm_id = vm["id"]
 
-    # Step 2: Get interfaces for the VM
-    iface_resp = requests.get(
-        f"https://netbox.thejfk.ca/virtualization/interfaces/",
-        headers=HEADERS,
+    # Step 2: Get interfaces for that VM
+    interfaces_data = et_phone_home(
+        "https://netbox.thejfk.ca/api/virtualization/interfaces/",
         params={"virtual_machine_id": vm_id}
     )
-    iface_resp.raise_for_status()
-    interfaces = iface_resp.json()["results"]
+    interfaces = interfaces_data["results"]
 
-    # Step 3: Get IPs for each interface
+    # Step 3: For each interface, get associated IPs
     result = {}
     for iface in interfaces:
         iface_id = iface["id"]
-        ip_resp = requests.get(
-            f"https://netbox.thejfk.ca/ipam/ip-addresses/",
-            headers=HEADERS,
+        iface_name = iface["name"]
+
+        ip_data = et_phone_home(
+            "https://netbox.thejfk.ca/api/ipam/ip-addresses/",
             params={"interface_id": iface_id}
         )
-        ip_resp.raise_for_status()
-        ips = [ip["address"] for ip in ip_resp.json()["results"]]
-        result[iface["name"]] = ips
+        ips = [ip["address"] for ip in ip_data["results"]]
+        result[iface_name] = ips
 
     return result
+
 
 
 
@@ -87,7 +88,7 @@ def replace_text_in_file(file_path, old_text, new_text):
 
 def et_phone_home(url):
     # Set your token
-    TOKEN = "18a09ac581f3b2679df0f538698e2893aac493a7"    
+    TOKEN = "example"    
 
     # Set the headers
     headers = {
