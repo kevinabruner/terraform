@@ -85,7 +85,7 @@ for vm in vms["results"]:
         os.mkdir(curDir)                                    
 
         if vm["custom_fields"]['VMorContainer'][0] == "vm":
-            #print(vm["name"])
+            print(vm["name"])
             
             # Copy and rename the template files
             shutil.copy(gitDir + '/main.template', curDir + '/main.tf')
