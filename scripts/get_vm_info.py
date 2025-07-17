@@ -84,7 +84,7 @@ def replace_text_in_file(file_path, old_text, new_text):
     with open(file_path, 'w') as file:
         file.write(modified_content)
 
-def et_phone_home(url):
+def et_phone_home(url, params=None):
     # Set your token
     TOKEN = "18a09ac581f3b2679df0f538698e2893aac493a7"    
 
