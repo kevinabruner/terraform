@@ -5,7 +5,7 @@ import shutil
 import ipaddress
 import requests
 
-def get_vm_interfaces_with_ips(vm_name):
+def get_vm_interfaces(vm_name):
     # Step 1: Get the VM
     vm_data = et_phone_home(
         "https://netbox.thejfk.ca/api/virtualization/virtual-machines/",
