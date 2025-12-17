@@ -21,7 +21,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   name        = var.vm_name
   desc        = "tf description"
   target_node = var.pve_node
-  agent       = 0
+  agent       = 1
 
   ##existing boot disk, cloned and expanded as needed
   disks {    
@@ -68,9 +68,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   full_clone = true
   @@@vm_pool
   scsihw  = "virtio-scsi-pci"
-  bootdisk = "scsi0"
-  agent = 1
-  
+  bootdisk = "scsi0"  
   
   memory  = var.memory  
   os_type   = "ubuntu"
