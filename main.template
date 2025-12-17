@@ -65,7 +65,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
 
   onboot = true
   @@@image
-  full_clone = false  
+  full_clone = true  
   @@@vm_pool
   scsihw  = "virtio-scsi-pci"
   bootdisk = "scsi0"
