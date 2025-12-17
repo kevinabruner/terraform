@@ -138,14 +138,22 @@ for vm in vms["results"]:
             else:                
                 replace_text_in_file(curDir + "/main.tf" , "@@@vm_pool", "")               
 
-            ###adds a line if there is a template tag
-            if vm["custom_fields"]["template"]:                                
-                templateId = str(vm["custom_fields"]["template"])                
+            # Check for the new prod_image field first
+            if vm["custom_fields"].get("prod_image"):
+                # If prod_image has a value, use it regardless of other settings
+                image_name = str(vm["custom_fields"]["prod_image"])
+                replace_text_in_file(curDir + "/main.tf", "@@@image", "clone = \"" + image_name + "\"")
+
+            # Fallback to the existing template tag logic
+            elif vm["custom_fields"].get("template"):
+                templateId = str(vm["custom_fields"]["template"])
                 if templateId == "ubuntu-2204-cloud":
                     templateId = "ubuntu-cloud"
-                replace_text_in_file(curDir + "/main.tf" , "@@@image", "clone = \"" + templateId + "\"")   
+                replace_text_in_file(curDir + "/main.tf", "@@@image", "clone = \"" + templateId + "\"")
+
+            # Final fallback if neither field is set
             else:
-                replace_text_in_file(curDir + "/main.tf" , "@@@image", "clone = \"ubuntu-cloud\"")   
+                replace_text_in_file(curDir + "/main.tf", "@@@image", "clone = \"ubuntu-cloud\"")  
 
             if vm["disk"] >= 1000:
                 diskSize = f'{int(vm["disk"] / 1000)}G'
