@@ -153,7 +153,7 @@ for vm in vms["results"]:
             else:
                 replace_text_in_file(curDir + "/main.tf", "@@@image", "clone = \"ubuntu-cloud\"")  
 
-            if vm["custom_fields"].get("storage_location") = "":                                
+            if vm["custom_fields"].get("storage_location") == "":                                
                 storage_location = "ceph"                
             else:
                 storage_location = vm["custom_fields"].get("storage_location")
