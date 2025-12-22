@@ -41,7 +41,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
     ide {
       ide3 {
         cloudinit {
-          storage = "@@@storage"
+          storage = "@@@storage_location"
         }
       }
       ide2{
