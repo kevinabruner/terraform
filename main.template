@@ -30,7 +30,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
         disk{
           backup               = true
           format               = "raw"          
-          storage              = "ceph"                  
+          storage              = @@@storage                  
           iothread             = false           
           readonly             = false 
           replicate            = true 
@@ -41,7 +41,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
     ide {
       ide3 {
         cloudinit {
-          storage = "ceph"
+          storage = @@@storage
         }
       }
       ide2{

@@ -120,7 +120,7 @@ for vm in vms["results"]:
                 networkString += """\nnetwork {
                     id = 1
                     model = "virtio"
-                    bridge = "vmbr3"
+                    bridge = "vmbr3"                    
                 }"""
                 
                 ip_addr = vm["custom_fields"]["FAST_IP"]["address"]
@@ -143,17 +143,22 @@ for vm in vms["results"]:
                 # If prod_image has a value, use it regardless of other settings
                 image_name = str(vm["custom_fields"]["prod_image"])
                 replace_text_in_file(curDir + "/main.tf", "@@@image", "clone = \"" + image_name + "\"")
-
             # Fallback to the existing template tag logic
             elif vm["custom_fields"].get("template"):
                 templateId = str(vm["custom_fields"]["template"])
                 if templateId == "ubuntu-2204-cloud":
                     templateId = "ubuntu-cloud"
                 replace_text_in_file(curDir + "/main.tf", "@@@image", "clone = \"" + templateId + "\"")
-
             # Final fallback if neither field is set
             else:
                 replace_text_in_file(curDir + "/main.tf", "@@@image", "clone = \"ubuntu-cloud\"")  
+
+            if vm["custom_fields"].get("storage_location") = "":                                
+                storage_location = "ceph"                
+            else:
+                storage_location = vm["custom_fields"].get("storage_location")
+            
+            
 
             if vm["disk"] >= 1000:
                 diskSize = f'{int(vm["disk"] / 1000)}G'
@@ -161,6 +166,7 @@ for vm in vms["results"]:
                 diskSize = f'{int(vm["disk"])}M'
 
             ###generic variable replacements
+            replace_text_in_file(curDir + "/main.tf" , "@@@storage_location", storage_location)  
             replace_text_in_file(curDir + "/main.tf" , "@@@vm_name", vm["name"]) 
             replace_text_in_file(curDir + "/main.tf" , "@@@network", networkString)                       
             replace_text_in_file(curDir + "/vars.tf" , "@@@curDir", curDir)                        
