@@ -156,7 +156,7 @@ for vm in vms["results"]:
             if vm["custom_fields"].get("storage_location"):                                
                 storage_location = vm["custom_fields"].get("storage_location")                      
             else:
-                storage_location = "ceph"    
+                storage_location = "truenas-nfs"    
                 
             
 
