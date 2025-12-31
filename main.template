@@ -94,6 +94,7 @@ EOF
       onboot,
       hagroup,
       hastate,
+      hassid,
       vm_state,
       agent,
       usbs
