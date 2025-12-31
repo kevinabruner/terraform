@@ -93,8 +93,7 @@ EOF
       qemu_os,
       onboot,
       hagroup,
-      hastate,
-      hassid,
+      hastate,      
       vm_state,
       agent,
       usbs
