@@ -94,6 +94,7 @@ EOF
       hagroup,
       hastate,      
       vm_state,
+      replication,
       agent,
       usbs
     ]
