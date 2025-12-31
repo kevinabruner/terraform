@@ -32,7 +32,8 @@ resource "proxmox_vm_qemu" @@@vm_name {
           format               = "raw"          
           storage              = "@@@storage_location"                 
           iothread             = false           
-          readonly             = false           
+          readonly             = false 
+          replicate            = true 
           size                 = var.storage                    
         }
       }
@@ -94,7 +95,6 @@ EOF
       hagroup,
       hastate,      
       vm_state,
-      replicate,
       agent,
       usbs
     ]
