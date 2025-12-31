@@ -32,8 +32,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
           format               = "raw"          
           storage              = "@@@storage_location"                 
           iothread             = false           
-          readonly             = false 
-          replicate            = true 
+          readonly             = false           
           size                 = var.storage                    
         }
       }
