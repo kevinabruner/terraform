@@ -19,7 +19,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   count       = @@@count
   vmid        = var.vmid
   name        = var.vm_name
-  description        = "description"
+  description = "description"
   target_node = var.pve_node
   agent       = 1
 
@@ -99,7 +99,8 @@ EOF
       agent,
       usbs,
       tags,
-      network
+      network,
+      desc
     ]
   }
 }
