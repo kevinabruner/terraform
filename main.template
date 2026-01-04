@@ -96,7 +96,7 @@ EOF
       hastate,      
       vm_state,
       agent,
-      usb0
+      usb
     ]
   }
 }
