@@ -69,6 +69,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   @@@vm_pool
   scsihw  = "virtio-scsi-pci"
   bootdisk = "scsi0"  
+  tags = ""
   
   memory  = var.memory  
   os_type   = "cloud-init"
