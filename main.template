@@ -19,7 +19,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   count       = @@@count
   vmid        = var.vmid
   name        = var.vm_name
-  desc        = "description"
+  description        = "description"
   target_node = var.pve_node
   agent       = 1
 
