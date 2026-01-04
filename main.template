@@ -92,7 +92,7 @@ EOF
   lifecycle {
     ignore_changes = [
       qemu_os,
-      onboot,
+      start_at_node_boot,
       hagroup,
       hastate,      
       vm_state,
