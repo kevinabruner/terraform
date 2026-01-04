@@ -71,7 +71,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
   bootdisk = "scsi0"  
   
   memory  = var.memory  
-  os_type   = "ubuntu"
+  os_type   = "cloud-init"
   ipconfig0 = "ip=${var.vm_ip},gw=${var.vm_gw}"
   @@@fastip
   ciuser = var.pve_user
@@ -96,7 +96,7 @@ EOF
       hastate,      
       vm_state,
       agent,
-      usbs
+      usb
     ]
   }
 }
