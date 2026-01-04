@@ -100,7 +100,6 @@ EOF
       usbs,
       tags,
       network,
-      desc,
       startup_shutdown
     ]
   }
