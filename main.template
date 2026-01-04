@@ -99,7 +99,7 @@ EOF
       agent,
       usbs,
       tags,
-      macaddr
+      network
     ]
   }
 }
