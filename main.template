@@ -100,7 +100,8 @@ EOF
       usbs,
       tags,
       network,
-      desc
+      desc,
+      startup
     ]
   }
 }
