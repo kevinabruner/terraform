@@ -63,7 +63,7 @@ resource "proxmox_vm_qemu" @@@vm_name {
     sockets = 1    
   }
 
-  onboot = true
+  start_at_node_boot = true
   @@@image
   full_clone = true
   @@@vm_pool
