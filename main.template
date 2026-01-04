@@ -101,7 +101,7 @@ EOF
       tags,
       network,
       desc,
-      startup
+      startup_shutdown
     ]
   }
 }
