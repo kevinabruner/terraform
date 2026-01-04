@@ -98,7 +98,8 @@ EOF
       vm_state,
       agent,
       usbs,
-      tags
+      tags,
+      macaddr
     ]
   }
 }
