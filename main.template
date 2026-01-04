@@ -96,7 +96,8 @@ EOF
       hastate,      
       vm_state,
       agent,
-      usbs
+      usbs,
+      tags
     ]
   }
 }
