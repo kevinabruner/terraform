@@ -4,6 +4,10 @@ terraform {
       source = "telmate/proxmox"
       version = "3.0.2-rc07"
     }
+    netbox = {
+      source  = "e-minguez/netbox"
+      version = "~> 5.0" # Or current version
+    }
   }
 }
 
