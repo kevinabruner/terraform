@@ -46,7 +46,9 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
   
   agent    = 1
   memory   = each.value.memory
-  os_type  = "cloud-init"
+  clone       = each.value.image   
+  full_clone  = true
+  os_type     = "ubuntu"
   scsihw   = "virtio-scsi-pci"
   boot     = "order=scsi0;ide3"
 
