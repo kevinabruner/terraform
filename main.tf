@@ -31,7 +31,7 @@ provider "proxmox" {
 
 locals {
   # This reaches into the object and pulls out the list of VMs
-  vms = jsondecode(data.http.netbox_export.response_body).results
+  vms = data.http.netbox_export.response_body
 }
 
 resource "proxmox_vm_qemu" "proxmox_vms" {
