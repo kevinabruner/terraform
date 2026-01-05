@@ -27,3 +27,29 @@ provider "proxmox" {
 }
 
 
+locals {
+  # Decode the JSON export from the HTTP data source
+  vms = jsondecode(data.http.netbox_export.response_body).results
+}
+
+resource "proxmox_vm_qemu" "proxmox_vms" {
+  # This creates one resource for every VM found in the NetBox export
+  for_each = { for vm in local.vms : vm.name => vm }
+
+  name        = each.value.name
+  vmid        = each.value.custom_fields.vmid # Adjust this based on your NetBox field name
+  target_node = "nuc1" 
+
+  # Add the 'Shields' we validated earlier
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes = [
+      clone,
+      full_clone,
+      disk,
+      network,
+      target_node,
+      qemu_os
+    ]
+  }
+}
