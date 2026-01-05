@@ -116,9 +116,10 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCqAJpgMNAvZsnnWEfg4vqU0LpmhNYN1+Pv9D8op3EG
 EOF
 
   lifecycle {
-    prevent_destroy = true
     ignore_changes = [
-      qemu_os, clone, full_clone, network
+      qemu_os, start_at_node_boot, hagroup, hastate,      
+      vm_state, agent, usbs, tags, network, startup_shutdown,
+      clone, full_clone, ipconfig1
     ]
   }
 }
