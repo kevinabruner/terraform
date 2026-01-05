@@ -67,13 +67,24 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
         }
       }
     }
-    ide {
-      ide2 { cdrom { passthrough = false } }
-      ide3 { cloudinit { storage = each.value.storage } }
+    ide {      
+      ide2 { 
+        cdrom { 
+          passthrough = false 
+        } 
+      }      
+      ide3 { 
+        cloudinit { 
+          storage = each.value.storage 
+        } 
+      }
     }
   }
 
-  serial { id = 0; type = "socket" }
+  serial { 
+    id   = 0 
+    type = "socket" 
+  }
 
   # Networking
   network {
