@@ -24,7 +24,7 @@ data "http" "netbox_export" {
 provider "proxmox" {  
   pm_api_url = "https://pve.thejfk.ca/api2/json"    
   pm_api_token_id = "terraform@pam!main_terraform"    
-  pm_api_token_secret = "var.proxmox_api_token_secret"    
+  pm_api_token_secret = var.proxmox_api_token_secret
   pm_tls_insecure = false
 }
 
