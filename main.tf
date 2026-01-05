@@ -119,9 +119,19 @@ EOF
 
   lifecycle {
     ignore_changes = [
-      qemu_os, start_at_node_boot, hagroup, hastate,      
-      vm_state, agent, usbs, tags, network, startup_shutdown,
-      clone, full_clone, ipconfig1
+      qemu_os, 
+      start_at_node_boot, 
+      hagroup, 
+      hastate,      
+      vm_state, 
+      agent, 
+      usbs, 
+      tags, 
+      network, 
+      startup_shutdown,
+      clone, 
+      full_clone, 
+      ipconfig1
     ]
   }
 }
