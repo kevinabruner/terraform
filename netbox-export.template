@@ -2,6 +2,7 @@
 {% for vm in queryset %}
   {# Using vm.status directly as requested #}
   {% if vm.status == 'active' and 'vm' in vm.custom_field_data.VMorContainer %}
+  {% set context = vm.get_config_context() %}
   {
     "name": "{{ vm.name }}",
     "ssh_keys": "{{ context.ssh_keys | join('\n') }}",
