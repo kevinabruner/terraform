@@ -4,12 +4,12 @@ variable "proxmox_api_token_secret" {
 }
 
 variable "vm_password" { 
-    type = string; 
+    type = string 
     sensitive = true 
 }
 
 variable "vm_name" { 
-    type = string; 
+    type = string 
     default = "kevin"
 }
 
