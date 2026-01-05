@@ -15,7 +15,7 @@ data "http" "netbox_export" {
   url = "https://netbox.thejfk.ca/api/virtualization/virtual-machines/?export=Main+terraform+templates"
 
   request_headers = {
-    Authorization = "Token " + var.netbox_api_token_secret
+    Authorization = "Token ${var.netbox_api_token_secret}"
     Accept = "application/json"
   }
 }
