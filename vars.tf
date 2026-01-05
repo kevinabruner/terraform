@@ -8,7 +8,7 @@ variable "vm_password" {
     sensitive = true 
 }
 
-variable "vm_name" { 
+variable "vm_username" { 
     type = string 
     default = "kevin"
 }
