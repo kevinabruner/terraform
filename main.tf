@@ -16,9 +16,11 @@ data "http" "netbox_export" {
 
   request_headers = {
     Authorization = "18a09ac581f3b2679df0f538698e2893aac493a7"
-    Accept        = "text/plain"
+    Accept = "application/json"
   }
 }
+
+
 provider "proxmox" {  
   pm_api_url = "https://pve.thejfk.ca/api2/json"    
   pm_api_token_id = "terraform@pam!main_terraform"    
