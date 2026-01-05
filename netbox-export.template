@@ -5,7 +5,7 @@
   {% set context = vm.get_config_context() %}
   {
     "name": "{{ vm.name }}",
-    "ssh_keys": "{{ context.ssh_keys | join('\n') }}",
+    "ssh_keys": "{{ context.ssh_keys | join('\\n') }}",
     "vmid": {{ vm.custom_field_data.vmid or 0 }},
     "desc": "{{ vm.comments | replace('\n', ' ') or 'Managed by NetBox' }}",
     "node": "{{ vm.device.name }}",
