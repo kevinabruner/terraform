@@ -7,6 +7,14 @@ terraform {
   }
 }
 
+data "http" "netbox_export" {
+  url = "http://netbox.thejfk.ca/api/virtualization/virtual-machines/?export=Main+terraform+templates"
+
+  request_headers = {
+    Authorization = "18a09ac581f3b2679df0f538698e2893aac493a7"
+    Accept        = "text/plain"
+  }
+}
 provider "proxmox" {  
   pm_api_url = "https://192.168.11.15/api2/json"    
   pm_api_token_id = "terraform@pam!main_terraform"    
@@ -15,4 +23,3 @@ provider "proxmox" {
 }
 
 
-###generated###
