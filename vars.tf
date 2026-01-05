@@ -1,4 +1,6 @@
-##If there is no value here, they will need to be exported manually or placed in /etc/environment
+##------BIG NOTE:----###
+#If there is no "default" value here, they will need to be exported manually or placed in /etc/environment
+##------END BIG NOTE:----###
 
 variable "proxmox_api_token_secret" { 
     type = string
