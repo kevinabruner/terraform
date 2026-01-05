@@ -11,6 +11,9 @@ This repository has been updated to be far less shit than it once was.
 
 An [installation script](scripts/install.sh) is included in this repo. I try not to re-install this very often for obvious reasons, so use at your own risk. 
 
+## Netbox template
+In order to export templates from Netbox, a [Netbox export template file](netbox-export.template) file exists here. The content must be manually updated in Netbox by copying and pasting the entire file over the [export template entry in the web interface](https://netbox.thejfk.ca/extras/export-templates/1/).
+
 ## Plugins
 It uses the following plugins:
 - [`e-breuninger/netbox`](https://github.com/e-breuninger/terraform-provider-netbox): This allows for direct connection to Netbox using a local `main.tf` file in this repo. This plugin pulls variables from the VM data in [my local Netbox instance](https://netbox.thejfk.ca/).
