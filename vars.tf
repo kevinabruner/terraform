@@ -1,5 +1,5 @@
 variable "proxmox_api_token_secret" { 
-    type = string; 
+    type = string
     sensitive = true 
 }
 
