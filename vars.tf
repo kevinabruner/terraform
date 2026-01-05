@@ -5,6 +5,11 @@ variable "proxmox_api_token_secret" {
     sensitive = true 
 }
 
+variable "netbox_api_token_secret" { 
+    type = string
+    sensitive = true 
+}
+
 variable "vm_password" { 
     type = string 
     sensitive = true 
