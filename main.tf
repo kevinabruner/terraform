@@ -30,8 +30,9 @@ provider "proxmox" {
 
 
 locals {
-  # Decode the JSON export from the HTTP data source
-  vms = jsondecode(data.http.netbox_export.response_body).results
+  raw_data = jsondecode(data.http.netbox_export.response_body)
+  # This tries to find 'results', but falls back to the whole body if it's a raw list
+  vms = try(local.raw_data.results, local.raw_data)
 }
 
 resource "proxmox_vm_qemu" "proxmox_vms" {
