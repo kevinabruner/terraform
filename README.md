@@ -7,6 +7,9 @@ This repository has been updated to be far less shit than it once was.
 - This repository uses [my local Netbox instance](https://netbox.thejfk.ca/) as a source of truth. 
 - VMs are located in [my Proxmox Cluster](https://pve.thejfk.ca).
 
+## Installation
+
+An [installation script](scripts/install.sh) is included in this repo. I try not to re-install this very often for obvious reasons, so use at your own risk. 
 
 ## Plugins
 It uses the following plugins:
