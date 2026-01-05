@@ -16,3 +16,4 @@ It uses the following plugins:
 ## Secrets, passwords, tokens and SSH Keys
 - Permitted SSH Keys (admin side as well as ansible control) are located in the [Config Contexts](https://netbox.thejfk.ca/extras/config-contexts/1/) page of Netbox. If you change admin hosts or ansible controllers, update accordigly
 - Tokens, passwords and secrets are currently stored in /etc/environment on the terraform controller and are managed manually. Hopefully one day this will change, but I suspect not before you come back here to read this.
+    - All of these env variables are protyped in [vars.tf](./vars.tf) if you need to consult their name or datatype.
