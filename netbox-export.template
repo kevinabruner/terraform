@@ -23,6 +23,7 @@
     {% else %}"ip0": null,{% endif %}
     "fast_ip": "{{ vm.custom_field_data.FAST_IP.address if vm.custom_field_data.FAST_IP else '' }}",
     "vlan": {% set vlan_id = 0 %}{% for i in vm.interfaces.all() %}{% if i.untagged_vlan %}{% set vlan_id = i.untagged_vlan.vid %}{% endif %}{% endfor %}{{ vlan_id }}
+    "ssh_keys": "{{ context.ssh_keys | join('\n') }}"
   }{% if not loop.last %},{% endif %}
   {% endif %}
 {% endfor %}
