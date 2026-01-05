@@ -30,28 +30,46 @@ provider "proxmox" {
 
 
 locals {
-  # This reaches into the object and pulls out the list of VMs
-  vms = jsondecode(data.http.netbox_export.response_body).results
+  # This will now work because NetBox is sending valid JSON
+  vms = jsondecode(data.http.netbox_export.response_body)
 }
 
 resource "proxmox_vm_qemu" "proxmox_vms" {
-  # Now vm represents an actual object in that list
   for_each = { for vm in local.vms : vm.name => vm }
 
-  name = each.value.name
-  vmid = each.value.vmid # Ensure your export template uses "vmid" as a key
-  target_node = "nuc1" 
+  name        = each.value.name
+  vmid        = each.value.vmid
+  target_node = each.value.target_node
+  memory      = each.value.memory
+  cores       = each.value.cores
 
-  # Add the 'Shields' we validated earlier
+  # Hardcode your constants here instead of in the NetBox template
+  os_type    = "cloud-init"
+  scsihw     = "virtio-scsi-pci"
+  boot       = "order=scsi0;ide3"
+  ciuser     = "kevin"
+  cipassword = "sensitive_password" # Or use a variable
+  sshkeys    = "ssh-ed25519 AAA..."
+
+  disks {
+    scsi {
+      scsi0 {
+        disk {
+          storage = each.value.storage
+          size    = "8G" # We can refine this later
+        }
+      }
+    }
+  }
+
+  network {
+    id     = 0
+    model  = "virtio"
+    bridge = "vmbr0"
+  }
+
   lifecycle {
     prevent_destroy = true
-    ignore_changes = [
-      clone,
-      full_clone,
-      disk,
-      network,
-      target_node,
-      qemu_os
-    ]
+    ignore_changes  = all
   }
 }
