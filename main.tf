@@ -30,17 +30,16 @@ provider "proxmox" {
 
 
 locals {
-  raw_data = jsondecode(data.http.netbox_export.response_body)
-  # This tries to find 'results', but falls back to the whole body if it's a raw list
-  vms = try(local.raw_data.results, local.raw_data)
+  # This reaches into the object and pulls out the list of VMs
+  vms = jsondecode(data.http.netbox_export.response_body).results
 }
 
 resource "proxmox_vm_qemu" "proxmox_vms" {
-  # This creates one resource for every VM found in the NetBox export
+  # Now vm represents an actual object in that list
   for_each = { for vm in local.vms : vm.name => vm }
 
-  name        = each.value.name
-  vmid        = each.value.custom_fields.vmid # Adjust this based on your NetBox field name
+  name = each.value.name
+  vmid = each.value.vmid # Ensure your export template uses "vmid" as a key
   target_node = "nuc1" 
 
   # Add the 'Shields' we validated earlier
