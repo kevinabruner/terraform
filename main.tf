@@ -90,27 +90,11 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
   }
 
   # Networking
-# Block 1: For Tagged VMs (vlan > 0)
-  dynamic "network" {
-    for_each = tonumber(each.value.vlan) != 999 ? [1] : []
-    content {
-      id     = 0
-      model  = "virtio"
-      bridge = "vmbr0"
-      tag    = tonumber(each.value.vlan)
-    }
-  }
-
-  # Block 2: For Untagged VMs (vlan is 999)
-  dynamic "network" {
-    for_each = tonumber(each.value.vlan) == 999 ? [1] : []
-    content {
-      id     = 0
-      model  = "virtio"
-      bridge = "vmbr0"
-      # The "tag" attribute is completely omitted here.
-      # This prevents the "-1" error and the "0 -> null" wipe.
-    }
+  network {
+    id     = 0
+    model  = "virtio"
+    bridge = "vmbr0"
+tag = tonumber(each.value.vlan) > 0 ? tonumber(each.value.vlan) : null
   }
 
   ipconfig0 = each.value.ip0
