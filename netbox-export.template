@@ -24,8 +24,14 @@
       "ip0": null,
     {%- endif %}
     "fast_ip": "{{ vm.custom_field_data.FAST_IP.address if vm.custom_field_data.FAST_IP else '' }}",
-    {% set primary_interface = vm.interfaces.all() | first %}
-    "vlan": {{ primary_interface.untagged_vlan.vid if primary_interface and primary_interface.untagged_vlan else 0 }}
+"vlan": {% set vlan_ns = namespace(id=0) -%}
+{%- for interface in vm.interfaces.all() -%}
+    {%- if interface.untagged_vlan -%}
+        {%- set vlan_ns.id = interface.untagged_vlan.vid -%}
+    {%- endif -%}
+{%- endfor -%}
+{{ vlan_ns.id }}
+    
   }
   {% endif %}
 {% endfor %}
