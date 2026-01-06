@@ -26,6 +26,7 @@ provider "proxmox" {
   pm_api_token_id = "terraform@pam!main_terraform"    
   pm_api_token_secret = var.proxmox_api_token_secret
   pm_tls_insecure = false
+  pm_parallel = 3
 }
 
 
