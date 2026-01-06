@@ -126,7 +126,7 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
       tags, 
       network, 
       startup_shutdown,
-      clone
+      clone,
       full_clone, 
       ipconfig1
     ]
