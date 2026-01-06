@@ -94,7 +94,7 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
     id     = 0
     model  = "virtio"
     bridge = "vmbr0"
-    tag    = tonumber(each.value.vlan) > 0 ? tonumber(each.value.vlan) : -1
+    tag    = tonumber(each.value.vlan) > 0 ? tonumber(each.value.vlan) : null
   }
 
   ipconfig0 = each.value.ip0
