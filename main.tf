@@ -33,6 +33,7 @@ provider "proxmox" {
 locals {
   # This will now work because NetBox is sending valid JSON
   vms = jsondecode(data.http.netbox_export.response_body)
+  no_tag = -1
 }
 
 
@@ -88,31 +89,13 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
     id   = 0 
     type = "socket" 
   }
-  
-dynamic "network" {
-    for_each = [
-      merge(
-        {
-          id     = 0
-          model  = "virtio"
-          bridge = "vmbr0"
-        },
-        # This is the critical part: 
-        # If vlan is > 0, we add the "tag" key.
-        # If vlan is 0, we add NOTHING. No null, no -1.
-        tonumber(each.value.vlan) > 0 ? { tag = tonumber(each.value.vlan) } : {}
-      )
-    ]
 
-    content {
-      id     = network.value.id
-      model  = network.value.model
-      bridge = network.value.bridge
-      
-      # We use lookup to only assign to the 'tag' attribute 
-      # IF it exists in our merged map.
-      tag = lookup(network.value, "tag", null)
-    }
+  # Networking
+  network {
+    id     = 0
+    model  = "virtio"
+    bridge = "vmbr0"
+tag = tonumber(each.value.vlan) > 0 ? tonumber(each.value.vlan) : local.no_tag
   }
 
   ipconfig0 = each.value.ip0
