@@ -125,7 +125,6 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
       agent, 
       usbs, 
       tags, 
-      network, 
       startup_shutdown,
       clone,
       full_clone, 
