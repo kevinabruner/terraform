@@ -103,7 +103,7 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
 
   # Block 2: For Untagged VMs (vlan is 999)
   dynamic "network" {
-    for_each = tonumber(each.value.vlan) == 0 ? [1] : []
+    for_each = tonumber(each.value.vlan) == 999 ? [1] : []
     content {
       id     = 0
       model  = "virtio"
