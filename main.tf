@@ -90,13 +90,26 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
   }
 
   # Networking
-  network {
-    id     = 0
-    model  = "virtio"
-    bridge = "vmbr0"
-    tag = tonumber(each.value.vlan) > 0 ? tonumber(each.value.vlan) : -1
+  dynamic "network" {
+    for_each = [
+      merge(
+        {
+          id     = 0
+          model  = "virtio"
+          bridge = "vmbr0"
+        },
+        tonumber(each.value.vlan) > 0 ? { vlan_tag = tonumber(each.value.vlan) } : {}
+      )
+    ]
+    content {
+      id     = network.value.id
+      model  = network.value.model
+      bridge = network.value.bridge
+      
+      # If vlan_tag isn't in the map, this attribute isn't sent
+      tag = lookup(network.value, "vlan_tag", null)
+    }
   }
-
   ipconfig0 = each.value.ip0
 
   # Fast IP Logic
