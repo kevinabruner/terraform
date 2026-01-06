@@ -1,0 +1,26 @@
+##----------------BIG NOTE:---------------###
+#  If there is no "default" value here,     #
+#  they will need to be exported manually   #
+#  or placed in /etc/environment            #
+##--------------END BIG NOTE:-------------###
+
+
+variable "proxmox_api_token_secret" { 
+    type = string
+    sensitive = true 
+}
+
+variable "netbox_api_token_secret" { 
+    type = string
+    sensitive = true 
+}
+
+variable "vm_password" { 
+    type = string 
+    sensitive = true 
+}
+
+variable "vm_username" { 
+    type = string 
+    default = "kevin"
+}
