@@ -90,11 +90,30 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
   }
 
   # Networking
-  network {
-    id     = 0
-    model  = "virtio"
-    bridge = "vmbr0"
-tag = tonumber(each.value.vlan) > 0 ? tonumber(each.value.vlan) : -1
+  dynamic "network" {
+    for_each = [
+      merge(
+        {
+          id     = 0
+          model  = "virtio"
+          bridge = "vmbr0"
+        },
+        # ONLY add the 'tag' key to the map if it's > 0
+        tonumber(each.value.vlan) > 0 ? { tag = tonumber(each.value.vlan) } : {}
+      )
+    ]
+
+    content {
+      id     = network.value.id
+      model  = network.value.model
+      bridge = network.value.bridge
+      
+      # This is the trick: 
+      # If 'tag' wasn't in the merge above, lookup returns null.
+      # In a dynamic block, an attribute assigned null is often 
+      # treated as "totally absent" rather than "reset to zero".
+      tag = lookup(network.value, "tag", null)
+    }
   }
 
   ipconfig0 = each.value.ip0
