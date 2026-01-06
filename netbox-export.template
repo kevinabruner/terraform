@@ -24,7 +24,7 @@
       "ip0": "ip={{ ip_str }},gw={{ ip_parts[0] }}.{{ ip_parts[1] }}.{{ ip_parts[2] }}.1",
     {% else %}"ip0": null,{% endif %}
     "fast_ip": "{{ vm.custom_field_data.FAST_IP.address if vm.custom_field_data.FAST_IP else '' }}",
-    "vlan":  {{ vm.custom_field_data.vlan.vid }}
+    "vlan":  "{{ vm.custom_field_data.vlan.vid }}"
   }{% if not loop.last %},{% endif %}
   {% endif %}
 {% endfor %}
