@@ -46,7 +46,7 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
   
   agent    = 1
   memory   = each.value.memory
-  clone       = each.value.image   
+  clone       = each.value.image   # This comes from your NetBox "image" field
   full_clone  = true
   os_type     = "ubuntu"
   scsihw   = "virtio-scsi-pci"
@@ -126,7 +126,6 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
       tags, 
       network, 
       startup_shutdown,
-      clone, 
       full_clone, 
       ipconfig1
     ]
