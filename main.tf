@@ -38,19 +38,19 @@ locals {
 resource "proxmox_vm_qemu" "proxmox_vms" {
   for_each = { for vm in local.vms : vm.name => vm if vm.name != "" }
 
-  name        = each.value.name
-  vmid        = each.value.vmid
-  target_node = each.value.node
-  description = each.value.desc
-  pool        = each.value.pool != "" ? each.value.pool : null
+  name               = each.value.name
+  vmid               = each.value.vmid
+  target_node        = each.value.node
+  description        = each.value.desc
+  pool               = each.value.pool != "" ? each.value.pool : null
   start_at_node_boot = each.value.start_at_node_boot
-  agent       = 1
-  memory      = each.value.memory
-  clone       = each.value.image   # This comes from your NetBox "image" field
-  full_clone  = true
-  os_type     = "ubuntu"
-  scsihw      = "virtio-scsi-pci"
-  boot        = "order=scsi0;ide3"
+  agent              = 1
+  memory             = each.value.memory
+  clone              = each.value.image   # This comes from your NetBox "image" field
+  full_clone         = true
+  os_type            = "ubuntu"
+  scsihw             = "virtio-scsi-pci"
+  boot               = "order=scsi0;ide3"
 
   cpu {
     cores   = each.value.cores
