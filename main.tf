@@ -43,7 +43,7 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
   target_node = each.value.node
   description = each.value.desc
   pool        = each.value.pool != "" ? each.value.pool : null
-  start_at_node_boot = tobool(each.value.start_at_node_boot)
+  start_at_node_boot = tobool(lower(each.value.start_at_node_boot))
   agent       = 1
   memory      = each.value.memory
   clone       = each.value.image   # This comes from your NetBox "image" field
