@@ -26,7 +26,7 @@
       "storage": "{{ vm.custom_field_data.storage_location or 'local-zfs' }}",
       "disk_size": "{{ (vm.disk / 1000) | int if vm.disk else 8 }}G",
       "pool": "{{ vm.custom_field_data.proxmox_pool or '' }}",
-      "start_at_node_boot": {{ vm.custom_field_data.start_at_node_boot }},
+      "start_at_node_boot": {{ vm.custom_field_data.start_at_node_boot | lower }},
       
       {# Image Logic #}
       {% if vm.custom_field_data.prod_image %}{% set img = vm.custom_field_data.prod_image %}
