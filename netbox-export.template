@@ -26,8 +26,7 @@
       "storage": "{{ vm.custom_field_data.storage_location or 'local-zfs' }}",
       "disk_size": "{{ (vm.disk / 1000) | int if vm.disk else 8 }}G",
       "pool": "{{ vm.custom_field_data.proxmox_pool or '' }}",
-      "start_at_node_boot": {{ vm.custom_field_data.start_at_node_boot | lower }},
-      
+      "start_at_node_boot": {{ "true" if vm.start_on_boot.value == "on" else "false" }},     
       {# Image Logic #}
       {% if vm.custom_field_data.prod_image %}{% set img = vm.custom_field_data.prod_image %}
       {% elif vm.custom_field_data.template == "ubuntu-2204-cloud" %}{% set img = "ubuntu-cloud" %}
