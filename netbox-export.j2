@@ -1,7 +1,7 @@
 [
 {% set ns = namespace(first=true) %}
 {% for vm in queryset %}
-  {% if vm.status == 'active' and 'vm' in vm.custom_field_data.VMorContainer %}
+  {% if (vm.status == 'active' or vm.status == 'paused') and 'vm' in vm.custom_field_data.VMorContainer %}
     {% if ns.first %}{% set ns.first = false %}{% else %},{% endif %}
     {% set context = vm.get_config_context() %}
     {% set vars = namespace(vlan=0, f_ip="") %}
@@ -17,6 +17,7 @@
     
     {
       "name": "{{ vm.name }}",
+      "status": "{{ 'running' if vm.status == 'active' else 'stopped' }}",
       "ssh_keys": "{{ context.ssh_keys | join('\\n') if context.ssh_keys else '' }}",
       "vmid": {{ vm.custom_field_data.vmid or 0 }},
       "desc": "{{ vm.comments | replace('\n', ' ') | replace('"', '\\"') or 'Managed by NetBox' }}",
