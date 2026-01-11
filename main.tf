@@ -51,6 +51,7 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
   os_type            = "ubuntu"
   scsihw             = "virtio-scsi-pci"
   boot               = "order=scsi0;ide3"
+  vm_state           = each.value.status
 
   cpu {
     cores   = each.value.cores
@@ -118,8 +119,7 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
     ignore_changes = [
       qemu_os, 
       hagroup, 
-      hastate,      
-      vm_state, 
+      hastate,            
       agent, 
       usbs, 
       tags, 
