@@ -125,7 +125,10 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
       tags, 
       startup_shutdown,
       clone,
-      full_clone
+      full_clone,
+      default_ipv4_address,
+      ssh_host,
+      ssh_port
     ]
   }
 }
