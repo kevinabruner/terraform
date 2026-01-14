@@ -107,9 +107,9 @@ dynamic "network" {
   }
 }
 
-  ipconfig0 = "ip=${each.value.interfaces[0].ip},gw=${each.value.interfaces[0].gw}"
-  
-  # If there is a second interface, add ipconfig1
+  ipconfig0 = "ip=${each.value.interfaces[0].ip},gw=${regexall("^(\\d+\\.\\d+\\.\\d+)", each.value.interfaces[0].ip)[0]}.1"
+
+  # Secondary interface (no gateway usually needed)
   ipconfig1 = length(each.value.interfaces) > 1 ? "ip=${each.value.interfaces[1].ip}" : null
 
   # Standardized user data
