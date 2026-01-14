@@ -127,9 +127,7 @@ lifecycle {
       clone,
       full_clone,
       ipconfig0,      
-
       network,        # Prevents network-interface-change reboots
-      desc,
     ]
   } 
 }
