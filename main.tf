@@ -138,9 +138,7 @@ lifecycle {
       tags, 
       startup_shutdown,
       clone,
-      full_clone,
-      #ipconfig0,     #These might affect startup and shutdown behaviour, idk 
-      #network,        
+      full_clone,  
     ]
   } 
 }
