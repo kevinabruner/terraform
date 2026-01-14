@@ -4,7 +4,6 @@
   {% if (vm.status == 'active' or vm.status == 'paused') and 'vm' in vm.custom_field_data.VMorContainer %}
 
     {% set context = vm.get_config_context() %}
-    {%- set ns_vm = namespace(ifaces=[]) -%}
     
     {%- set ns_vm = namespace(ifaces=[]) -%}
 
