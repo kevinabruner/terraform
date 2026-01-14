@@ -116,7 +116,7 @@ dynamic "network" {
   ipconfig0 = "ip=${each.value.primary_iface.ip},gw=${each.value.gateway}"
 
   # Grabs the IP of the first non-primary interface, if one exists
-  ipconfig1 = length(each.value.secondary_ifaces) > 0 ? "ip=${each.value.secondary_ifaces[0].ip}" : null
+  #ipconfig1 = length(each.value.secondary_ifaces) > 0 ? "ip=${each.value.secondary_ifaces[0].ip}" : null
 
   # Standardized user data
   ciuser     = var.vm_username
@@ -133,7 +133,9 @@ lifecycle {
       tags, 
       startup_shutdown,
       clone,
-      full_clone,       
+      full_clone,
+      #ipconfig0,     #These might affect startup and shutdown behaviour, idk 
+      #network,        
     ]
   } 
 }
