@@ -6,9 +6,9 @@
     {% set context = vm.get_config_context() %}
     {% set vars = namespace(vlan=0, net1_ip="") %}
     
-    {% set network_interfaces = [] %}
+  {%- set network_interfaces = [] -%}
     
-    
+    {# Use .all() and ensure the variable i is scoped correctly #}
     {%- for i in vm.interfaces.all() -%}
       {%- set ip_obj = i.ip_addresses.first() -%}
       {%- set ip_str = ip_obj.address | string if ip_obj else "" -%}
@@ -18,13 +18,13 @@
         {%- set is_primary = true -%}
       {%- endif -%}
 
-      {# This line replaces the "do" append logic #}
-      {%- set network_interfaces = network_interfaces + [{
-        "name": i.name,
+      {%- set i_data = {
+        "name": i.name | string,
         "vlan": i.untagged_vlan.vid if i.untagged_vlan else 0,
         "ip": ip_str,
         "is_primary": is_primary
-      }] -%}
+      } -%}
+      {%- set network_interfaces = network_interfaces + [i_data] -%}
     {%- endfor -%}
 
     {
