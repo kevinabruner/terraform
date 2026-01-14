@@ -101,14 +101,14 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
 
   # Fast IP Logic
   dynamic "network" {
-    for_each = each.value.fast_ip != "" ? [1] : []
+    for_each = each.value.secondary_ip != "" ? [1] : []
     content {
       id     = 1
       model  = "virtio"
       bridge = "vmbr3"
     }
   }
-  ipconfig1 = each.value.fast_ip != "" ? "ip=${each.value.fast_ip}" : null
+  ipconfig1 = each.value.secondary_ip != "" ? "ip=${each.value.secondary_ip}" : null
 
   # Standardized user data
   ciuser     = var.vm_username

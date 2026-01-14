@@ -4,25 +4,32 @@
   {% if (vm.status == 'active' or vm.status == 'paused') and 'vm' in vm.custom_field_data.VMorContainer %}
 
     {% set context = vm.get_config_context() %}
-    {% set vars = namespace(vlan=0, f_ip="") %}
+    {% set vars = namespace(vlan=0, net1_ip="") %}
     
     {# Loop through interfaces to find VLAN and net1 IP #}
     {% for i in vm.interfaces.all() %}
-      {% if i.untagged_vlan %}{% set vars.vlan = i.untagged_vlan.vid %}{% endif %}
+
+      {# If any interface is tagged with a vlan, use that as the vlan IP #}
+      {% if i.untagged_vlan %}
+        {% set vars.vlan = i.untagged_vlan.vid %}
+      {% endif %}
+
+      {# If any interface is named "net1" use that as the second ip #}
       {% if i.name == "net1" %}
         {% set ip_obj = i.ip_addresses.first() %}
-        {% if ip_obj %}{% set vars.f_ip = ip_obj.address | string %}{% endif %}
+        {% if ip_obj %}{% set vars.net1_ip = ip_obj.address | string %}{% endif %}
       {% endif %}
-    {% endfor %}
+
+    {%- endfor -%}
     
     {
+      {# Basic variables #}
       "name": "{{ vm.name }}",
       "status": "{{ 'running' if vm.status == 'active' else 'stopped' }}",
       "ssh_keys": "{{ context.ssh_keys | join('\\n') if context.ssh_keys else '' }}",
       "vmid": {{ vm.custom_field_data.vmid or 0 }},
       "desc": "{{ vm.comments | replace('\n', ' ') | replace('"', '\\"') or 'Managed by NetBox' }}",
       "node": "{{ vm.device.name if vm.device else (vm.cluster.name if vm.cluster else 'pve') }}",
-
       "cores": {{ vm.vcpus | int if vm.vcpus else 1 }},
       "memory": {{ vm.memory or 1024 }},
       "storage": "{{ vm.custom_field_data.storage_location or 'local-zfs' }}",
@@ -39,7 +46,6 @@
       {% else -%}
         {% set img = vm.custom_field_data.template or "ubuntu-cloud" %}
       {%- endif -%}
-
       "image": "{{ img }}",
       
       {# Primary IP / GW Logic #}
@@ -50,10 +56,13 @@
       {% else %}"ip0": null,{% endif %}
       
       "vlan": {{ vars.vlan }},
-      "fast_ip": "{{ vars.f_ip }}",
+      "secondary_ip": "{{ vars.net1_ip }}",
       "tags": "{{ vm.tags.all() | join(',') }}"
     }
+
+    {# Important: adds a comma after every entry except the last for valid JSON #}
     {{ "," if not loop.last }}
+
   {% endif %}
 {% endfor %}
 ]
