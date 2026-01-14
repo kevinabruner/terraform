@@ -126,7 +126,6 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
       startup_shutdown,
       clone,
       full_clone,
-      cloudinit_cdrom_storage
       #default_ipv4_address,
       #ssh_host,
       #ssh_port
