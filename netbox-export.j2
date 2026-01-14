@@ -14,7 +14,7 @@
         {% set vars.vlan = i.untagged_vlan.vid %}
       {% endif %}
 
-      {# If any interface is named "net1" use that as the second ip #}
+      {# If any interface is named "net1" use that as the secondary ip #}
       {% if i.name == "net1" %}
         {% set ip_obj = i.ip_addresses.first() %}
         {% if ip_obj %}{% set vars.net1_ip = ip_obj.address | string %}{% endif %}
