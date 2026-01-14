@@ -115,7 +115,7 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
   cipassword = var.vm_password
   sshkeys = each.value.ssh_keys
 
-  lifecycle {
+lifecycle {
     ignore_changes = [
       qemu_os, 
       hagroup, 
@@ -126,8 +126,11 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
       startup_shutdown,
       clone,
       full_clone,
-      ipconfig0
+      ipconfig0,      
+      
+      network,        # Prevents network-interface-change reboots
+      desc,
     ]
-  }
+  
 }
 
