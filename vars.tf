@@ -24,11 +24,6 @@ variable "netbox_api_token_secret" {
     sensitive = true 
 }
 
-variable "netbox_export_url" { 
-    type = string
-    default = "https://netbox.thejfk.ca/api/virtualization/virtual-machines/?export=Main+terraform+templates"
-}
-
 variable "vm_password" { 
     type = string 
     sensitive = true 
