@@ -49,13 +49,13 @@
       "image": "{{ img }}",
       
       {# Primary IP / GW Logic #}
-      {% if vm.primary_ip %}
+      {% if vm.primary_ip -%}
         {% set ip_str = vm.primary_ip.address | string %}
         {% set ip_parts = ip_str.split('.') %}
-        {% set gateway= ip_parts[0]  ~ '.' ~ ip_parts[1] ~ '.' ~ ip_parts[2] ~ '.1' }
+        {% set gateway= ip_parts[0]  ~ '.' ~ ip_parts[1] ~ '.' ~ ip_parts[2] ~ '.1' -%}
 
         "ip0": "ip={{ ip_str }},gw={{ gateway }}",
-        
+
       {% else %}"ip0": null,{% endif %}
       
       "vlan": {{ vars.vlan }},
