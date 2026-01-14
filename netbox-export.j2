@@ -16,10 +16,18 @@
       {%- endif -%}
 
       {# Using the namespace list append logic #}
+      {%- set ip_obj = i.ip_addresses.first() -%}
+      {%- set gw_str = "" -%}
+      {%- if ip_obj and ip_obj.address.prefix.first_as_ip -%}
+         {# This logic assumes the first IP in the prefix is the gateway #}
+         {%- set gw_str = ip_obj.address.prefix.first_as_ip | string -%}
+      {%- endif -%}
+
       {%- set iface_entry = {
         "name": i.name,
         "vlan": i.untagged_vlan.vid if i.untagged_vlan else 0,
         "ip": ip_str,
+        "gw": gw_str,
         "is_primary": is_primary
       } -%}
       {%- set ns_vm.ifaces = ns_vm.ifaces + [iface_entry] -%}
@@ -39,7 +47,7 @@
       "disk_size": "{{ (vm.disk / 1000) | int if vm.disk else 8 }}G",
       "pool": "{{ vm.custom_field_data.proxmox_pool or '' }}",
       "start_at_node_boot": {{ "true" if vm.start_on_boot == "on" else "false" }},
-      "interfaces": {{ network_interfaces | tojson }}, 
+      "interfaces": {{ ns_vm.ifaces | tojson }},
 
 
       {# Image Logic #}
