@@ -6,29 +6,17 @@
     {% set context = vm.get_config_context() %}
     {%- set ns_vm = namespace(ifaces=[]) -%}
     
+    {%- set ns_vm = namespace(ifaces=[]) -%}
+
+    {# Run through every interface and set networking information #}
     {%- for i in vm.interfaces.all() -%}
       {%- set ip_obj = i.ip_addresses.first() -%}
       {%- set ip_str = ip_obj.address | string if ip_obj else "" -%}
-      
-      {%- set is_primary = false -%}
-      {%- if vm.primary_ip and ip_str == (vm.primary_ip.address | string) -%}
-        {%- set is_primary = true -%}
-      {%- endif -%}
-
-      {# Using the namespace list append logic #}
-      {%- set ip_obj = i.ip_addresses.first() -%}
-      {%- set gw_str = "" -%}
-      {%- if ip_obj and ip_obj.address.prefix.first_as_ip -%}
-         {# This logic assumes the first IP in the prefix is the gateway #}
-         {%- set gw_str = ip_obj.address.prefix.first_as_ip | string -%}
-      {%- endif -%}
-
       {%- set iface_entry = {
         "name": i.name,
         "vlan": i.untagged_vlan.vid if i.untagged_vlan else 0,
         "ip": ip_str,
-        "gw": gw_str,
-        "is_primary": is_primary
+        "is_primary": (vm.primary_ip and ip_str == (vm.primary_ip.address | string))
       } -%}
       {%- set ns_vm.ifaces = ns_vm.ifaces + [iface_entry] -%}
     {%- endfor -%}
