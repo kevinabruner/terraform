@@ -102,7 +102,7 @@ dynamic "network" {
     id     = network.key
     model  = "virtio"
     bridge = network.value.name 
-    tag    = network.value.vlan > 0 ? network.value.vlan : -1
+    tag    = network.value.vlan > 0 ? network.value.vlan : null
   }
 }
 
