@@ -99,7 +99,7 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
 
   ipconfig0 = each.value.ip0
 
-  # Fast IP Logic
+  # secondary ip logic
   dynamic "network" {
     for_each = each.value.secondary_ip != "" ? [1] : []
     content {
