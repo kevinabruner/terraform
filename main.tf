@@ -32,11 +32,17 @@ provider "proxmox" {
 
 locals {
   vms = jsondecode(data.http.netbox_export.response_body)
+  vm_configs = {
+    for vm in local.vms : vm.name => merge(vm, {
+        gateway = "${join(".", slice(split(".", element([for i in vm.interfaces : i.ip if i.is_primary], 0)), 0, 3))}.1"
+      }) if vm.name != ""
+  }
 }
 
 
+
 resource "proxmox_vm_qemu" "proxmox_vms" {
-  for_each = { for vm in local.vms : vm.name => vm if vm.name != "" }
+  for_each = local.vm_configs
 
   name               = each.value.name
   vmid               = each.value.vmid
@@ -89,26 +95,18 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
     type = "socket" 
   }
 
-  # Networking
-  network {
-    id     = 0
+dynamic "network" {
+  for_each = each.value.interfaces
+  content {
+    id     = network.key
     model  = "virtio"
-    bridge = "vmbr0"
-    tag = tonumber(each.value.vlan) > 0 ? tonumber(each.value.vlan) : null
+    bridge = network.value.name 
+    tag    = network.value.vlan > 0 ? network.value.vlan : null
   }
+}
 
-  ipconfig0 = each.value.ip0
-
-  # secondary ip logic
-  dynamic "network" {
-    for_each = each.value.secondary_ip != "" ? [1] : []
-    content {
-      id     = 1
-      model  = "virtio"
-      bridge = "vmbr3"
-    }
-  }
-  ipconfig1 = each.value.secondary_ip != "" ? "ip=${each.value.secondary_ip}" : null
+  ipconfig0 = "ip=${each.value.interfaces[0].ip},gw=${each.value.gateway}"
+  ipconfig1 = length(each.value.interfaces) > 1 ? "ip=${each.value.interfaces[1].ip}" : null
 
   # Standardized user data
   ciuser     = var.vm_username
@@ -127,7 +125,7 @@ lifecycle {
       clone,
       full_clone,
       ipconfig0,      
-      network,        
+      #network,        
     ]
   } 
 }
