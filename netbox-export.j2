@@ -4,28 +4,26 @@
   {% if (vm.status == 'active' or vm.status == 'paused') and 'vm' in vm.custom_field_data.VMorContainer %}
 
     {% set context = vm.get_config_context() %}
-    {% set vars = namespace(vlan=0, net1_ip="") %}
+    {%- set ns_vm = namespace(ifaces=[]) -%}
     
-{%- set network_interfaces = [] -%}
-    
-    {# 1. Try to get the Primary Interface via the Primary IP link #}
-    {%- if vm.primary_ip and vm.primary_ip.assigned_object -%}
-      {%- set i = vm.primary_ip.assigned_object -%}
-      {%- set i_data = {
-        "name": i.name | string,
-        "vlan": i.untagged_vlan.vid if i.untagged_vlan else 0,
-        "ip": vm.primary_ip.address | string,
-        "is_primary": true
-      } -%}
-      {%- set network_interfaces = network_interfaces + [i_data] -%}
-    {%- endif -%}
+    {%- for i in vm.interfaces.all() -%}
+      {%- set ip_obj = i.ip_addresses.first() -%}
+      {%- set ip_str = ip_obj.address | string if ip_obj else "" -%}
+      
+      {%- set is_primary = false -%}
+      {%- if vm.primary_ip and ip_str == (vm.primary_ip.address | string) -%}
+        {%- set is_primary = true -%}
+      {%- endif -%}
 
-    {# 2. Fallback: If no interfaces found yet, try the 'interfaces' manager one last way #}
-    {%- if network_interfaces | length == 0 -%}
-      {%- for i in vm.interfaces.all() -%}
-         {%- set network_interfaces = network_interfaces + [{"name": i.name | string, "is_primary": false}] -%}
-      {%- endfor -%}
-    {%- endif -%}
+      {# Using the namespace list append logic #}
+      {%- set iface_entry = {
+        "name": i.name,
+        "vlan": i.untagged_vlan.vid if i.untagged_vlan else 0,
+        "ip": ip_str,
+        "is_primary": is_primary
+      } -%}
+      {%- set ns_vm.ifaces = ns_vm.ifaces + [iface_entry] -%}
+    {%- endfor -%}
 
     {
       {# Basic variables #}

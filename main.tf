@@ -96,30 +96,19 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
     type = "socket" 
   }
 
-  # 1. Primary network
-  network {
-    id     = 0
+dynamic "network" {
+  for_each = each.value.interfaces
+  content {
     model  = "virtio"
-    bridge = "vmbr0"
-    tag    = each.value.primary_vlan > 0 ? each.value.primary_vlan : -1
+    bridge = "network.value.name"
+    tag    = network.value.vlan > 0 ? network.value.vlan : -1
   }
+}
 
-  ipconfig0 = each.value.ip0
-
-  # 2. Dynamic Secondary Interfaces (id > 0)
-  dynamic "network" {
-    # Loop through all interfaces EXCEPT the one already used for id 0
-    for_each = [for i in each.value.interfaces : i if !i.is_primary]
-    content {
-      # Use the loop index + 1 to ensure we don't clash with id 0
-      id     = network.key + 1
-      model  = "virtio"
-      bridge = network.value.vlan == 10 ? "vmbr3" : "vmbr0" # Example logic for different bridges
-      tag    = tonumber(network.value.vlan) > 0 ? tonumber(network.value.vlan) : -1
-    }
-  }
-
-  ipconfig1 = length([for i in each.value.interfaces : i if !i.is_primary && i.ip != ""]) > 0 ? "ip=${[for i in each.value.interfaces : i if !i.is_primary && i.ip != ""][0].ip}" : null
+  ipconfig0 = "ip=${each.value.interfaces[0].ip},gw=${local.gateway}"
+  
+  # If there is a second interface, add ipconfig1
+  ipconfig1 = length(each.value.interfaces) > 1 ? "ip=${each.value.interfaces[1].ip}" : null
 
   # Standardized user data
   ciuser     = var.vm_username
