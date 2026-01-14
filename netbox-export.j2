@@ -8,14 +8,24 @@
     
 {%- set network_interfaces = [] -%}
     
-    {# In some NetBox environments, you iterate over the manager directly #}
-    {%- for i in vm.interfaces.all -%}
+    {# Calling .all() inside the for-loop directly usually triggers the sandbox block #}
+    {# Using the .all() here and ensuring no spaces #}
+    {%- set vm_ifaces = vm.interfaces.all() -%}
+    
+    {%- for i in vm_ifaces -%}
       {%- set ip_obj = i.ip_addresses.first() -%}
+      {%- set ip_str = ip_obj.address | string if ip_obj else "" -%}
+      
+      {%- set is_primary = false -%}
+      {%- if vm.primary_ip and ip_str == (vm.primary_ip.address | string) -%}
+        {%- set is_primary = true -%}
+      {%- endif -%}
+
       {%- set i_data = {
         "name": i.name | string,
         "vlan": i.untagged_vlan.vid if i.untagged_vlan else 0,
-        "ip": ip_obj.address | string if ip_obj else "",
-        "is_primary": (vm.primary_ip and ip_obj and ip_obj.id == vm.primary_ip.id)
+        "ip": ip_str,
+        "is_primary": is_primary
       } -%}
       {%- set network_interfaces = network_interfaces + [i_data] -%}
     {%- endfor -%}
