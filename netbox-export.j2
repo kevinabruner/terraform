@@ -8,12 +8,12 @@
     {%- set ns_vm = namespace(ifaces=[]) -%}
 
     {# Run through every interface and set networking information #}
-    {%- for i in vm.interfaces.all() -%}
-      {%- set ip_obj = i.ip_addresses.first() -%}
+    {%- for interface in vm.interfaces.all() -%}
+      {%- set ip_obj = interface.ip_addresses.first() -%}
       {%- set ip_str = ip_obj.address | string if ip_obj else "" -%}
       {%- set iface_entry = {
-        "name": i.name,
-        "vlan": i.untagged_vlan.vid if i.untagged_vlan else 0,
+        "name": interface.name,
+        "vlan": interface.untagged_vlan.vid if interface.untagged_vlan else 0,
         "ip": ip_str,
         "is_primary": (vm.primary_ip and ip_str == (vm.primary_ip.address | string))
       } -%}
