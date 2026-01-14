@@ -6,10 +6,10 @@
     {% set context = vm.get_config_context() %}
     {% set vars = namespace(vlan=0, net1_ip="") %}
     
-  {%- set network_interfaces = [] -%}
+{%- set network_interfaces = [] -%}
     
-    {# Use .all() and ensure the variable i is scoped correctly #}
-    {%- for i in vm.interfaces.all() -%}
+    {# In NetBox Export Templates, Virtual Machines use 'vminterfaces' #}
+    {%- for i in vm.vminterfaces.all() -%}
       {%- set ip_obj = i.ip_addresses.first() -%}
       {%- set ip_str = ip_obj.address | string if ip_obj else "" -%}
       
