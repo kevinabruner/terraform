@@ -8,25 +8,24 @@
     
     {% set network_interfaces = [] %}
     
-    {% for i in vm.interfaces.all() %}
-      {% set ip_obj = i.ip_addresses.first() %}
-      {% set ip_str = ip_obj.address | string if ip_obj else "" %}
+    
+    {%- for i in vm.interfaces.all() -%}
+      {%- set ip_obj = i.ip_addresses.first() -%}
+      {%- set ip_str = ip_obj.address | string if ip_obj else "" -%}
       
-      {# Check if this IP matches the VM's designated Primary IP #}
-      {% set is_primary = false %}
-      {% if vm.primary_ip and ip_str == (vm.primary_ip.address | string) %}
-        {% set is_primary = true %}
-      {% endif %}
+      {%- set is_primary = false -%}
+      {%- if vm.primary_ip and ip_str == (vm.primary_ip.address | string) -%}
+        {%- set is_primary = true -%}
+      {%- endif -%}
 
-      {% set i_data = {
+      {# This line replaces the "do" append logic #}
+      {%- set network_interfaces = network_interfaces + [{
         "name": i.name,
         "vlan": i.untagged_vlan.vid if i.untagged_vlan else 0,
         "ip": ip_str,
         "is_primary": is_primary
-      } %}
-      
-      {% do network_interfaces.append(i_data) %}
-    {% endfor %}
+      }] -%}
+    {%- endfor -%}
 
     {
       {# Basic variables #}
