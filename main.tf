@@ -99,8 +99,10 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
 dynamic "network" {
   for_each = each.value.interfaces
   content {
+    # .key provides the index (0, 1, 2...)
+    id     = network.key
     model  = "virtio"
-    bridge = "network.value.name"
+    bridge = network.value.name 
     tag    = network.value.vlan > 0 ? network.value.vlan : -1
   }
 }
