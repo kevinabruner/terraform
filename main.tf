@@ -34,12 +34,12 @@ locals {
   vms = jsondecode(data.http.netbox_export.response_body)
   vm_configs = {
     for vm in local.vms : vm.name => merge(vm, {
-        primary_vlan = tonumber(
-          element([for i in vm.interfaces : i.vlan if i.is_primary], 0)
-        )
+        # THIS IS THE DEFINITION:
+        gateway = "${join(".", slice(split(".", element([for i in vm.interfaces : i.ip if i.is_primary], 0)), 0, 3))}.1"
       }) if vm.name != ""
   }
 }
+
 
 
 resource "proxmox_vm_qemu" "proxmox_vms" {
@@ -107,9 +107,7 @@ dynamic "network" {
   }
 }
 
-  ipconfig0 = "ip=${each.value.interfaces[0].ip},gw=${regexall("^(\\d+\\.\\d+\\.\\d+)", each.value.interfaces[0].ip)[0]}.1"
-
-  # Secondary interface (no gateway usually needed)
+  ipconfig0 = "ip=${each.value.interfaces[0].ip},gw=${each.value.gateway}"
   ipconfig1 = length(each.value.interfaces) > 1 ? "ip=${each.value.interfaces[1].ip}" : null
 
   # Standardized user data
