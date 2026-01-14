@@ -6,22 +6,28 @@
     {% set context = vm.get_config_context() %}
     {% set vars = namespace(vlan=0, net1_ip="") %}
     
-    {# Loop through interfaces to find VLAN and net1 IP #}
-    {% for i in vm.interfaces.all() %}
-
-      {# If any interface is tagged with a vlan, use that as the vlan IP #}
-      {% if i.untagged_vlan %}
-        {% set vars.vlan = i.untagged_vlan.vid %}
-      {% endif %}
-
-      {# If any interface is named "net1" use that as the secondary ip #}
-      {% if i.name == "net1" %}
-        {% set ip_obj = i.ip_addresses.first() %}
-        {% if ip_obj %}{% set vars.net1_ip = ip_obj.address | string %}{% endif %}
-      {% endif %}
-
-    {%- endfor -%}
+    {% set network_interfaces = [] %}
     
+    {% for i in vm.interfaces.all() %}
+      {% set ip_obj = i.ip_addresses.first() %}
+      {% set ip_str = ip_obj.address | string if ip_obj else "" %}
+      
+      {# Check if this IP matches the VM's designated Primary IP #}
+      {% set is_primary = false %}
+      {% if vm.primary_ip and ip_str == (vm.primary_ip.address | string) %}
+        {% set is_primary = true %}
+      {% endif %}
+
+      {% set i_data = {
+        "name": i.name,
+        "vlan": i.untagged_vlan.vid if i.untagged_vlan else 0,
+        "ip": ip_str,
+        "is_primary": is_primary
+      } %}
+      
+      {% do network_interfaces.append(i_data) %}
+    {% endfor %}
+
     {
       {# Basic variables #}
       "name": "{{ vm.name }}",
@@ -35,7 +41,8 @@
       "storage": "{{ vm.custom_field_data.storage_location or 'local-zfs' }}",
       "disk_size": "{{ (vm.disk / 1000) | int if vm.disk else 8 }}G",
       "pool": "{{ vm.custom_field_data.proxmox_pool or '' }}",
-      "start_at_node_boot": {{ "true" if vm.start_on_boot == "on" else "false" }}, 
+      "start_at_node_boot": {{ "true" if vm.start_on_boot == "on" else "false" }},
+      "interfaces": {{ network_interfaces | tojson }}, 
 
 
       {# Image Logic #}
@@ -47,19 +54,6 @@
         {% set img = vm.custom_field_data.template or "ubuntu-cloud" %}
       {%- endif -%}
       "image": "{{ img }}",
-      
-      {# Primary IP / GW Logic #}
-      {% if vm.primary_ip -%}
-        {% set ip_str = vm.primary_ip.address | string %}
-        {% set ip_parts = ip_str.split('.') %}
-        {% set gateway= ip_parts[0]  ~ '.' ~ ip_parts[1] ~ '.' ~ ip_parts[2] ~ '.1' -%}
-
-        "ip0": "ip={{ ip_str }},gw={{ gateway }}",
-
-      {% else %}"ip0": null,{% endif %}
-      
-      "vlan": {{ vars.vlan }},
-      "secondary_ip": "{{ vars.net1_ip }}",
       "tags": "{{ vm.tags.all() | join(',') }}"
     }
 

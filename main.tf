@@ -32,6 +32,13 @@ provider "proxmox" {
 
 locals {
   vms = jsondecode(data.http.netbox_export.response_body)
+  vm_configs = {
+    for vm in local.vms : vm.name => merge(vm, {
+        primary_vlan = tonumber(
+          element([for i in vm.interfaces : i.vlan if i.is_primary], 0)
+        )
+      }) if vm.name != ""
+  }
 }
 
 
@@ -89,26 +96,30 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
     type = "socket" 
   }
 
-  # Networking
+  # 1. Primary network
   network {
     id     = 0
     model  = "virtio"
     bridge = "vmbr0"
-    tag = tonumber(each.value.vlan) > 0 ? tonumber(each.value.vlan) : null
+    tag    = each.value.primary_vlan > 0 ? each.value.primary_vlan : -1
   }
 
   ipconfig0 = each.value.ip0
 
-  # Fast IP Logic
+  # 2. Dynamic Secondary Interfaces (id > 0)
   dynamic "network" {
-    for_each = each.value.secondary_ip != "" ? [1] : []
+    # Loop through all interfaces EXCEPT the one already used for id 0
+    for_each = [for i in each.value.interfaces : i if !i.is_primary]
     content {
-      id     = 1
+      # Use the loop index + 1 to ensure we don't clash with id 0
+      id     = network.key + 1
       model  = "virtio"
-      bridge = "vmbr3"
+      bridge = network.value.vlan == 10 ? "vmbr3" : "vmbr0" # Example logic for different bridges
+      tag    = tonumber(network.value.vlan) > 0 ? tonumber(network.value.vlan) : -1
     }
   }
-  ipconfig1 = each.value.secondary_ip != "" ? "ip=${each.value.secondary_ip}" : null
+
+  ipconfig1 = length([for i in each.value.interfaces : i if !i.is_primary && i.ip != ""]) > 0 ? "ip=${[for i in each.value.interfaces : i if !i.is_primary && i.ip != ""][0].ip}" : null
 
   # Standardized user data
   ciuser     = var.vm_username
