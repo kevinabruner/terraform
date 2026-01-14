@@ -2,7 +2,7 @@
 {% set ns = namespace(first=true) %}
 {% for vm in queryset %}
   {% if (vm.status == 'active' or vm.status == 'paused') and 'vm' in vm.custom_field_data.VMorContainer %}
-    {% if ns.first %}{% set ns.first = false %}{% else %},{% endif %}
+
     {% set context = vm.get_config_context() %}
     {% set vars = namespace(vlan=0, f_ip="") %}
     
@@ -22,16 +22,24 @@
       "vmid": {{ vm.custom_field_data.vmid or 0 }},
       "desc": "{{ vm.comments | replace('\n', ' ') | replace('"', '\\"') or 'Managed by NetBox' }}",
       "node": "{{ vm.device.name if vm.device else (vm.cluster.name if vm.cluster else 'pve') }}",
+
       "cores": {{ vm.vcpus | int if vm.vcpus else 1 }},
       "memory": {{ vm.memory or 1024 }},
       "storage": "{{ vm.custom_field_data.storage_location or 'local-zfs' }}",
       "disk_size": "{{ (vm.disk / 1000) | int if vm.disk else 8 }}G",
       "pool": "{{ vm.custom_field_data.proxmox_pool or '' }}",
-      "start_at_node_boot": {{ "true" if vm.start_on_boot == "on" else "false" }},     
+      "start_at_node_boot": {{ "true" if vm.start_on_boot == "on" else "false" }}, 
+
+
       {# Image Logic #}
-      {% if vm.custom_field_data.prod_image %}{% set img = vm.custom_field_data.prod_image %}
-      {% elif vm.custom_field_data.template == "ubuntu-2204-cloud" %}{% set img = "ubuntu-cloud" %}
-      {% else %}{% set img = vm.custom_field_data.template or "ubuntu-cloud" %}{% endif %}
+      {%- if vm.custom_field_data.prod_image -%}
+        {%- set img = vm.custom_field_data.prod_image -%}
+      {%- elif vm.custom_field_data.template == "ubuntu-2204-cloud" -%}
+        {%- set img = "ubuntu-cloud" -%}
+      {% else -%}
+        {% set img = vm.custom_field_data.template or "ubuntu-cloud" %}
+      {%- endif -%}
+
       "image": "{{ img }}",
       
       {# Primary IP / GW Logic #}
@@ -45,6 +53,7 @@
       "fast_ip": "{{ vars.f_ip }}",
       "tags": "{{ vm.tags.all() | join(',') }}"
     }
+    {{ "," if not loop.last }}
   {% endif %}
 {% endfor %}
 ]
