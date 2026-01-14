@@ -34,14 +34,16 @@ locals {
   vms = jsondecode(data.http.netbox_export.response_body)
   vm_configs = {
     for vm in local.vms : vm.name => merge(vm, {
+
       # Find the specific interface object where is_primary is true
       primary_iface = [for i in vm.interfaces : i if i.is_primary][0]
 
       # Find all interfaces that are NOT primary
       secondary_ifaces = [for i in vm.interfaces : i if !i.is_primary]
       
-      # Use that found object to calculate the gateway
+      # Use that found object generate a gateway address (192.168.xx + .1)
       gateway = "${join(".", slice(split(".", [for i in vm.interfaces : i.ip if i.is_primary][0]), 0, 3))}.1"
+      
     }) if vm.name != ""
   }
 }
@@ -113,7 +115,7 @@ dynamic "network" {
 }
 
   # Always uses the Netbox primary ipv4 interface
-  #ipconfig0 = "ip=${each.value.primary_iface.ip},gw=${each.value.gateway}"
+  ipconfig0 = "ip=${each.value.primary_iface.ip},gw=${each.value.gateway}"
 
   # Grabs the IP of the first non-primary interface, if one exists
   ipconfig1 = length(each.value.secondary_ifaces) > 0 ? "ip=${each.value.secondary_ifaces[0].ip}" : null
