@@ -108,7 +108,7 @@ dynamic "network" {
   ipconfig0 = "ip=${each.value.interfaces[0].ip},gw=${each.value.interfaces[0].gw}"
   
   # If there is a second interface, add ipconfig1
-  pconfig1 = length(each.value.interfaces) > 1 ? "ip=${each.value.interfaces[1].ip}" : null
+  ipconfig1 = length(each.value.interfaces) > 1 ? "ip=${each.value.interfaces[1].ip}" : null
 
   # Standardized user data
   ciuser     = var.vm_username
