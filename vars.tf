@@ -4,7 +4,6 @@
 #  or placed in /etc/environment            #
 ##--------------END BIG NOTE:-------------###
 
-
 variable "proxmox_api_token_secret" { 
     type = string
     sensitive = true 
@@ -23,4 +22,9 @@ variable "vm_password" {
 variable "vm_username" { 
     type = string 
     default = "kevin"
+}
+
+variable "netbox_export_url" { 
+    type = string
+    default = "https://netbox.thejfk.ca/api/virtualization/virtual-machines/?export=Main+terraform+templates"
 }

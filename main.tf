@@ -12,7 +12,7 @@ terraform {
 }
 
 data "http" "netbox_export" {
-  url = "https://netbox.thejfk.ca/api/virtualization/virtual-machines/?export=Main+terraform+templates"
+  url = "${var.netbox_export_url}"
 
   request_headers = {
     Authorization = "Token ${var.netbox_api_token_secret}"
