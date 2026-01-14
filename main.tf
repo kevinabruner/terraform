@@ -113,10 +113,10 @@ dynamic "network" {
 }
 
   # Always uses the Netbox primary ipv4 interface
-  ipconfig0 = "ip=${each.value.primary_iface.ip},gw=${each.value.gateway}"
+  #ipconfig0 = "ip=${each.value.primary_iface.ip},gw=${each.value.gateway}"
 
   # Grabs the IP of the first non-primary interface, if one exists
-  #ipconfig1 = length(each.value.secondary_ifaces) > 0 ? "ip=${each.value.secondary_ifaces[0].ip}" : null
+  ipconfig1 = length(each.value.secondary_ifaces) > 0 ? "ip=${each.value.secondary_ifaces[0].ip}" : null
 
   # Standardized user data
   ciuser     = var.vm_username
