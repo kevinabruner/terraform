@@ -133,9 +133,7 @@ lifecycle {
       tags, 
       startup_shutdown,
       clone,
-      full_clone,
-      ipconfig0,      
-      #network,        
+      full_clone,       
     ]
   } 
 }
