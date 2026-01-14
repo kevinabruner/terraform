@@ -34,7 +34,6 @@ locals {
   vms = jsondecode(data.http.netbox_export.response_body)
   vm_configs = {
     for vm in local.vms : vm.name => merge(vm, {
-        # THIS IS THE DEFINITION:
         gateway = "${join(".", slice(split(".", element([for i in vm.interfaces : i.ip if i.is_primary], 0)), 0, 3))}.1"
       }) if vm.name != ""
   }
@@ -43,7 +42,7 @@ locals {
 
 
 resource "proxmox_vm_qemu" "proxmox_vms" {
-  for_each = { for vm in local.vms : vm.name => vm if vm.name != "" }
+  for_each = local.vm_configs
 
   name               = each.value.name
   vmid               = each.value.vmid
