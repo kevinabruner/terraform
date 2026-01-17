@@ -136,6 +136,16 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
     type    = "host"
   }
 
+  dynamic "network" {
+    for_each = each.value.interfaces
+    content {
+      id     = network.key
+      model  = "virtio"
+      bridge = network.value.name 
+      tag    = network.value.vlan > 0 ? network.value.vlan : null
+    }
+  }
+
   disks {
     scsi {
       scsi0 {
