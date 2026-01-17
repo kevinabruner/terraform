@@ -60,36 +60,23 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     "local-hostname" = each.value.name
   })
 
-user_data = <<-EOT
-  #cloud-config
-  write_files:
-    - path: /etc/environment
-      content: |
-        NETBOX_ID=${each.value.vmid}
-        VM_NAME=${each.value.name}
-      append: true
+user_data = trimspace(<<-EOT
+#cloud-config
+write_files:
+  - path: /etc/environment
+    content: |
+      NETBOX_ID=${each.value.vmid}
+      VM_NAME=${each.value.name}
+    append: true
 
-  users:
-    - name: ${var.vm_username}
-      sudo: ALL=(ALL) NOPASSWD:ALL
-      shell: /bin/bash
-      ssh_authorized_keys:
-${indent(8, trimspace(each.value.ssh_keys))}
-  EOT
-
-  # Using a cleaner YAML format without unnecessary quotes
-  network_config = <<EOT
-version: 1
-config:
-  - type: physical
-    name: eth0
-    subnets:
-      - type: static
-        address: ${each.value.primary_iface.ip}
-        gateway: ${each.value.gateway}
-        dns_nameservers:
-          - 192.168.11.99
+users:
+  - name: kevin
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+${indent(6, trimspace(each.value.ssh_keys))}
 EOT
+  )
 }
 
 resource "proxmox_vm_qemu" "proxmox_vms" {
