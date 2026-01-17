@@ -154,9 +154,9 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
         } 
       }      
       ide3 { 
-        cloudinit { 
-          id = proxmox_cloud_init_disk.ci_configs[each.key].id
-        } 
+        cdrom {
+          iso = proxmox_cloud_init_disk.ci_configs[each.key].id
+        }
       }
     }
   }
