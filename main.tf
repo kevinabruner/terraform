@@ -53,7 +53,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
 
   name     = "${each.value.name}-ci"
   pve_node = each.value.node
-  storage  = each.value.storage
+  storage  = cephfs
 
   meta_data = yamlencode({
     instance_id    = sha1(each.value.name)
