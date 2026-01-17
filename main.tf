@@ -60,7 +60,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     local-hostname: ${each.value.name}
   EOT
 
-  user_data = <<-EOT
+user_data = <<-EOT
   #cloud-config
   write_files:
     - path: /etc/environment
