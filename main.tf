@@ -55,10 +55,11 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
   pve_node = each.value.node
   storage  = "cephfs"
 
-  meta_data = yamlencode({
-    instance_id    = sha1(each.value.name)
-    local-hostname = each.value.name
-  })
+  # Cloud-init is very picky about these keys
+  meta_data = <<-EOT
+    instance-id: ${sha1(each.value.name)}
+    local-hostname: ${each.value.name}
+  EOT
 
   user_data = <<-EOT
   #cloud-config
@@ -67,37 +68,34 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
       content: |
         NETBOX_ID=${each.value.vmid}
         VM_NAME=${each.value.name}
-        # Add any other Netbox custom fields here
       append: true
 
+  # Re-add your users and ssh keys here to ensure 
+  # they are part of this new disk
   users:
     - name: ${var.vm_username}
-      passwd: ${var.vm_password}
-      groups: sudo
+      sudo: ALL=(ALL) NOPASSWD:ALL
       shell: /bin/bash
-      lock_passwd: false
       ssh_authorized_keys:
         - ${each.value.ssh_keys}
-
-  # This ensures packages are updated on first boot
-  package_update: true
   EOT
 
+  # Fix for the "Name Resolution" error: Add DNS
   network_config = yamlencode({
     version = 1
     config = concat(
       [
         {
           type    = "physical"
-          name    = "eth0" # Primary interface
+          name    = "eth0"
           subnets = [{
             type    = "static"
             address = each.value.primary_iface.ip
             gateway = each.value.gateway
+            dns_nameservers = ["1.1.1.1", "8.8.8.8"] # Add this!
           }]
         }
       ],
-      # Dynamically add secondary interfaces if they exist
       [
         for idx, iface in each.value.secondary_ifaces : {
           type    = "physical"
