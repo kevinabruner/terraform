@@ -60,7 +60,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     "local-hostname" = each.value.name
   })
 
-user_data = trimspace(<<-EOT
+user_data = <<-EOT
 #cloud-config
 write_files:
   - path: /etc/environment
@@ -74,9 +74,8 @@ users:
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
     ssh_authorized_keys:
-${indent(6, trimspace(each.value.ssh_keys))}
+${indent(6, join("\n", [for key in split("\n", trimspace(each.value.ssh_keys)) : "- ${trimspace(key)}"]))}
 EOT
-  )
 }
 
 resource "proxmox_vm_qemu" "proxmox_vms" {
