@@ -70,7 +70,8 @@ write_files:
     append: true
 
 users:
-  - name: kevin
+  - name: vars.vm_username
+    psswd: vars.vm_password
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
     ssh_authorized_keys:
