@@ -31,6 +31,7 @@
       "cores": {{ vm.vcpus | int if vm.vcpus else 1 }},
       "memory": {{ vm.memory or 1024 }},
       "storage": "{{ vm.custom_field_data.storage_location or 'local-zfs' }}",
+      "env": "{{ vm.custom_field_data.dev_or_prod or ' ' }}",
       "disk_size": "{{ (vm.disk / 1000) | int if vm.disk else 8 }}G",
       "pool": "{{ vm.custom_field_data.proxmox_pool or '' }}",
       "start_at_node_boot": {{ "true" if vm.start_on_boot == "on" else "false" }},

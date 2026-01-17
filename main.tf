@@ -48,7 +48,69 @@ locals {
   }
 }
 
+resource "proxmox_cloud_init_disk" "ci_configs" {
+  for_each = local.vm_configs
 
+  name     = "${each.value.name}-ci"
+  pve_node = each.value.node
+  storage  = each.value.storage
+
+  meta_data = yamlencode({
+    instance_id    = sha1(each.value.name)
+    local-hostname = each.value.name
+  })
+
+  user_data = <<-EOT
+  #cloud-config
+  write_files:
+    - path: /etc/environment
+      content: |
+        NETBOX_ID=${each.value.vmid}
+        VM_NAME=${each.value.name}
+        # Add any other Netbox custom fields here
+      append: true
+
+  users:
+    - name: ${var.vm_username}
+      passwd: ${var.vm_password}
+      groups: sudo
+      shell: /bin/bash
+      lock_passwd: false
+      ssh_authorized_keys:
+        - ${each.value.ssh_keys}
+
+  # This ensures packages are updated on first boot
+  package_update: true
+  EOT
+
+  network_config = yamlencode({
+    version = 1
+    config = concat(
+      [
+        {
+          type    = "physical"
+          name    = "eth0" # Primary interface
+          subnets = [{
+            type    = "static"
+            address = each.value.primary_iface.ip
+            gateway = each.value.gateway
+          }]
+        }
+      ],
+      # Dynamically add secondary interfaces if they exist
+      [
+        for idx, iface in each.value.secondary_ifaces : {
+          type    = "physical"
+          name    = "eth${idx + 1}"
+          subnets = [{
+            type    = "static"
+            address = iface.ip
+          }]
+        }
+      ]
+    )
+  })
+}
 
 resource "proxmox_vm_qemu" "proxmox_vms" {
   for_each = local.vm_configs
@@ -93,7 +155,7 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
       }      
       ide3 { 
         cloudinit { 
-          storage = each.value.storage 
+          id = proxmox_cloud_init_disk.ci_configs[each.key].id
         } 
       }
     }
@@ -104,29 +166,8 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
     type = "socket" 
   }
 
-dynamic "network" {
-  for_each = each.value.interfaces
-  content {
-    id     = network.key
-    model  = "virtio"
-    bridge = network.value.name 
-    tag    = network.value.vlan > 0 ? network.value.vlan : null
-  }
-}
 
-  # Always uses the Netbox primary ipv4 interface
-  ipconfig0 = "ip=${each.value.primary_iface.ip},gw=${each.value.gateway}"
-
-  # Grabs the IP of the first few non-primary interfaces, if any (this can't be a loop, I'm sorry)
-  ipconfig1 = length(each.value.secondary_ifaces) > 0 ? "ip=${each.value.secondary_ifaces[0].ip}" : null
-  ipconfig2 = length(each.value.secondary_ifaces) > 1 ? "ip=${each.value.secondary_ifaces[1].ip}" : null
-  ipconfig3 = length(each.value.secondary_ifaces) > 2 ? "ip=${each.value.secondary_ifaces[2].ip}" : null
-
-
-  # Standardized user data
-  ciuser     = var.vm_username
-  cipassword = var.vm_password
-  sshkeys = each.value.ssh_keys
+ 
 
 lifecycle {
     ignore_changes = [
