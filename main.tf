@@ -74,7 +74,9 @@ users:
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
     ssh_authorized_keys:
-${indent(6, join("\n", [for key in split("\n", trimspace(each.value.ssh_keys)) : "- ${trimspace(key)}"]))}
+%{ for key in split("\n", trimspace(each.value.ssh_keys)) ~}
+      - ${trimspace(key)}
+%{ endfor ~}
 EOT
 }
 
