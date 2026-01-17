@@ -71,7 +71,7 @@ write_files:
 
 users:
   - name: "${var.vm_username}"
-    psswd: "${var.vm_password}"
+    passwd: "${var.vm_password}"
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
     ssh_authorized_keys:
