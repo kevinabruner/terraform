@@ -55,10 +55,10 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
   pve_node = each.value.node
   storage  = "cephfs"
 
-  meta_data = <<-EOT
-    instance-id: ${sha1(each.value.name)}-v4
-    local-hostname: ${each.value.name}
-  EOT
+  meta_data = yamlencode({
+    "instance-id"    = each.value.name
+    "local-hostname" = each.value.name
+  })
 
 user_data = <<-EOT
   #cloud-config
