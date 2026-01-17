@@ -55,12 +55,13 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
   pve_node = each.value.node
   storage  = "cephfs"
 
+  # Cloud-init is very picky about these keys
   meta_data = <<-EOT
-    instance-id: ${sha1(each.value.name)}-v4
+    instance-id: ${sha1(each.value.name)}
     local-hostname: ${each.value.name}
   EOT
 
-user_data = <<-EOT
+  user_data = <<-EOT
   #cloud-config
   write_files:
     - path: /etc/environment
@@ -69,29 +70,45 @@ user_data = <<-EOT
         VM_NAME=${each.value.name}
       append: true
 
+  # Re-add your users and ssh keys here to ensure 
+  # they are part of this new disk
   users:
     - name: ${var.vm_username}
       sudo: ALL=(ALL) NOPASSWD:ALL
       shell: /bin/bash
       ssh_authorized_keys:
-${indent(8, trimspace(each.value.ssh_keys))}
+        - ${each.value.ssh_keys}
   EOT
 
-  # Using a cleaner YAML format without unnecessary quotes
-  network_config = <<EOT
-version: 1
-config:
-  - type: physical
-    name: eth0
-    subnets:
-      - type: static
-        address: ${each.value.primary_iface.ip}
-        gateway: ${each.value.gateway}
-        dns_nameservers:
-          - 192.168.11.99
-EOT
+  # Fix for the "Name Resolution" error: Add DNS
+  network_config = yamlencode({
+    version = 1
+    config = concat(
+      [
+        {
+          type    = "physical"
+          name    = "eth0"
+          subnets = [{
+            type    = "static"
+            address = each.value.primary_iface.ip
+            gateway = each.value.gateway
+            dns_nameservers = ["1.1.1.1", "8.8.8.8"] # Add this!
+          }]
+        }
+      ],
+      [
+        for idx, iface in each.value.secondary_ifaces : {
+          type    = "physical"
+          name    = "eth${idx + 1}"
+          subnets = [{
+            type    = "static"
+            address = iface.ip
+          }]
+        }
+      ]
+    )
+  })
 }
-
 resource "proxmox_vm_qemu" "proxmox_vms" {
   for_each = local.vm_configs
 
