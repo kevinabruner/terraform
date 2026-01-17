@@ -74,9 +74,7 @@ user_data = <<-EOT
       sudo: ALL=(ALL) NOPASSWD:ALL
       shell: /bin/bash
       ssh_authorized_keys:
-%{ for key in split("\n", trimspace(each.value.ssh_keys)) ~}
-        - ${trimspace(key)}
-%{ endfor ~}
+${indent(8, trimspace(each.value.ssh_keys))}
   EOT
 
   # Using a cleaner YAML format without unnecessary quotes
