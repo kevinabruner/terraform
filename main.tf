@@ -56,7 +56,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
   storage  = "cephfs"
 
   meta_data = <<-EOT
-    instance-id: ${sha1(each.value.name)}-v5
+    instance-id: ${sha1(each.value.name)}-v4
     local-hostname: ${each.value.name}
   EOT
 
