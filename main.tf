@@ -90,8 +90,7 @@ config:
         address: ${each.value.primary_iface.ip}
         gateway: ${each.value.gateway}
         dns_nameservers:
-          - 1.1.1.1
-          - 8.8.8.8
+          - 192.168.11.99
 EOT
 }
 
