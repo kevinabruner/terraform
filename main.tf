@@ -113,6 +113,7 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
   boot               = "order=scsi0;ide3"
   vm_state           = each.value.status
   define_connection_info = true
+  ssh_forward_ip = split("/", each.value.primary_iface.ip)[0]
 
   serial {
     id   = 0
