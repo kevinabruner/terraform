@@ -76,7 +76,13 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
           NETBOX_ID=${each.value.vmid}
           VM_NAME=${each.value.name}
         append: true
-  EOT
+
+    power_state:
+      delay: "now"
+      mode: reboot
+      message: "Rebooting to initialize Guest Agent"
+      condition: true
+      EOT
 
   network_config = <<-EOT
 version: 2
