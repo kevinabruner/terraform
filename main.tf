@@ -80,7 +80,7 @@ write_files:
     append: true
 EOT
 
-  network_config = <<-EOT
+network_config = <<-EOT
 version: 2
 ethernets:
   ens18:
