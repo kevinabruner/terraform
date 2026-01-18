@@ -49,29 +49,16 @@ locals {
 }
 
 resource "proxmox_cloud_init_disk" "ci_configs" {
-  for_each = local.vm_configs
-
+  for_each = var.vm_map
   name     = "${each.value.name}-ci"
-  pve_node = each.value.node
+  pve_node = var.proxmox_node
   storage  = "cephfs"
 
-  meta_data = yamlencode({
-    "instance-id"    = each.value.name
-    "local-hostname" = each.value.name
-  })
-
-user_data = <<-EOT
+  user_data = <<-EOT
 #cloud-config
-ssh_pwauth: true
-write_files:
-  - path: /etc/environment
-    content: |
-      NETBOX_ID=${each.value.vmid}
-      VM_NAME=${each.value.name}
-    append: true
 users:
   - name: ${var.vm_username}
-    passwd: ${var.vm_password}
+    passwd: '${var.vm_password}'  # Single quotes are vital here
     lock_passwd: false
     sudo: ALL=(ALL) NOPASSWD:ALL
     groups: [adm, conf, dip, lxd, plugdev, sudo]
@@ -80,9 +67,30 @@ users:
 %{ for key in split("\n", trimspace(each.value.ssh_keys)) ~}
       - ${trimspace(key)}
 %{ endfor ~}
+
+runcmd:
+  - systemctl enable qemu-guest-agent
+  - systemctl start qemu-guest-agent
+
+write_files:
+  - path: /etc/environment
+    content: |
+      NETBOX_ID=${each.value.vmid}
+      VM_NAME=${each.value.name}
+    append: true
+EOT
+
+  network_config = <<-EOT
+version: 2
+ethernets:
+  ens18:
+    addresses:
+      - ${each.value.primary_iface.ip}
+    gateway4: ${each.value.gateway}
+    nameservers:
+      addresses: [192.168.11.99]
 EOT
 }
-
 resource "proxmox_vm_qemu" "proxmox_vms" {
   for_each = local.vm_configs
 
