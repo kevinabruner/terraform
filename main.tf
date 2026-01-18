@@ -88,6 +88,8 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
         %{ endif ~}
     %{ endfor ~}
   EOT
+
+
 }
 
 resource "proxmox_vm_qemu" "proxmox_vms" {
