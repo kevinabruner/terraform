@@ -65,14 +65,14 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     package_update: false
     packages:
       - qemu-guest-agent
-      %{~ if each.value.role == "drupal" ~}
+      %{~ if each.value.role == "Drupal" ~}
       - apache2
       %{~ endif ~}
 
     #cloud-config
     write_files:
-    %{~ if each.value.role == "drupal" ~}
-      - path: /etc/apache2/conf-available/drupal-env.conf
+    %{~ if each.value.role == "Drupal" ~}
+      - path: /etc/apache2/conf-available/Drupal-env.conf
         content: |
           SetEnv mysql_db_host "db-${each.value.env}.jfkhome"
         owner: root:root
@@ -95,8 +95,8 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     runcmd:
       - systemctl enable qemu-guest-agent
       - systemctl start qemu-guest-agent
-    %{~ if each.value.role == "drupal" ~}
-      - a2enconf drupal-env
+    %{~ if each.value.role == "Drupal" ~}
+      - a2enconf Drupal-env
     %{~ endif ~}
 
     power_state:
