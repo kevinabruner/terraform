@@ -75,6 +75,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
         content: |
           NETBOX_ID=${each.value.vmid}
           VM_NAME=${each.value.name}
+          mysql_db_host=db-${each.value.env}.jfkhome
         append: true
 
     power_state:
