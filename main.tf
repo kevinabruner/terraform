@@ -108,12 +108,11 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
   memory             = each.value.memory
   clone              = each.value.image
   full_clone         = true
+  clone_wait             = 30
   os_type            = "cloud-init"
   scsihw             = "virtio-scsi-pci"
   boot               = "order=scsi0;ide3"
   vm_state           = each.value.status
-  define_connection_info = true
-  ssh_forward_ip = split("/", each.value.primary_iface.ip)[0]
 
   serial {
     id   = 0
