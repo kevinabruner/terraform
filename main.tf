@@ -69,7 +69,6 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     runcmd:
       - systemctl enable qemu-guest-agent
       - systemctl start qemu-guest-agent
-      #- modprobe virtio_console
 
     write_files:
       - path: /etc/environment
@@ -78,12 +77,12 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
           VM_NAME=${each.value.name}
         append: true
 
-    #power_state:
-    #  delay: "now"
-    #  mode: reboot
-    #  message: "Rebooting to initialize Guest Agent"
-    #  condition: true
-    #  EOT
+    power_state:
+      delay: "now"
+      mode: reboot
+      message: "Rebooting to initialize Guest Agent"
+      condition: true
+      EOT
 
   network_config = <<-EOT
 version: 2
