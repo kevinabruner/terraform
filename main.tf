@@ -69,7 +69,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     runcmd:
       - systemctl enable qemu-guest-agent
       - systemctl start qemu-guest-agent
-      - modprobe virtio_console
+      #- modprobe virtio_console
 
     write_files:
       - path: /etc/environment
