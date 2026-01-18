@@ -88,12 +88,16 @@ EOT
   network_config = <<-EOT
 version: 2
 ethernets:
-  ens18:
+%{ for index, iface in each.value.interfaces ~}
+  ens${18 + index}:
     addresses:
-      - ${each.value.primary_iface.ip}
+      - ${iface.ip}
+    %{ if iface.is_primary ~}
     gateway4: ${each.value.gateway}
     nameservers:
       addresses: [192.168.11.99]
+    %{ endif ~}
+%{ endfor ~}
 EOT
 }
 
