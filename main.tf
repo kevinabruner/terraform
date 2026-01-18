@@ -113,6 +113,11 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
   boot               = "order=scsi0;ide3"
   vm_state           = each.value.status
 
+  serial {
+    id   = 0
+    type = "socket"
+  }
+  
   timeouts {
     create = "5m"
     delete = "5m"
@@ -159,10 +164,6 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
     }
   }
 
-  serial {
-    id   = 0
-    type = "socket"
-  }
 
   lifecycle {
     ignore_changes = [
