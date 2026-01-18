@@ -39,7 +39,7 @@ locals {
 
 resource "proxmox_cloud_init_disk" "ci_configs" {
   for_each = local.vm_configs
-  name     = "cidata"
+  name     = "${each.value.vmid}-cidata"
   pve_node = each.value.node
   storage  = "cephfs"
 
