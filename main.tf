@@ -104,10 +104,15 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
   memory             = each.value.memory
   clone              = each.value.image
   full_clone         = true
-  os_type            = "ubuntu"
+  os_type            = "cloud-init"
   scsihw             = "virtio-scsi-pci"
   boot               = "order=scsi0;ide3"
   vm_state           = each.value.status
+
+  timeouts {
+    create = "5m"
+    delete = "5m"
+  }
 
   cpu {
     cores   = each.value.cores
