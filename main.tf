@@ -50,9 +50,14 @@ locals {
 
 resource "proxmox_cloud_init_disk" "ci_configs" {
   for_each = local.vm_configs
-  name     = "${each.value.name}-ci"
+  name     = "cidata"
   pve_node = each.value.node
   storage  = "cephfs"
+
+  meta_data = <<-EOT
+instance-id: ${each.value.name}
+local-hostname: ${each.value.name}
+EOT
 
   user_data = <<-EOT
 #cloud-config
