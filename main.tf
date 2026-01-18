@@ -93,7 +93,7 @@ ethernets:
       - ${each.value.primary_iface.ip}
     gateway4: ${each.value.gateway}
     nameservers:
-      addresses: [1.1.1.1, 8.8.8.8]
+      addresses: [192.168.11.99]
 EOT
 }
 
