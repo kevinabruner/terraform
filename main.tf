@@ -49,7 +49,7 @@ locals {
 }
 
 resource "proxmox_cloud_init_disk" "ci_configs" {
-  for_each = var.vm_map
+  for_each = local.vm_configs
   name     = "${each.value.name}-ci"
   pve_node = var.proxmox_node
   storage  = "cephfs"
@@ -80,7 +80,7 @@ write_files:
     append: true
 EOT
 
-network_config = <<-EOT
+  network_config = <<-EOT
 version: 2
 ethernets:
   ens18:
@@ -88,9 +88,10 @@ ethernets:
       - ${each.value.primary_iface.ip}
     gateway4: ${each.value.gateway}
     nameservers:
-      addresses: [192.168.11.99]
+      addresses: [1.1.1.1, 8.8.8.8]
 EOT
 }
+
 resource "proxmox_vm_qemu" "proxmox_vms" {
   for_each = local.vm_configs
 
