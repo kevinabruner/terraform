@@ -29,6 +29,7 @@
       "desc": "{{ vm.comments | replace('\n', ' ') | replace('"', '\\"') or 'Managed by NetBox' }}",
       "node": "{{ vm.device.name if vm.device else (vm.cluster.name if vm.cluster else 'pve') }}",
       "cores": {{ vm.vcpus | int if vm.vcpus else 1 }},
+      "role": "{{ vm.role.name if vm.role else 'default' }}",
       "memory": {{ vm.memory or 1024 }},
       "storage": "{{ vm.custom_field_data.storage_location or 'local-zfs' }}",
       "env": "{{ vm.custom_field_data.dev_or_prod or ' ' }}",
