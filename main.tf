@@ -62,17 +62,19 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
 
 user_data = <<-EOT
 #cloud-config
+ssh_pwauth: true
 write_files:
   - path: /etc/environment
     content: |
       NETBOX_ID=${each.value.vmid}
       VM_NAME=${each.value.name}
     append: true
-
 users:
   - name: ${var.vm_username}
     passwd: ${var.vm_password}
+    lock_passwd: false
     sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: [adm, conf, dip, lxd, plugdev, sudo]
     shell: /bin/bash
     ssh_authorized_keys:
 %{ for key in split("\n", trimspace(each.value.ssh_keys)) ~}
