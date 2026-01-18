@@ -113,6 +113,7 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
   scsihw             = "virtio-scsi-pci"
   boot               = "order=scsi0;ide3"
   vm_state           = each.value.status
+  define_connection_info = false
 
   serial {
     id   = 0
