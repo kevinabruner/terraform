@@ -62,6 +62,13 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
           - ${trimspace(key)}
     %{ endfor ~}
 
+    package_update: false
+    packages:
+      - qemu-guest-agent
+
+    runcmd:
+      - systemctl enable qemu-guest-agent
+      - systemctl start qemu-guest-agent
 
     write_files:
       - path: /etc/environment
