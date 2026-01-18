@@ -99,7 +99,6 @@ ethernets:
     %{ endif ~}
 %{ endfor ~}
 EOT
-}
 
 resource "proxmox_vm_qemu" "proxmox_vms" {
   for_each = local.vm_configs
