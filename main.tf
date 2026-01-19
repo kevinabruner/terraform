@@ -98,7 +98,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
       - sudo -u www-data /usr/local/bin/drush updb -y >> /var/log/cloud-init-drupal.log 2>&1
       - sudo -u www-data /usr/local/bin/drush cim -y >> /var/log/cloud-init-drupal.log 2>&1
       - echo "--- Finished Drupal Init: $(date) ---" >> /var/log/cloud-init-drupal.log
-      %{~ endif ~}s
+      %{~ endif ~}
     %{~ endif ~}
 
     power_state:
