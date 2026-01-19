@@ -74,7 +74,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     %{~ if each.value.role == "Drupal" ~}
       - path: /etc/apache2/conf-available/Drupal-env.conf
         content: |
-          SetEnv mysql_db_host "db-${each.value.env}.jfkhome"
+          SetEnv environment "${each.value.env}"
         owner: root:root
         permissions: '0644'
     %{~ endif ~}
