@@ -93,11 +93,12 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
       
       # Run Drupal DB maintenance only on the first production node
       %{~ if each.value.env == "prod" && endswith(each.value.name, "1") ~}
-      - echo "Running primary node initialization for ${each.value.name}" >> /var/log/cloud-init-drupal.log
-      - [ sudo, -u, www-data, /usr/local/bin/drush, cr, -y ]
-      - [ sudo, -u, www-data, /usr/local/bin/drush, updb, -y ]
-      - [ sudo, -u, www-data, /usr/local/bin/drush, cim, -y ]
-      %{~ endif ~}
+      - echo "--- Starting Drupal Init: $(date) ---" >> /var/log/cloud-init-drupal.log
+      - sudo -u www-data /usr/local/bin/drush cr -y >> /var/log/cloud-init-drupal.log 2>&1
+      - sudo -u www-data /usr/local/bin/drush updb -y >> /var/log/cloud-init-drupal.log 2>&1
+      - sudo -u www-data /usr/local/bin/drush cim -y >> /var/log/cloud-init-drupal.log 2>&1
+      - echo "--- Finished Drupal Init: $(date) ---" >> /var/log/cloud-init-drupal.log
+      %{~ endif ~}s
     %{~ endif ~}
 
     power_state:
