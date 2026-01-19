@@ -69,7 +69,6 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
       - apache2
       %{~ endif ~}
 
-    #cloud-config
     write_files:
     %{~ if each.value.role == "Drupal" ~}
       - path: /etc/apache2/conf-available/Drupal-env.conf
@@ -91,16 +90,18 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     %{~ if each.value.role == "Drupal" ~}
       - a2enconf Drupal-env
       
-      # Run Drupal DB maintenance only on the first production node
+     # Drupal Maintenance Logic
       %{~ if each.value.env == "prod" && endswith(each.value.name, "1") ~}
-      - echo "--- Starting Drupal Init: $(date) ---" >> /var/log/cloud-init-drupal.log
-      - sudo -u www-data /usr/local/bin/drush cr -y >> /var/log/cloud-init-drupal.log 2>&1
-      - sudo -u www-data /usr/local/bin/drush updb -y >> /var/log/cloud-init-drupal.log 2>&1
-      - sudo -u www-data /usr/local/bin/drush cim -y >> /var/log/cloud-init-drupal.log 2>&1
-      - echo "--- Finished Drupal Init: $(date) ---" >> /var/log/cloud-init-drupal.log
+      - |
+        export environment="${each.value.env}"
+        echo "--- Starting Drupal Init: $(date) ---" >> /var/log/cloud-init-drupal.log
+        # Using full path to drush and ensuring env is visible to the subshell
+        sudo -u www-data environment=${each.value.env} /usr/local/bin/drush cr -y >> /var/log/cloud-init-drupal.log 2>&1
+        sudo -u www-data environment=${each.value.env} /usr/local/bin/drush updb -y >> /var/log/cloud-init-drupal.log 2>&1
+        sudo -u www-data environment=${each.value.env} /usr/local/bin/drush cim -y >> /var/log/cloud-init-drupal.log 2>&1
       %{~ endif ~}
     %{~ endif ~}
-
+      - systemctl restart ssh
 
   network_config = <<-EOT
 version: 2
