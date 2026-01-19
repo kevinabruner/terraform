@@ -110,8 +110,7 @@ ethernets:
     gateway4: ${each.value.gateway}
     nameservers:
       addresses: [192.168.11.99]
-    search:
-    - jfkhome
+    search: [jfkhome]
 %{ endif ~}
 %{ endfor ~}
 EOT
