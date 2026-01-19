@@ -89,6 +89,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
       - systemctl start qemu-guest-agent
     %{~ if each.value.role == "Drupal" ~}
       - a2enconf Drupal-env
+      - systemctl restart ssh
       
      # Drupal Maintenance Logic
       %{~ if each.value.env == "prod" && endswith(each.value.name, "1") ~}
@@ -101,7 +102,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
         sudo -u www-data environment=${each.value.env} /usr/local/bin/drush cim -y >> /var/log/cloud-init-drupal.log 2>&1
       %{~ endif ~}
     %{~ endif ~}
-      - systemctl restart ssh
+      
 
   network_config = <<-EOT
 version: 2
