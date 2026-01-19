@@ -62,7 +62,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
           - ${trimspace(key)}
     %{ endfor ~}
 
-    package_update: false
+    package_update: true
     packages:
       - qemu-guest-agent
       %{~ if each.value.role == "Drupal" ~}
