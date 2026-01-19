@@ -111,6 +111,9 @@ ethernets:
     nameservers:
       addresses: [192.168.11.99]
     search: [jfkhome]
+    routes:
+      - to: default
+        via: ${each.value.gateway}
 %{ endif ~}
 %{ endfor ~}
 EOT
