@@ -85,13 +85,6 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
           mysql_db_host=db-${each.value.env}.jfkhome
         append: true
 
-    manage_resolv_conf: true
-    resolv_conf:
-      nameservers:
-        - 192.168.11.99
-      searchdomains:
-        - jfkhome
-
     runcmd:
       - systemctl enable qemu-guest-agent
       - systemctl start qemu-guest-agent
@@ -118,7 +111,7 @@ ethernets:
     nameservers:
       addresses: [192.168.11.99]
     searchdomains:
-    - example.com
+    - jfkhome
 %{ endif ~}
 %{ endfor ~}
 EOT
