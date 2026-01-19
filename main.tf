@@ -62,7 +62,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
           - ${trimspace(key)}
     %{ endfor ~}
 
-    package_update: true
+    package_update: ${each.value.env == "dev" ? "true" : "false"}
     packages:
       - qemu-guest-agent
       %{~ if each.value.role == "Drupal" ~}
@@ -70,6 +70,12 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
       %{~ endif ~}
 
     write_files:
+      - path: /etc/environment
+        content: |
+          NETBOX_ID=${each.value.vmid}
+          VM_NAME=${each.value.name}
+          environment=${each.value.env}
+        append: true
     %{~ if each.value.role == "Drupal" ~}
       - path: /etc/apache2/conf-available/Drupal-env.conf
         content: |
@@ -77,32 +83,33 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
         owner: root:root
         permissions: '0644'
     %{~ endif ~}
-      - path: /etc/environment
-        content: |
-          NETBOX_ID=${each.value.vmid}
-          VM_NAME=${each.value.name}
-          environment=${each.value.env}
-        append: true
 
     runcmd:
-      - systemctl enable qemu-guest-agent
-      - systemctl start qemu-guest-agent
+      # Use restart to ensure the agent picks up the new Cloud-init metadata
+      - systemctl restart qemu-guest-agent || true
+      - systemctl restart ssh || true
     %{~ if each.value.role == "Drupal" ~}
-      - a2enconf Drupal-env
-      - systemctl restart ssh
+      - a2enconf Drupal-env || true
+      - systemctl restart apache2 || true
       
-     # Drupal Maintenance Logic
+      # Drupal Maintenance: Only runs on the first prod node
       %{~ if each.value.env == "prod" && endswith(each.value.name, "1") ~}
       - |
-        export environment="${each.value.env}"
-        echo "--- Starting Drupal Init: $(date) ---" >> /var/log/cloud-init-drupal.log
-        # Using full path to drush and ensuring env is visible to the subshell
-        sudo -u www-data environment=${each.value.env} /usr/local/bin/drush cr -y >> /var/log/cloud-init-drupal.log 2>&1
-        sudo -u www-data environment=${each.value.env} /usr/local/bin/drush updb -y >> /var/log/cloud-init-drupal.log 2>&1
-        sudo -u www-data environment=${each.value.env} /usr/local/bin/drush cim -y >> /var/log/cloud-init-drupal.log 2>&1
+        (
+          export environment="${each.value.env}"
+          export PATH="$PATH:/usr/local/bin"
+          # Only run if Drupal is actually installed (handles the 'Fresh' vs 'Golden' gap)
+          if [ -f "/var/www/vendor/drush/drush/drush" ] && [ -d "/var/www/html" ]; then
+            cd /var/www/html
+            echo "--- Starting Drupal Init: $(date) ---" >> /var/log/cloud-init-drupal.log
+            sudo -u www-data environment=${each.value.env} /var/www/vendor/drush/drush/drush cr -y >> /var/log/cloud-init-drupal.log 2>&1 || true
+            sudo -u www-data environment=${each.value.env} /var/www/vendor/drush/drush/drush updb -y >> /var/log/cloud-init-drupal.log 2>&1 || true
+            sudo -u www-data environment=${each.value.env} /var/www/vendor/drush/drush/drush cim -y >> /var/log/cloud-init-drupal.log 2>&1 || true
+          fi
+        )
       %{~ endif ~}
     %{~ endif ~}
-      EOT
+  EOT
       
 
   network_config = <<-EOT
