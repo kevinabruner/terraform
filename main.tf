@@ -99,7 +99,6 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
       - [ sudo, -u, www-data, /usr/local/bin/drush, cim, -y ]
       %{~ endif ~}
     %{~ endif ~}
-    %{~ endif ~}
 
     power_state:
       delay: "now"
