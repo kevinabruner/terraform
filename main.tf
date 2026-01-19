@@ -101,12 +101,6 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
       %{~ endif ~}
     %{~ endif ~}
 
-    power_state:
-      delay: "now"
-      mode: reboot
-      message: "Rebooting to initialize Guest Agent"
-      condition: true
-      EOT
 
   network_config = <<-EOT
 version: 2
