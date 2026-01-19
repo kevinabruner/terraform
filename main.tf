@@ -90,6 +90,15 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
       - systemctl start qemu-guest-agent
     %{~ if each.value.role == "Drupal" ~}
       - a2enconf Drupal-env
+      
+      # Run Drupal DB maintenance only on the first production node
+      %{~ if each.value.env == "prod" && endswith(each.value.name, "1") ~}
+      - echo "Running primary node initialization for ${each.value.name}" >> /var/log/cloud-init-drupal.log
+      - [ sudo, -u, www-data, /usr/local/bin/drush, cr, -y ]
+      - [ sudo, -u, www-data, /usr/local/bin/drush, updb, -y ]
+      - [ sudo, -u, www-data, /usr/local/bin/drush, cim, -y ]
+      %{~ endif ~}
+    %{~ endif ~}
     %{~ endif ~}
 
     power_state:
