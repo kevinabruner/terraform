@@ -35,6 +35,20 @@ locals {
       gateway       = "${join(".", slice(split(".", [for i in vm.interfaces : i.ip if i.is_primary][0]), 0, 3))}.1"
     }) if vm.name != ""
   }
+  role_configs = {
+    "Drupal" = {
+      packages = ["apache2"]
+      commands = [
+        "a2enconf Drupal-env || true",
+        "systemctl restart apache2 || true",
+        "echo 'Drupal specific setup complete'"
+      ]
+    }
+    "Default" = {
+      packages = ["cowsay"]
+      commands = ["echo 'No specific role actions'"]
+    }
+  }
 }
 
 resource "proxmox_cloud_init_disk" "ci_configs" {
@@ -47,6 +61,21 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     instance-id: ${each.value.name}
     local-hostname: ${each.value.name}
   EOT
+
+  user_data = templatefile("${path.module}/templates/main.tftpl", {
+    username       = var.vm_username
+    password       = var.vm_password
+    ssh_keys       = split("\n", trimspace(each.value.ssh_keys))
+    
+    # This is the "Switch" logic
+    extra_packages = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).packages
+    extra_commands = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).commands
+    
+    # Pass through other vars needed for the template
+    name = each.value.name
+    env  = each.value.env
+    vmid = each.value.vmid
+  })
 
   user_data = <<-EOT
     #cloud-config

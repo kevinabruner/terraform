@@ -1,0 +1,25 @@
+#cloud-config
+users:
+  - name: ${username}
+    passwd: ${password}
+    lock_passwd: false
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+%{ for key in ssh_keys ~}
+      - ${trimspace(key)}
+%{ endfor ~}
+
+# Global packages
+packages:
+  - qemu-guest-agent
+  - curl
+%{ for pkg in extra_packages ~}
+  - ${pkg}
+%{ endfor ~}
+
+runcmd:
+  - systemctl restart qemu-guest-agent || true
+# Inject app-specific commands here
+%{ for cmd in extra_commands ~}
+  - ${cmd}
+%{ endfor ~}
