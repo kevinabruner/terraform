@@ -46,7 +46,7 @@ locals {
       files = [
         {
           path    = "/etc/apache2/conf-available/Drupal-env.conf"
-          content = "SetEnv environment '${each.value.env}'" 
+          content = "SetEnv environment \"$${env}\""
         }
       ]
     }
@@ -74,7 +74,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     password       = var.vm_password
     ssh_keys       = split("\n", trimspace(each.value.ssh_keys))
     
-    # This is the "Switch" logic
+    # Role-based switch logic
     extra_packages = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).packages
     extra_commands = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).commands
     
@@ -82,6 +82,16 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     name = each.value.name
     env  = each.value.env
     vmid = each.value.vmid
+
+    # Logic-based commands
+    extra_commands = concat(
+      lookup(local.role_configs, each.value.role, local.role_configs["Default"]).commands,
+      
+      # Add the Drush script ONLY if it's Drupal, Prod, and the first node
+      (each.value.role == "Drupal" && each.value.env == "prod" && endswith(each.value.name, "1")) 
+        ? [file("${path.module}/scripts/drupal_prod_db_flush.sh")] 
+        : []
+    )
   })
       
 
