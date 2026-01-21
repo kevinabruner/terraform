@@ -26,31 +26,8 @@ provider "proxmox" {
   pm_tls_insecure     = false
   pm_parallel         = 3
 }
-locals {
-  # Define the script string once, outside the map
-  
 
-  role_configs = {
-    "Drupal" = {
-      packages        = ["apache2", "php", "libapache2-mod-php"]
-      commands        = ["a2enconf Drupal-env || true", "systemctl restart apache2 || true"]
-      db_flush_script = local.drupal_script_template # Reference it here
-      files           = [{ path = "/etc/apache2/conf-available/Drupal-env.conf", content = "SetEnv environment \"$${env}\"" }]
-    }
-    "Default" = {
-      packages        = []
-      commands        = []
-      db_flush_script = "" # Every role MUST have this key, even if empty
-      files           = []
-    }
-    "Database" = {
-      packages        = ["mariadb-server"]
-      commands        = ["systemctl enable mariadb"]
-      db_flush_script = "" # Every role MUST have this key
-      files           = []
-    }
-  }
-}
+
 locals {
   vms = jsondecode(data.http.netbox_export.response_body)
   
