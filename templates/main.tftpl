@@ -18,7 +18,6 @@ packages:
 %{ endfor ~}
 
 write_files:
-  # Every VM gets these global files
   - path: /etc/environment
     content: |
       NETBOX_ID=${vmid}
@@ -26,28 +25,23 @@ write_files:
       environment=${env}
     append: true
 
-  # Inject role-specific files
 %{ for file in extra_files ~}
   - path: ${file.path}
     content: |
-      ${indent(6, file.content)}
+      ${indent(6, replace(file.content, "$${env}", env))}
 %{ endfor ~}
 
 runcmd:
   - systemctl restart qemu-guest-agent || true
-
-  # Standard role commands
 %{ for cmd in extra_commands ~}
   - ${cmd}
 %{ endfor ~}
 
-# Drupal Production Master Logic
 %{ if is_drupal_master ~}
   - |
     #!/bin/bash
     cd /var/www/html
     echo "--- Starting Drupal Prod db cache flush: $(date) ---" >> /var/log/cloud-init-drupal.log
-    # Look how easy it is to use variables here!
     sudo -u www-data environment=${env} /var/www/vendor/drush/drush/drush cr -y >> /var/log/cloud-init-drupal.log 2>&1
     sudo -u www-data environment=${env} /var/www/vendor/drush/drush/drush updb -y >> /var/log/cloud-init-drupal.log 2>&1
     sudo -u www-data environment=${env} /var/www/vendor/drush/drush/drush cim -y >> /var/log/cloud-init-drupal.log 2>&1
