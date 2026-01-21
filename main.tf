@@ -55,6 +55,13 @@ locals {
       packages = [], commands = [], files = []
     }
   }
+  db_flush_script = <<-EOT
+    #!/bin/bash
+    cd /var/www/html
+    echo "--- Starting Drupal Prod db cache flush: $(date) ---" >> /var/log/cloud-init-drupal.log
+    sudo -u www-data environment=REPLACE_ME_ENV /var/www/vendor/drush/drush/drush cr -y >> /var/log/cloud-init-drupal.log 2>&1 || true
+    sudo -u www-data environment=REPLACE_ME_ENV /var/www/vendor/drush/drush/drush updb -y >> /var/log/cloud-init-drupal.log 2>&1 || true
+  EOT
 }
 
 resource "proxmox_cloud_init_disk" "ci_configs" {
@@ -83,11 +90,11 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     
     # 3. Dynamic Logic for Commands (The "Switch" replacement)
     extra_commands = concat(
-      lookup(local.role_configs, each.value.role, local.role_configs["Default"]).commands,
-      # This is your conditional Drush script logic moved here!
-      (each.value.role == "Drupal" && each.value.env == "prod" && endswith(each.value.name, "1")) 
-        ? [file("${path.module}/scripts/drupal_prod_db_flush.sh")] 
-        : []
+      local.role_configs[each.value.role].commands,
+      (each.value.role == "Drupal" && each.value.env == "prod" && endswith(each.value.name, "1")) ? [
+        # The '|' tells YAML this is a multi-line string
+        "|\n${indent(4, replace(local.role_configs["Drupal"].db_flush_script, "REPLACE_ME_ENV", each.value.env))}"
+      ] : []
     )
   })
 
