@@ -30,8 +30,7 @@ provider "proxmox" {
 
 locals {
   vms = jsondecode(data.http.netbox_export.response_body)
-  drupal_script_template = file("${path.module}/scripts/drupal_prod_db_flush.sh")
-
+  drupal_script_raw = trimspace(file("${path.module}/scripts/drupal_prod_db_flush.sh"))
   vm_configs = {
     for vm in local.vms : vm.name => merge(vm, {
       primary_iface = [for i in vm.interfaces : i if i.is_primary][0]
@@ -90,7 +89,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
       
       # Logic for the Drupal-specific script
       (each.value.role == "Drupal" && each.value.env == "prod" && endswith(each.value.name, "1")) ? [
-        "|\n${indent(4, replace(local.role_configs["Drupal"].db_flush_script, "REPLACE_ME_ENV", each.value.env))}"
+        "|\n${indent(4, replace(local.drupal_script_raw, "REPLACE_ME_ENV", each.value.env))}"
       ] : []
     )
   })
