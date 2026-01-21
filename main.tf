@@ -46,7 +46,7 @@ locals {
       files = [
         {
           path    = "/etc/apache2/conf-available/Drupal-env.conf"
-          content = "SetEnv environment \"${var.env_placeholder_logic}\"" # You can pass vars here
+          content = "SetEnv environment \"${each.value.env}"\"" 
         }
       ]
     }
