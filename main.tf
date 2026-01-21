@@ -31,12 +31,18 @@ provider "proxmox" {
 locals {
   vms = jsondecode(data.http.netbox_export.response_body)
   drupal_script_raw = trimspace(file("${path.module}/scripts/drupal_prod_db_flush.sh"))
+  
+  # Merg in VM Data with computed network data
   vm_configs = {
     for vm in local.vms : vm.name => merge(vm, {
+      # Extract Primary Interface
       primary_iface = [for i in vm.interfaces : i if i.is_primary][0]
-      gateway       = "${join(".", slice(split(".", [for i in vm.interfaces : i.ip if i.is_primary][0]), 0, 3))}.1"
+      # Construct Gateway from Primary IP
+      gateway = "${join(".", slice(split(".", [for i in vm.interfaces : i.ip if i.is_primary][0]), 0, 3))}.1"
     }) if vm.name != ""
   }
+
+  # Role-based configurations
   role_configs = {
     "Drupal" = {
       packages = ["apache2"]
@@ -86,7 +92,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
   })
 
   
-
+  #Dynamically generate network config based on interfaces in Netbox
   network_config = <<-EOT
 version: 2
 ethernets:
