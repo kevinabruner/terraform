@@ -51,7 +51,7 @@ locals {
     "Default" = { 
       packages = []
       commands = []
-      files    = [] # ADD THIS
+      files    = [] 
     }
   }
 }

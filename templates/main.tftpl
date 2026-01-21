@@ -36,7 +36,7 @@ write_files:
 runcmd:
   - systemctl restart qemu-guest-agent || true
 
-# Standard role commands
+  # Standard role commands
 %{ for cmd in extra_commands ~}
   - ${cmd}
 %{ endfor ~}
