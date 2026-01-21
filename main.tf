@@ -30,6 +30,7 @@ provider "proxmox" {
 
 locals {
   vms = jsondecode(data.http.netbox_export.response_body)
+  drupal_script_template = file("${path.module}/scripts/drupal_prod_db_flush.sh")
   
   drupal_script_template = <<-EOT
     #!/bin/bash
@@ -47,31 +48,23 @@ locals {
   }
   role_configs = {
     "Drupal" = {
-      packages = ["apache2", "php", "libapache2-mod-php"]
-      commands = [
-        "a2enconf Drupal-env || true",
-        "systemctl restart apache2 || true"
-      ]
-      files = [
-        {
-          path    = "/etc/apache2/conf-available/Drupal-env.conf"
-          # We use a template variable ${env} here. 
-          # Terraform will evaluate this when templatefile() is called.
-          content = "SetEnv environment \"$${env}\"" 
-        }
-      ]
+      packages        = ["apache2", "php", "libapache2-mod-php"]
+      commands        = ["a2enconf Drupal-env || true", "systemctl restart apache2 || true"]
+      files           = [{ path = "/etc/apache2/conf-available/Drupal-env.conf", content = "SetEnv environment \"$${env}\"" }]
+      custom_script = local.drupal_script_template # Put the script here
     }
     "Default" = {
-      packages = [], commands = [], files = []
+      packages        = []
+      commands        = []
+      files           = []
+      custom_script = "" # Must exist, even if empty
     }
-    db_flush_script = <<-EOT
-        #!/bin/bash
-        cd /var/www/html
-        echo "--- Starting Drupal Prod db cache flush: $(date) ---" >> /var/log/cloud-init-drupal.log
-        sudo -u www-data environment=REPLACE_ME_ENV /var/www/vendor/drush/drush/drush cr -y >> /var/log/cloud-init-drupal.log 2>&1 || true
-        sudo -u www-data environment=REPLACE_ME_ENV /var/www/vendor/drush/drush/drush updb -y >> /var/log/cloud-init-drupal.log 2>&1 || true
-      EOT
-  }
+    "Database" = {
+      packages        = ["mariadb-server"]
+      commands        = ["systemctl enable mariadb"]
+      files           = []
+      custom_script = "" # Must exist
+    }
 }
 
 resource "proxmox_cloud_init_disk" "ci_configs" {
