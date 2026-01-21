@@ -52,7 +52,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     #cloud-config
     users:
       - name: ${var.vm_username}
-        passwd: '${var.vm_password}'
+        passwd: ${var.vm_password}
         lock_passwd: false
         sudo: ALL=(ALL) NOPASSWD:ALL
         groups: [adm, conf, dip, lxd, plugdev, sudo]
