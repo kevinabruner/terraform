@@ -200,3 +200,10 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
     ]
   }
 }
+
+output "debug_cloud_init" {
+  # This will show the rendered config for every VM
+  value = {
+    for k, v in proxmox_cloud_init_disk.ci_configs : k => v.user_data
+  }
+}
