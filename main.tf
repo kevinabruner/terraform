@@ -140,8 +140,8 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
   }
 
   timeouts {
-    create = "5m"
-    delete = "5m"
+    create = "15m"
+    delete = "15m"
   }
 
   cpu {
