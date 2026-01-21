@@ -17,6 +17,24 @@ packages:
   - ${pkg}
 %{ endfor ~}
 
+write_files:
+  # Every VM gets these global files
+  - path: /etc/environment
+    content: |
+      NETBOX_ID=${vmid}
+      VM_NAME=${name}
+      environment=${env}
+    append: true
+
+  # Inject role-specific files
+%{ for file in extra_files ~}
+  - path: ${file.path}
+    owner: ${lookup(file, "owner", "root:root")}
+    permissions: '${lookup(file, "permissions", "0644")}'
+    content: |
+      ${indent(6, file.content)}
+%{ endfor ~}
+
 runcmd:
   - systemctl restart qemu-guest-agent || true
 # Inject app-specific commands here
