@@ -26,9 +26,42 @@ provider "proxmox" {
   pm_tls_insecure     = false
   pm_parallel         = 3
 }
+locals {
+  # Define the script string once, outside the map
+  
 
+  role_configs = {
+    "Drupal" = {
+      packages        = ["apache2", "php", "libapache2-mod-php"]
+      commands        = ["a2enconf Drupal-env || true", "systemctl restart apache2 || true"]
+      db_flush_script = local.drupal_script_template # Reference it here
+      files           = [{ path = "/etc/apache2/conf-available/Drupal-env.conf", content = "SetEnv environment \"$${env}\"" }]
+    }
+    "Default" = {
+      packages        = []
+      commands        = []
+      db_flush_script = "" # Every role MUST have this key, even if empty
+      files           = []
+    }
+    "Database" = {
+      packages        = ["mariadb-server"]
+      commands        = ["systemctl enable mariadb"]
+      db_flush_script = "" # Every role MUST have this key
+      files           = []
+    }
+  }
+}
 locals {
   vms = jsondecode(data.http.netbox_export.response_body)
+  
+  drupal_script_template = <<-EOT
+    #!/bin/bash
+    cd /var/www/html
+    echo "--- Starting Drupal Prod db cache flush: $(date) ---" >> /var/log/cloud-init-drupal.log
+    sudo -u www-data environment=REPLACE_ME_ENV /var/www/vendor/drush/drush/drush cr -y >> /var/log/cloud-init-drupal.log 2>&1 || true
+    sudo -u www-data environment=REPLACE_ME_ENV /var/www/vendor/drush/drush/drush updb -y >> /var/log/cloud-init-drupal.log 2>&1 || true
+  EOT
+
   vm_configs = {
     for vm in local.vms : vm.name => merge(vm, {
       primary_iface = [for i in vm.interfaces : i if i.is_primary][0]
@@ -90,7 +123,6 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     
     # 3. Dynamic Logic for Commands (The "Switch" replacement)
     extra_commands = concat(
-      # Use lookup here to prevent the "Invalid Index" error for unknown roles
       lookup(local.role_configs, each.value.role, local.role_configs["Default"]).commands,
       
       # Logic for the Drupal-specific script
