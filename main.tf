@@ -42,7 +42,7 @@ locals {
       packages        = ["apache2", "php", "libapache2-mod-php"]
       commands        = ["a2enconf Drupal-env || true", "systemctl restart apache2 || true"]
       files           = [{ path = "/etc/apache2/conf-available/Drupal-env.conf", content = "SetEnv environment \"$${env}\"" }]
-      custom_script = local.drupal_script_template # Put the script here
+      custom_script = local.drupal_script_raw # Put the script here
     }
     "Default" = {
       packages        = []
