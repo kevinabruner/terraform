@@ -200,10 +200,8 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
     ]
   }
 }
-
-output "debug_cloud_init" {
-  # This will show the rendered config for every VM
-  value = {
-    for k, v in proxmox_cloud_init_disk.ci_configs : k => v.user_data
-  }
+resource "local_file" "debug_rendered_yaml" {
+  for_each = local.vm_configs
+  content  = proxmox_cloud_init_disk.ci_configs[each.key].user_data
+  filename = "${path.module}/debug/${each.key}_cloud_init.yaml"
 }
