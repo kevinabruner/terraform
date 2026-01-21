@@ -39,10 +39,20 @@ locals {
   }
   role_configs = {
     "Drupal" = {
-      packages = ["apache2", "php", "libapache2-mod-php"]
+      packages = ["apache2"]
       commands = ["a2enconf Drupal-env || true", "systemctl restart apache2 || true"]
+      files    = [
+        {
+          path    = "/etc/apache2/conf-available/Drupal-env.conf"
+          content = "SetEnv environment \"$${env}\"" 
+        }
+      ]
     }
-    "Default" = { packages = [], commands = [] }
+    "Default" = { 
+      packages = []
+      commands = []
+      files    = [] # ADD THIS
+    }
   }
 }
 
