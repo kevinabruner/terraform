@@ -37,23 +37,22 @@ locals {
   }
   role_configs = {
     "Drupal" = {
-      packages = ["apache2"]
+      packages = ["apache2", "php", "libapache2-mod-php"]
       commands = [
         "a2enconf Drupal-env || true",
-        "systemctl restart apache2 || true",
-        each.value.env == "prod" && endswith(each.value.name, "1") ? file("${path.module}/scripts/drupal_prod_db_flush.sh") : "echo 'Skipping Drush'"
+        "systemctl restart apache2 || true"
       ]
       files = [
         {
           path    = "/etc/apache2/conf-available/Drupal-env.conf"
-          content = "SetEnv environment \"$${env}\""
+          # We use a template variable ${env} here. 
+          # Terraform will evaluate this when templatefile() is called.
+          content = "SetEnv environment \"$${env}\"" 
         }
       ]
     }
     "Default" = {
-      packages = []
-      commands = []
-      files    = []
+      packages = [], commands = [], files = []
     }
   }
 }
@@ -70,29 +69,28 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
   EOT
 
   user_data = templatefile("${path.module}/templates/main.tftpl", {
-    username       = var.vm_username
-    password       = var.vm_password
-    ssh_keys       = split("\n", trimspace(each.value.ssh_keys))
-    
-    # Role-based switch logic
-    extra_packages = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).packages
-    extra_commands = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).commands
-    
-    # Pass through other vars needed for the template
-    name = each.value.name
-    env  = each.value.env
-    vmid = each.value.vmid
+    # 1. Basic Identity
+    username = var.vm_username
+    password = var.vm_password
+    ssh_keys = split("\n", trimspace(each.value.ssh_keys))
+    name     = each.value.name
+    vmid     = each.value.vmid
+    env      = each.value.env
 
-    # Logic-based commands
+    # 2. Extract Role Data from Locals
+    extra_packages = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).packages
+    extra_files    = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).files
+    
+    # 3. Dynamic Logic for Commands (The "Switch" replacement)
     extra_commands = concat(
       lookup(local.role_configs, each.value.role, local.role_configs["Default"]).commands,
-      
-      # Add the Drush script ONLY if it's Drupal, Prod, and the first node
+      # This is your conditional Drush script logic moved here!
       (each.value.role == "Drupal" && each.value.env == "prod" && endswith(each.value.name, "1")) 
         ? [file("${path.module}/scripts/drupal_prod_db_flush.sh")] 
         : []
     )
   })
+}
       
 
   network_config = <<-EOT
