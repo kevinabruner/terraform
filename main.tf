@@ -202,6 +202,6 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
 }
 resource "local_file" "debug_rendered_yaml" {
   for_each = local.vm_configs
-content  = nonsensitive(proxmox_cloud_init_disk.ci_configs[each.key].user_data)
+  content  = proxmox_cloud_init_disk.ci_configs[each.key].user_data
   filename = "${path.module}/debug/${each.key}_cloud_init.yaml"
 }
