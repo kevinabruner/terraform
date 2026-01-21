@@ -32,7 +32,7 @@ locals {
   vms = jsondecode(data.http.netbox_export.response_body)
   drupal_script_raw = trimspace(file("${path.module}/scripts/drupal_prod_db_flush.sh"))
   
-  # Merg in VM Data with computed network data
+  # Merge in VM Data with computed network data
   vm_configs = {
     for vm in local.vms : vm.name => merge(vm, {
       # Extract Primary Interface
