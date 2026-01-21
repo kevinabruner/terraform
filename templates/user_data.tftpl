@@ -44,9 +44,7 @@ write_files:
               "$${distro_id}:$${distro_codename}-updates";
               "$${distro_id}ESMApps:$${distro_codename}-apps-security";
               "$${distro_id}ESM:$${distro_codename}-infra-security";
-      };
-
-      // These settings also override the system defaults
+      };      
       Unattended-Upgrade::Automatic-Reboot "true";
       Unattended-Upgrade::Automatic-Reboot-Time "04:00";
       Unattended-Upgrade::Remove-Unused-Dependencies "true";
