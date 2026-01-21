@@ -54,14 +54,14 @@ locals {
     "Default" = {
       packages = [], commands = [], files = []
     }
+    db_flush_script = <<-EOT
+        #!/bin/bash
+        cd /var/www/html
+        echo "--- Starting Drupal Prod db cache flush: $(date) ---" >> /var/log/cloud-init-drupal.log
+        sudo -u www-data environment=REPLACE_ME_ENV /var/www/vendor/drush/drush/drush cr -y >> /var/log/cloud-init-drupal.log 2>&1 || true
+        sudo -u www-data environment=REPLACE_ME_ENV /var/www/vendor/drush/drush/drush updb -y >> /var/log/cloud-init-drupal.log 2>&1 || true
+      EOT
   }
-  db_flush_script = <<-EOT
-    #!/bin/bash
-    cd /var/www/html
-    echo "--- Starting Drupal Prod db cache flush: $(date) ---" >> /var/log/cloud-init-drupal.log
-    sudo -u www-data environment=REPLACE_ME_ENV /var/www/vendor/drush/drush/drush cr -y >> /var/log/cloud-init-drupal.log 2>&1 || true
-    sudo -u www-data environment=REPLACE_ME_ENV /var/www/vendor/drush/drush/drush updb -y >> /var/log/cloud-init-drupal.log 2>&1 || true
-  EOT
 }
 
 resource "proxmox_cloud_init_disk" "ci_configs" {
@@ -90,9 +90,11 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     
     # 3. Dynamic Logic for Commands (The "Switch" replacement)
     extra_commands = concat(
-      local.role_configs[each.value.role].commands,
+      # Use lookup here to prevent the "Invalid Index" error for unknown roles
+      lookup(local.role_configs, each.value.role, local.role_configs["Default"]).commands,
+      
+      # Logic for the Drupal-specific script
       (each.value.role == "Drupal" && each.value.env == "prod" && endswith(each.value.name, "1")) ? [
-        # The '|' tells YAML this is a multi-line string
         "|\n${indent(4, replace(local.role_configs["Drupal"].db_flush_script, "REPLACE_ME_ENV", each.value.env))}"
       ] : []
     )
