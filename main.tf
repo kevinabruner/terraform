@@ -40,7 +40,7 @@ locals {
       packages = ["apache2"]
       commands = [
         "a2enconf Drupal-env || true",
-        "systemctl restart apache2 || true"
+        "systemctl restart apache2 || true",
         each.value.env == "prod" && endswith(each.value.name, "1") ? file("${path.module}/scripts/drupal_prod_db_flush.sh") : "echo 'Skipping Drush'"
       ]
       files = [
