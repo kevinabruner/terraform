@@ -57,6 +57,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
         sudo: ALL=(ALL) NOPASSWD:ALL
         groups: [adm, conf, dip, lxd, plugdev, sudo]
         shell: /bin/bash
+        ssh_pwauth: true
         ssh_authorized_keys:
     %{ for key in split("\n", trimspace(each.value.ssh_keys)) ~}
           - ${trimspace(key)}
