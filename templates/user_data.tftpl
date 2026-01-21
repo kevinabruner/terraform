@@ -10,6 +10,19 @@ users:
       - ${trimspace(key)}
 %{ endfor ~}
 
+package_update: true
+package_upgrade: true
+
+apt:
+  unattended_upgrades:
+    enable: true
+    auto_reboot: true
+    reboot_time: "04:00"
+    remove_unused_dependencies: true
+    origins:
+      - "$${distro_id}:$${distro_codename}-security"
+      - "$${distro_id}:$${distro_codename}-updates"
+
 # Global packages
 packages:
   - qemu-guest-agent
