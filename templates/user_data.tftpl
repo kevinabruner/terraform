@@ -13,6 +13,8 @@ users:
 packages:
   - qemu-guest-agent
   - curl
+  - htop
+  - vim
 %{ for pkg in extra_packages ~}
   - ${pkg}
 %{ endfor ~}

@@ -67,7 +67,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     local-hostname: ${each.value.name}
   EOT
 
-  user_data = templatefile("${path.module}/templates/main.tftpl", {
+  user_data = templatefile("${path.module}/templates/user_data.tftpl", {
     # 1. Basic Identity
     username = var.vm_username
     password = var.vm_password
