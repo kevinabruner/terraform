@@ -53,10 +53,11 @@ locals {
     }
     "Database" = {
       packages        = ["mariadb-server"]
-      commands        = ["systemctl enable mariadb"]
+      commands        = []
       files           = []
       custom_script = "" # Must exist
     }
+  }
 }
 
 resource "proxmox_cloud_init_disk" "ci_configs" {
