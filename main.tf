@@ -27,13 +27,38 @@ provider "proxmox" {
   pm_parallel         = 3
 }
 
+
 locals {
   vms = jsondecode(data.http.netbox_export.response_body)
+  drupal_script_raw = trimspace(file("${path.module}/scripts/drupal_prod_db_flush.sh"))
+  
+  # Merge in VM Data with computed network data
   vm_configs = {
     for vm in local.vms : vm.name => merge(vm, {
+      # Extract Primary Interface
       primary_iface = [for i in vm.interfaces : i if i.is_primary][0]
-      gateway       = "${join(".", slice(split(".", [for i in vm.interfaces : i.ip if i.is_primary][0]), 0, 3))}.1"
+      # Construct Gateway from Primary IP
+      gateway = "${join(".", slice(split(".", [for i in vm.interfaces : i.ip if i.is_primary][0]), 0, 3))}.1"
     }) if vm.name != ""
+  }
+
+  # Role-based configurations
+  role_configs = {
+    "Drupal" = {
+      packages = ["apache2"]
+      commands = ["a2enconf Drupal-env || true", "systemctl restart apache2 || true"]
+      files    = [
+        {
+          path    = "/etc/apache2/conf-available/Drupal-env.conf"
+          content = "SetEnv environment \"$${env}\"" 
+        }
+      ]
+    }
+    "Default" = { 
+      packages = []
+      commands = []
+      files    = [] 
+    }
   }
 }
 
@@ -48,71 +73,26 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     local-hostname: ${each.value.name}
   EOT
 
-  user_data = <<-EOT
-    #cloud-config
-    users:
-      - name: ${var.vm_username}
-        passwd: ${var.vm_password}
-        lock_passwd: false
-        sudo: ALL=(ALL) NOPASSWD:ALL
-        groups: [adm, conf, dip, lxd, plugdev, sudo]
-        shell: /bin/bash
-        ssh_pwauth: true
-        ssh_authorized_keys:
-    %{ for key in split("\n", trimspace(each.value.ssh_keys)) ~}
-          - ${trimspace(key)}
-    %{ endfor ~}
+  user_data = templatefile("${path.module}/templates/user_data.tftpl", {
+    # 1. Basic Identity
+    username = var.vm_username
+    password = var.vm_password
+    ssh_keys = split("\n", trimspace(each.value.ssh_keys))
+    name     = each.value.name
+    vmid     = each.value.vmid
+    env      = each.value.env
 
-    package_update: ${each.value.env == "dev" ? "true" : "false"}
-    packages:
-      - qemu-guest-agent
-      %{~ if each.value.role == "Drupal" ~}
-      - apache2
-      %{~ endif ~}
+    # 2. Extract Role Data from Locals
+    extra_packages = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).packages
+    extra_files    = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).files
+    extra_commands = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).commands
+    
+    # 3. Boolean for all *-prod1 instances
+    is_drupal_master = (each.value.role == "Drupal" && each.value.env == "prod" && endswith(each.value.name, "1"))
+  })
 
-    write_files:
-      - path: /etc/environment
-        content: |
-          NETBOX_ID=${each.value.vmid}
-          VM_NAME=${each.value.name}
-          environment=${each.value.env}
-        append: true
-    %{~ if each.value.role == "Drupal" ~}
-      - path: /etc/apache2/conf-available/Drupal-env.conf
-        content: |
-          SetEnv environment "${each.value.env}"
-        owner: root:root
-        permissions: '0644'
-    %{~ endif ~}
-
-    runcmd:
-      # Use restart to ensure the agent picks up the new Cloud-init metadata
-      - systemctl restart qemu-guest-agent || true
-      - systemctl restart ssh || true
-    %{~ if each.value.role == "Drupal" ~}
-      - a2enconf Drupal-env || true
-      - systemctl restart apache2 || true
-      
-      # Drupal Maintenance: Only runs on the first prod node
-      %{~ if each.value.env == "prod" && endswith(each.value.name, "1") ~}
-      - |
-        (
-          export environment="${each.value.env}"
-          export PATH="$PATH:/usr/local/bin"
-          # Only run if Drupal is actually installed (handles the 'Fresh' vs 'Golden' gap)
-          if [ -f "/var/www/vendor/drush/drush/drush" ] && [ -d "/var/www/html" ]; then
-            cd /var/www/html
-            echo "--- Starting Drupal Init: $(date) ---" >> /var/log/cloud-init-drupal.log
-            sudo -u www-data environment=${each.value.env} /var/www/vendor/drush/drush/drush cr -y >> /var/log/cloud-init-drupal.log 2>&1 || true
-            sudo -u www-data environment=${each.value.env} /var/www/vendor/drush/drush/drush updb -y >> /var/log/cloud-init-drupal.log 2>&1 || true
-            sudo -u www-data environment=${each.value.env} /var/www/vendor/drush/drush/drush cim -y >> /var/log/cloud-init-drupal.log 2>&1 || true
-          fi
-        )
-      %{~ endif ~}
-    %{~ endif ~}
-  EOT
-      
-
+  
+  #Dynamically generate network config based on interfaces in Netbox
   network_config = <<-EOT
 version: 2
 ethernets:
@@ -160,8 +140,8 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
   }
 
   timeouts {
-    create = "5m"
-    delete = "5m"
+    create = "15m"
+    delete = "15m"
   }
 
   cpu {
@@ -219,4 +199,9 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
       full_clone,
     ]
   }
+}
+resource "local_file" "debug_rendered_yaml" {
+  for_each = local.vm_configs
+  content  = proxmox_cloud_init_disk.ci_configs[each.key].user_data
+  filename = "${path.module}/debug/${each.key}_cloud_init.yaml"
 }
