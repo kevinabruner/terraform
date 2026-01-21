@@ -29,8 +29,6 @@ write_files:
   # Inject role-specific files
 %{ for file in extra_files ~}
   - path: ${file.path}
-    owner: ${lookup(file, "owner", "root:root")}
-    permissions: '${lookup(file, "permissions", "0644")}'
     content: |
       ${indent(6, file.content)}
 %{ endfor ~}
