@@ -35,7 +35,20 @@ write_files:
 
 runcmd:
   - systemctl restart qemu-guest-agent || true
-# Inject app-specific commands here
+
+# Standard role commands
 %{ for cmd in extra_commands ~}
   - ${cmd}
 %{ endfor ~}
+
+# Drupal Production Master Logic
+%{ if is_drupal_master ~}
+  - |
+    #!/bin/bash
+    cd /var/www/html
+    echo "--- Starting Drupal Prod db cache flush: $(date) ---" >> /var/log/cloud-init-drupal.log
+    # Look how easy it is to use variables here!
+    sudo -u www-data environment=${env} /var/www/vendor/drush/drush/drush cr -y >> /var/log/cloud-init-drupal.log 2>&1
+    sudo -u www-data environment=${env} /var/www/vendor/drush/drush/drush updb -y >> /var/log/cloud-init-drupal.log 2>&1
+    sudo -u www-data environment=${env} /var/www/vendor/drush/drush/drush cim -y >> /var/log/cloud-init-drupal.log 2>&1
+%{ endif ~}

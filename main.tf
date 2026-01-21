@@ -39,23 +39,10 @@ locals {
   }
   role_configs = {
     "Drupal" = {
-      packages        = ["apache2", "php", "libapache2-mod-php"]
-      commands        = ["a2enconf Drupal-env || true", "systemctl restart apache2 || true"]
-      files           = [{ path = "/etc/apache2/conf-available/Drupal-env.conf", content = "SetEnv environment \"$${env}\"" }]
-      custom_script = local.drupal_script_raw # Put the script here
+      packages = ["apache2", "php", "libapache2-mod-php"]
+      commands = ["a2enconf Drupal-env || true", "systemctl restart apache2 || true"]
     }
-    "Default" = {
-      packages        = []
-      commands        = []
-      files           = []
-      custom_script = "" # Must exist, even if empty
-    }
-    "Database" = {
-      packages        = ["mariadb-server"]
-      commands        = []
-      files           = []
-      custom_script = "" # Must exist
-    }
+    "Default" = { packages = [], commands = [] }
   }
 }
 
@@ -83,19 +70,11 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     extra_packages = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).packages
     extra_files    = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).files
     
-    # 3. Gets all custom commands for the appropriate vm "role" 
-    extra_commands = concat(
-      lookup(local.role_configs, each.value.role, local.role_configs["Default"]).commands,
-      
-      # Logic for the Drupal-specific script
-      (each.value.role == "Drupal" && each.value.env == "prod" && endswith(each.value.name, "1")) ? [
-        # Note the \n BEFORE the indent function call
-        "|\n${indent(4, replace(local.drupal_script_raw, "REPLACE_ME_ENV", each.value.env))}"
-      ] : []
-    )
+    # 3. Boolean for all *-prod1 instances
+    is_drupal_master = (each.value.role == "Drupal" && each.value.env == "prod" && endswith(each.value.name, "1"))
   })
 
-      
+  
 
   network_config = <<-EOT
 version: 2
