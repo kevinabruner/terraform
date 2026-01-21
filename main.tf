@@ -31,14 +31,6 @@ provider "proxmox" {
 locals {
   vms = jsondecode(data.http.netbox_export.response_body)
   drupal_script_template = file("${path.module}/scripts/drupal_prod_db_flush.sh")
-  
-  drupal_script_template = <<-EOT
-    #!/bin/bash
-    cd /var/www/html
-    echo "--- Starting Drupal Prod db cache flush: $(date) ---" >> /var/log/cloud-init-drupal.log
-    sudo -u www-data environment=REPLACE_ME_ENV /var/www/vendor/drush/drush/drush cr -y >> /var/log/cloud-init-drupal.log 2>&1 || true
-    sudo -u www-data environment=REPLACE_ME_ENV /var/www/vendor/drush/drush/drush updb -y >> /var/log/cloud-init-drupal.log 2>&1 || true
-  EOT
 
   vm_configs = {
     for vm in local.vms : vm.name => merge(vm, {
