@@ -90,7 +90,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
         : []
     )
   })
-}
+
       
 
   network_config = <<-EOT
