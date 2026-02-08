@@ -128,7 +128,7 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
   clone              = each.value.image
   full_clone         = true
   clone_wait             = 30
-  os_type            = "cloud-init"
+  os_type            = "ubuntu"
   scsihw             = "virtio-scsi-pci"
   boot               = "order=scsi0;ide3"
   vm_state           = each.value.status
