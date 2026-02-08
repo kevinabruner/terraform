@@ -32,6 +32,15 @@ locals {
   vms = jsondecode(data.http.netbox_export.response_body)
   drupal_script_raw = trimspace(file("${path.module}/scripts/drupal_prod_db_flush.sh"))
   
+  #zfs local storage for legs and pve nodes
+  node_storage_map = {
+    "legs" = "local-zfs"
+    "pve"  = "local-zfs"
+  }
+  
+  # Default to local-lvm for all other nodes
+  default_local_storage = "local-lvm"
+
   # Merge in VM Data with computed network data
   vm_configs = {
     for vm in local.vms : vm.name => merge(vm, {
@@ -66,7 +75,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
   for_each = local.vm_configs
   name     = "${each.value.vmid}-cidata"
   pve_node = each.value.node
-  storage  = "cephfs"
+  storage  = lookup(local.node_storage_map, each.value.node, local.default_local_storage)
 
   meta_data = <<-EOT
     instance-id: ${each.value.name}
