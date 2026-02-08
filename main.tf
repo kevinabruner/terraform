@@ -205,3 +205,25 @@ resource "local_file" "debug_rendered_yaml" {
   content  = proxmox_cloud_init_disk.ci_configs[each.key].user_data
   filename = "${path.module}/debug/${each.key}_cloud_init.yaml"
 }
+resource "local_file" "debug_network_config" {
+  for_each = var.proxmox_vms
+  content  = <<-EOT
+version: 2
+ethernets:
+%{ for index, iface in each.value.interfaces ~}
+  ens${18 + index}:
+    addresses:
+      - ${iface.ip}
+%{ if iface.is_primary ~}
+    gateway4: ${each.value.gateway}
+    nameservers:
+      addresses: [192.168.11.99]
+      search: [jfkhome]
+    routes:
+      - to: default
+        via: ${each.value.gateway}
+%{ endif ~}
+%{ endfor ~}
+EOT
+  filename = "${path.module}/debug/debug_${each.key}.yaml"
+}
