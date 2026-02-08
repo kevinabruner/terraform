@@ -206,7 +206,7 @@ resource "local_file" "debug_rendered_yaml" {
   filename = "${path.module}/debug/${each.key}_cloud_init.yaml"
 }
 resource "local_file" "debug_network_config" {
-  for_each = var.proxmox_vms
+  for_each = local.vm_configs
   content  = <<-EOT
 version: 2
 ethernets:
