@@ -98,6 +98,7 @@ version: 2
 ethernets:
 %{ for index, iface in each.value.interfaces ~}
   ens${18 + index}:
+    optional: true
     addresses:
       - ${iface.ip}
 %{ if iface.is_primary ~}
