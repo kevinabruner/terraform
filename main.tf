@@ -115,29 +115,6 @@ EOT
 
 }
 
-resource "local_file" "debug_network_config" {
-  for_each = var.proxmox_vms
-  content  = <<-EOT
-version: 2
-ethernets:
-%{ for index, iface in each.value.interfaces ~}
-  ens${18 + index}:
-    addresses:
-      - ${iface.ip}
-%{ if iface.is_primary ~}
-    gateway4: ${each.value.gateway}
-    nameservers:
-      addresses: [192.168.11.99]
-      search: [jfkhome]
-    routes:
-      - to: default
-        via: ${each.value.gateway}
-%{ endif ~}
-%{ endfor ~}
-EOT
-  filename = "${path.module}/debug_${each.key}.yaml"
-}
-
 resource "proxmox_vm_qemu" "proxmox_vms" {
   for_each           = local.vm_configs
   name               = each.value.name
