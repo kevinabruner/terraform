@@ -158,7 +158,7 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
     content {
       id     = network.key
       model  = "virtio"
-      bridge = network.value.bridge
+      bridge = lookup(network.value, "bridge", "vmbr0")
       tag    = network.value.vlan > 0 ? network.value.vlan : null
     }
   }
