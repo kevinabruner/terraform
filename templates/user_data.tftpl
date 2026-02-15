@@ -2,9 +2,9 @@
 apt:
   primary:
     - arches: [default]
-      uri: http://mirror.thejfk.ca/ubuntu
+      uri: ${mirror_url}
   security:
-    - uri: http://mirror.thejfk.ca/ubuntu
+    - uri: ${mirror_url}
   # If use_mirror is true, we overwrite (no fallback). 
   # If false, we keep the defaults alongside our mirror.
   preserve_sources_list: ${!use_mirror}
