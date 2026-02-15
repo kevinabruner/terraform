@@ -1,4 +1,13 @@
 #cloud-config
+apt:
+  primary:
+    - arches: [default]
+      uri: http://mirror.thejfk.ca/ubuntu
+  security:
+    - uri: http://mirror.thejfk.ca/ubuntu
+  # This ensures we don't fall back to official mirrors if yours is slow
+  preserve_sources_list: false
+
 users:
   - name: ${username}
     passwd: ${password}
