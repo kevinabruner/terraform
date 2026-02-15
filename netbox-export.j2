@@ -36,6 +36,7 @@
       "disk_size": "{{ (vm.disk / 1000) | int if vm.disk else 8 }}G",
       "pool": "{{ vm.custom_field_data.proxmox_pool or '' }}",
       "start_at_node_boot": {{ "true" if vm.start_on_boot == "on" else "false" }},
+      "use_mirror": {{ "true" if vm.custom_field_data.use_mirror == "true" else "false" }},
       "interfaces": {{ ns_vm.ifaces | tojson }},
 
 
