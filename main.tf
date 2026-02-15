@@ -66,7 +66,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
   for_each = local.vm_configs
   name     = "${each.value.vmid}-cidata"
   pve_node = each.value.node
-  storage  = "cephfs"
+  storage  = "local"
 
   meta_data = <<-EOT
     instance-id: ${each.value.name}
@@ -99,6 +99,7 @@ version: 2
 ethernets:
 %{ for index, iface in each.value.interfaces ~}
   ens${18 + index}:
+    optional: true
     addresses:
       - ${iface.ip}
 %{ if iface.is_primary ~}
@@ -128,8 +129,9 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
   memory             = each.value.memory
   clone              = each.value.image
   full_clone         = true
-  clone_wait             = 30
-  os_type            = "cloud-init"
+  clone_wait         = 5
+
+  os_type            = "ubuntu"
   scsihw             = "virtio-scsi-pci"
   boot               = "order=scsi0;ide3"
   vm_state           = each.value.status
@@ -156,7 +158,7 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
     content {
       id     = network.key
       model  = "virtio"
-      bridge = network.value.name
+      bridge = network.value.bridge
       tag    = network.value.vlan > 0 ? network.value.vlan : null
     }
   }
@@ -205,4 +207,26 @@ resource "local_file" "debug_rendered_yaml" {
   for_each = local.vm_configs
   content  = proxmox_cloud_init_disk.ci_configs[each.key].user_data
   filename = "${path.module}/debug/${each.key}_cloud_init.yaml"
+}
+resource "local_file" "debug_network_config" {
+  for_each = local.vm_configs
+  content  = <<-EOT
+version: 2
+ethernets:
+%{ for index, iface in each.value.interfaces ~}
+  ens${18 + index}:
+    addresses:
+      - ${iface.ip}
+%{ if iface.is_primary ~}
+    gateway4: ${each.value.gateway}
+    nameservers:
+      addresses: [192.168.11.99]
+      search: [jfkhome]
+    routes:
+      - to: default
+        via: ${each.value.gateway}
+%{ endif ~}
+%{ endfor ~}
+EOT
+  filename = "${path.module}/debug/debug_${each.key}.yaml"
 }

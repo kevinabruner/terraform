@@ -14,6 +14,7 @@
       {%- set iface_entry = {
         "name": interface.name,
         "vlan": interface.untagged_vlan.vid if interface.untagged_vlan else 0,
+        "bridge": interface.custom_field_data.parent_bridge if interface.custom_field_data.parent_bridge else 'vmbr0',
         "ip": ip_str,
         "is_primary": (vm.primary_ip and ip_str == (vm.primary_ip.address | string))
       } -%}
