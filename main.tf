@@ -82,6 +82,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     vmid     = each.value.vmid
     env      = each.value.env
     use_mirror   = each.value.use_mirror
+    mirror_url   = var.mirror_url
 
     # 2. Extract Role Data from Locals
     extra_packages = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).packages
