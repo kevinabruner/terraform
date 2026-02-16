@@ -2,10 +2,10 @@
 apt:
   primary:
     - arches: [default]
-      uri: http://${mirror_ip}/ubuntu
+      uri: http://${mirror_url}/ubuntu
   security:
     - arches: [default]    # <--- This was the missing required property
-      uri: http://${mirror_ip}/ubuntu
+      uri: http://${mirror_url}/ubuntu
   preserve_sources_list: ${!use_mirror}
 
 users:
