@@ -26,7 +26,7 @@ variable "netbox_api_token_secret" {
 
 variable "mirror_url" { 
     type = string 
-    default = "http://mirror.jfkhome/ubuntu/"
+    default = "http://mirror.jfkhome/"
 }
 
 variable "vm_password" { 
