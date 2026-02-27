@@ -139,7 +139,7 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
 
   os_type            = "ubuntu"
   scsihw             = "virtio-scsi-pci"
-  boot               = "order=scsi0;ide3"
+  boot               = "order=scsi0;net0;ide3;ide2"
   vm_state           = each.value.status
   define_connection_info = false
 
