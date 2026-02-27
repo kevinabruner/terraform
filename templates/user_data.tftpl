@@ -78,4 +78,7 @@ runcmd:
     sudo -u www-data environment=${env} /var/www/vendor/drush/drush/drush cr -y >> /var/log/cloud-init-drupal.log 2>&1
     sudo -u www-data environment=${env} /var/www/vendor/drush/drush/drush updb -y >> /var/log/cloud-init-drupal.log 2>&1
     sudo -u www-data environment=${env} /var/www/vendor/drush/drush/drush cim -y >> /var/log/cloud-init-drupal.log 2>&1
+    cat <<EOF > /etc/cron.d/ceph-nfs-backup
+    0 3 * * * root grep -q 'environment=prod' /etc/environment && rsync -az --delete /var/www/html/sites/default/files/ /home/kevin/nfs-files
+    EOF
 %{ endif ~}
