@@ -130,7 +130,7 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
   memory             = each.value.memory
   clone              = each.value.image
   full_clone         = true
-  clone_wait         = 5
+  clone_wait         = 15
 
   os_type            = "ubuntu"
   scsihw             = "virtio-scsi-pci"
