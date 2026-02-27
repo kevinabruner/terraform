@@ -46,7 +46,12 @@ locals {
   role_configs = {
     "Drupal" = {
       packages = ["apache2"]
-      commands = ["a2enconf Drupal-env || true", "systemctl restart apache2 || true"]
+      commands = [
+        "a2enconf Drupal-env || true", 
+        "systemctl restart apache2 || true",
+        "sed -i 's/,noauto//g' /etc/fstab",
+        "mount -a"
+      ]
       files    = [
         {
           path    = "/etc/apache2/conf-available/Drupal-env.conf"
