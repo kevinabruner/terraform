@@ -49,8 +49,8 @@ locals {
       commands = [
         "a2enconf Drupal-env || true", 
         "systemctl restart apache2 || true",
-        "sed -i 's/,noauto//g' /etc/fstab",
-        "mount -a"
+        "sed -i 's/,noauto//g' /etc/fstab || true",
+        "mount -a || true"
       ]
       files    = [
         {
