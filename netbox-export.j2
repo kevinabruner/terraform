@@ -1,7 +1,7 @@
 [
 {% set ns = namespace(first=true) %}
 {% for vm in queryset %}
-  {% if (vm.status == 'active' or vm.status == 'paused') and vm.custom_field_data.vm_type == 'vm' %}
+  {% if (vm.status == 'active' or vm.status == 'paused') and vm.custom_field_data.vm_type == 'vm' -%}
 
     {% set context = vm.get_config_context() %}
     
