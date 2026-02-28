@@ -70,6 +70,7 @@ runcmd:
   - ${cmd}
 %{ endfor ~}
 
+#sets ceph backups on the 1st prod server
 %{ if is_drupal_master ~}
   - |
     cat <<EOF > /etc/cron.d/ceph-nfs-backup
