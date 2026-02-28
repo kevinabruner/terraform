@@ -1,10 +1,12 @@
 [
-{% set ns = namespace(first=true) %}
-{% for vm in queryset %}
-  {% if (vm.status == 'active' or vm.status == 'paused') and vm.custom_field_data.vm_type == 'vm' -%}
+{%- set ns = namespace(first=true) -%}
+{%- for vm in queryset -%}
+  {%- if (vm.status == 'active' or vm.status == 'paused') and vm.custom_field_data.vm_type == 'vm' -%}
+    {#- Use the namespace to handle commas correctly -#}
+    {{- "," if not ns.first -}}
+    {%- set ns.first = false -%}
 
-    {% set context = vm.get_config_context() %}
-    
+    {%- set context = vm.get_config_context() -%}
     {%- set ns_vm = namespace(ifaces=[]) -%}
 
     {# Run through every interface and set networking information #}
@@ -53,9 +55,6 @@
       "tags": "{{ vm.tags.all() | join(',') }}"
     }
 
-    {# Important: adds a comma after every entry except the last for valid JSON #}
-    {{ "," if not loop.last }}
-
-  {% endif %}
-{% endfor %}
+  {%- endif -%}
+{%- endfor -%}
 ]

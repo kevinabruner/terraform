@@ -4,7 +4,7 @@ apt:
     - arches: [default]
       uri: ${mirror_url}
   security:
-    - arches: [default]    # <--- This was the missing required property
+    - arches: [default]    
       uri: ${mirror_url}
   preserve_sources_list: ${!use_mirror}
 
