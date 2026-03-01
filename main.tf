@@ -45,6 +45,7 @@ locals {
   # Role-based configurations
   role_configs = {
     "Drupal" = {
+      has_keepalived = false
       packages = ["apache2"]
       commands = [
         "a2enconf Drupal-env || true", 
@@ -72,6 +73,7 @@ locals {
       files          = []
     }
     "Default" = { 
+      has_keepalived = false
       packages = []
       commands = []
       files    = [] 
