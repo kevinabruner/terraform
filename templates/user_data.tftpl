@@ -52,11 +52,6 @@ write_files:
       state ${is_vrrp_master ? "MASTER" : "BACKUP"}
       priority ${is_vrrp_master ? 101 : 100}
       
-      # Unicast configuration
-      unicast_src_ip ${local_ip}
-      unicast_peer {
-        ${peer_ip}
-      }
 %{ endif ~}
 
   # Unattended apt updates for every VM
