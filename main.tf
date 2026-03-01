@@ -45,7 +45,6 @@ locals {
   # Role-based configurations
   role_configs = {
     "Drupal" = {
-      packages = ["apache2"]
       commands = [
         "a2enconf Drupal-env || true", 
         "systemctl restart apache2 || true",
