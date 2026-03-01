@@ -199,6 +199,7 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
     ignore_changes = [
       qemu_os,
       hagroup,
+      boot,
       hastate,
       agent,
       usbs,
