@@ -59,6 +59,18 @@ locals {
         }
       ]
     }
+    "Reverse proxy" = {
+      has_keepalived = true
+      packages       = []
+      commands       = ["systemctl restart keepalived"]
+      files          = []
+    }
+    "Database proxy" = {
+      has_keepalived = true
+      packages       = []
+      commands       = ["systemctl restart keepalived"]
+      files          = []
+    }
     "Default" = { 
       packages = []
       commands = []
@@ -96,6 +108,17 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     
     # 3. Boolean for all *-prod1 instances
     is_drupal_master = (each.value.role == "Drupal" && each.value.env == "prod" && endswith(each.value.name, "1"))
+    
+    # Keepalived Logic
+    has_keepalived = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).has_keepalived
+    is_vrrp_master = endswith(each.value.name, "1")
+    local_ip       = split("/", each.value.primary_iface.ip)[0] # Strip CIDR mask
+    
+    # Peer IP Search: Find the OTHER node with same role and env
+    peer_ip = try(split("/", [
+      for name, v in local.vm_configs : v.primary_iface.ip 
+      if v.role == each.value.role && v.env == each.value.env && v.name != each.value.name
+    ][0])[0], "127.0.0.1")
   })
 
   

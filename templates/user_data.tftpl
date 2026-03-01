@@ -33,7 +33,6 @@ packages:
 %{ endfor ~}
 
 write_files:
-
   # Environmental variables for every VM
   - path: /etc/environment
     content: |
@@ -41,6 +40,24 @@ write_files:
       VM_NAME=${name}
       environment=${env}
     append: true
+
+  # Keepalived Identity (Only for Proxy Roles)
+%{ if has_keepalived ~}
+  - path: /etc/keepalived/cluster_vars.conf
+    owner: root:root
+    permissions: '0644'
+    content: |
+      # Cluster Identity for ${name}
+      # Logic: Name ends in 1 is MASTER
+      state ${is_vrrp_master ? "MASTER" : "BACKUP"}
+      priority ${is_vrrp_master ? 101 : 100}
+      
+      # Unicast configuration
+      unicast_src_ip ${local_ip}
+      unicast_peer {
+        ${peer_ip}
+      }
+%{ endif ~}
 
   # Unattended apt updates for every VM
   - path: /etc/apt/apt.conf.d/99-terraform-custom
