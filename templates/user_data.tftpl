@@ -1,5 +1,5 @@
 %{ if os == "ubuntu24" ~}
-cloud-config
+#cloud-config
 apt:
   primary:
     - arches: [default]
@@ -22,6 +22,7 @@ apt:
     deb $mirror trixie-updates main contrib non-free non-free-firmware
     deb $security trixie-security main contrib non-free non-free-firmware
 %{ endif ~}
+
 users:
   - name: ${username}
     passwd: ${password}
