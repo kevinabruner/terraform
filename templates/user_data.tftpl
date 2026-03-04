@@ -4,7 +4,7 @@ apt:
     - arches: [default]
       uri: ${mirror_url}
   security:
-    - arches: [default]    # <--- This was the missing required property
+    - arches: [default]    
       uri: ${mirror_url}
   preserve_sources_list: ${!use_mirror}
 
@@ -33,7 +33,6 @@ packages:
 %{ endfor ~}
 
 write_files:
-
   # Environmental variables for every VM
   - path: /etc/environment
     content: |
@@ -41,6 +40,19 @@ write_files:
       VM_NAME=${name}
       environment=${env}
     append: true
+
+  # Keepalived Identity (Only for Proxy Roles)
+%{ if has_keepalived ~}
+  - path: /etc/keepalived/cluster_vars.conf
+    owner: root:root
+    permissions: '0644'
+    content: |
+      # Cluster Identity for ${name}
+      # Logic: Name ends in 1 is MASTER
+      state ${is_vrrp_master ? "MASTER" : "BACKUP"}
+      priority ${is_vrrp_master ? 101 : 100}
+      
+%{ endif ~}
 
   # Unattended apt updates for every VM
   - path: /etc/apt/apt.conf.d/99-terraform-custom
@@ -74,6 +86,6 @@ runcmd:
 %{ if is_drupal_master ~}
   - |
     cat <<EOF > /etc/cron.d/ceph-nfs-backup
-    0 3 * * * root grep -q 'environment=prod' /etc/environment && rsync -az --delete /var/www/html/sites/default/files/ /home/kevin/nfs-files
+    0 3 * * * root grep -q 'environment=prod' /etc/environment && rsync -az --delete /var/www/html/sites/default/files/ /home/${username}/nfs-files
     EOF
 %{ endif ~}
