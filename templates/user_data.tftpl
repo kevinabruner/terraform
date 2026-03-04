@@ -48,6 +48,12 @@ packages:
 %{ endfor ~}
 
 write_files:
+  #Force apt ipv4
+  - path: /etc/apt/apt.conf.d/99force-ipv4
+    permissions: '0644'
+    content: |
+      Acquire::ForceIPv4 "true";
+
   # Environmental variables for every VM
   - path: /etc/environment
     content: |
