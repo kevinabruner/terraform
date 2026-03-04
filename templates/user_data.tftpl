@@ -1,4 +1,12 @@
 #cloud-config
+# apt:
+#   primary:
+#     - arches: [default]
+#       uri: ${mirror_url}
+#   security:
+#     - arches: [default]    
+#       uri: ${mirror_url}
+#   preserve_sources_list: ${!use_mirror}
 apt:
   primary:
     - arches: [default]
