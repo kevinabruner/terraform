@@ -2,11 +2,18 @@
 apt:
   primary:
     - arches: [default]
-      uri: ${mirror_url}
+      # Points to your /debian symlink
+      uri: ${mirror_base_url}/debian
   security:
     - arches: [default]    
-      uri: ${mirror_url}
+      # Points to your /debian-security symlink
+      uri: ${mirror_base_url}/debian-security
   preserve_sources_list: ${!use_mirror}
+  # Ensure these suites match Debian 13 (Trixie)
+  sources_list: |
+    deb $mirror trixie main contrib non-free non-free-firmware
+    deb $mirror trixie-updates main contrib non-free non-free-firmware
+    deb $security trixie-security main contrib non-free non-free-firmware
 
 users:
   - name: ${username}
