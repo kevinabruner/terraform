@@ -133,7 +133,6 @@ ethernets:
     addresses:
       - ${iface.ip}
 %{ if iface.is_primary ~}
-    gateway4: ${each.value.gateway}
     nameservers:
       addresses: [192.168.11.99]
       search: [jfkhome]
