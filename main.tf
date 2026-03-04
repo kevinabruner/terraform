@@ -30,7 +30,6 @@ provider "proxmox" {
 
 locals {
   vms = jsondecode(data.http.netbox_export.response_body)
-  drupal_script_raw = trimspace(file("${path.module}/scripts/drupal_prod_db_flush.sh"))
   
   # Merge in VM Data with computed network data
   vm_configs = {
