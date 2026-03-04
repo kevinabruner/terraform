@@ -86,6 +86,6 @@ runcmd:
 %{ if is_drupal_master ~}
   - |
     cat <<EOF > /etc/cron.d/ceph-nfs-backup
-    0 3 * * * root grep -q 'environment=prod' /etc/environment && rsync -az --delete /var/www/html/sites/default/files/ /home/kevin/nfs-files
+    0 3 * * * root grep -q 'environment=prod' /etc/environment && rsync -az --delete /var/www/html/sites/default/files/ /home/${username}/nfs-files
     EOF
 %{ endif ~}
