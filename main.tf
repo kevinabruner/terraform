@@ -138,7 +138,7 @@ ethernets:
       addresses: [192.168.11.99]
       search: [jfkhome]
     routes:
-      - to: default
+      - to: 0.0.0.0/0
         via: ${each.value.gateway}
 %{ endif ~}
 %{ endfor ~}
