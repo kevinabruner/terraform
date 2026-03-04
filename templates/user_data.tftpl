@@ -1,28 +1,27 @@
-#cloud-config
-# apt:
-#   primary:
-#     - arches: [default]
-#       uri: ${mirror_url}
-#   security:
-#     - arches: [default]    
-#       uri: ${mirror_url}
-#   preserve_sources_list: ${!use_mirror}
+%{ if os == 'ubuntu24' ~}
+cloud-config
 apt:
   primary:
     - arches: [default]
-      # Points to your /debian symlink
+      uri: ${mirror_url}/ubuntu
+  security:
+    - arches: [default]    
+      uri: ${mirror_url}/ubuntu
+  preserve_sources_list: ${!use_mirror}
+%{ else ~}
+apt:
+  primary:
+    - arches: [default]
       uri: ${mirror_url}/debian
   security:
     - arches: [default]    
-      # Points to your /debian-security symlink
       uri: ${mirror_url}/debian-security
   preserve_sources_list: ${!use_mirror}
-  # Ensure these suites match Debian 13 (Trixie)
   sources_list: |
     deb $mirror trixie main contrib non-free non-free-firmware
     deb $mirror trixie-updates main contrib non-free non-free-firmware
     deb $security trixie-security main contrib non-free non-free-firmware
-
+%{ endif ~}
 users:
   - name: ${username}
     passwd: ${password}
