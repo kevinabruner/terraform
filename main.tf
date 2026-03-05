@@ -67,13 +67,13 @@ locals {
     }
     "Database proxy" = {
       has_keepalived = true
-      packages       = []
+      packages       = ["unattended-upgrades"]
       commands       = ["systemctl restart keepalived"]
       files          = []
     }
     "Default" = { 
       has_keepalived = false
-      packages = []
+      packages = ["unattended-upgrades"]
       commands = []
       files    = [] 
     }
