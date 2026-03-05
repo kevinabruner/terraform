@@ -79,17 +79,29 @@ write_files:
   - path: /etc/apt/apt.conf.d/99-terraform-custom
     owner: root:root
     permissions: '0644'
+%{ if os == "ubuntu24" ~}
+    content: |
+      Unattended-Upgrade::Allowed-Origins {
+              "$${distro_id}:$${distro_codename}";
+              "$${distro_id}:$${distro_codename}-security";
+              "$${distro_id}:$${distro_codename}-updates";
+              "$${distro_id}ESMApps:$${distro_codename}-apps-security";
+              "$${distro_id}ESM:$${distro_codename}-infra-security";
+      };      
+      Unattended-Upgrade::Automatic-Reboot "true";
+      Unattended-Upgrade::Automatic-Reboot-Time "04:00";
+      Unattended-Upgrade::Remove-Unused-Dependencies "true";
+%{ else ~}
     content: |
       Unattended-Upgrade::Allowed-Origins {
         "$${distro_id}:$${distro_codename}";
         "$${distro_id}:$${distro_codename}-security";
-        // Debian uses 'label=Debian-Security' often, but variable substitution usually works
         "origin=$${distro_id},codename=$${distro_codename}-updates";
       };      
       Unattended-Upgrade::Automatic-Reboot "true";
       Unattended-Upgrade::Automatic-Reboot-Time "04:00";
       Unattended-Upgrade::Remove-Unused-Dependencies "true";
-
+%{ endif ~}
 %{ for file in extra_files ~}
   - path: ${file.path}
     content: |
