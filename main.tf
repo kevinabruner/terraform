@@ -61,7 +61,7 @@ locals {
     }
     "Reverse proxy" = {
       has_keepalived = true
-      packages       = []
+      packages       = ["unattended-upgrades"]
       commands       = ["systemctl restart keepalived"]
       files          = []
     }
