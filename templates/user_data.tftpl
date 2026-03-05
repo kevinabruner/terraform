@@ -102,6 +102,8 @@ runcmd:
 %{ for cmd in extra_commands ~}
   - ${cmd}
 %{ endfor ~}
+  - sed -i '/\/media\/cdrom/s/^/#/' /etc/fstab || true
+  - systemctl daemon-reload
 
 #sets ceph backups on the 1st prod server
 %{ if is_drupal_master ~}
