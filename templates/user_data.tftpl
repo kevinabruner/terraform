@@ -94,8 +94,8 @@ write_files:
 %{ else ~}
     content: |
       Unattended-Upgrade::Allowed-Origins {
-        "origin=$${distro_id}:$${distro_codename}";
-        "origin=$${distro_id}:$${distro_codename}-security";
+        "origin=$${distro_id},$${distro_codename}";
+        "origin=$${distro_id},$${distro_codename}-security";
         "origin=$${distro_id},codename=$${distro_codename}-updates";
       };      
       Unattended-Upgrade::Automatic-Reboot "true";
