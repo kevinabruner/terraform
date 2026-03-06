@@ -85,6 +85,8 @@ write_files:
               "$${distro_id}:$${distro_codename}";
               "$${distro_id}:$${distro_codename}-security";
               "$${distro_id}:$${distro_codename}-updates";
+              "$${distro_id}ESMApps:$${distro_codename}-apps-security";
+              "$${distro_id}ESM:$${distro_codename}-infra-security";
       };      
       Unattended-Upgrade::Automatic-Reboot "true";
       Unattended-Upgrade::Automatic-Reboot-Time "04:00";
@@ -92,8 +94,8 @@ write_files:
 %{ else ~}
     content: |
       Unattended-Upgrade::Allowed-Origins {
-        "$${distro_id}:$${distro_codename}";
-        "$${distro_id}:$${distro_codename}-security";
+        "origin=$${distro_id}:$${distro_codename}";
+        "origin=$${distro_id}:$${distro_codename}-security";
         "origin=$${distro_id},codename=$${distro_codename}-updates";
       };      
       Unattended-Upgrade::Automatic-Reboot "true";
