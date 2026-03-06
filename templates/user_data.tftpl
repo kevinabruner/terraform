@@ -75,7 +75,8 @@ write_files:
       
 %{ endif ~}
 
-  # Unattended apt updates for every VM
+  # Unattended apt updates for every vm with a custom configuration for Ubuntu 24.04.
+  # Debian doesn't need the config, it's fine as-is for updates
   - path: /etc/apt/apt.conf.d/99-terraform-custom
     owner: root:root
     permissions: '0644'
@@ -87,16 +88,6 @@ write_files:
               "$${distro_id}:$${distro_codename}-updates";
               "$${distro_id}ESMApps:$${distro_codename}-apps-security";
               "$${distro_id}ESM:$${distro_codename}-infra-security";
-      };      
-      Unattended-Upgrade::Automatic-Reboot "true";
-      Unattended-Upgrade::Automatic-Reboot-Time "04:00";
-      Unattended-Upgrade::Remove-Unused-Dependencies "true";
-%{ else ~}
-    content: |
-      Unattended-Upgrade::Allowed-Origins {
-              "origin=$${distro_id},codename=$${distro_codename}";
-              "origin=$${distro_id},codename=$${distro_codename}-security";
-              "origin=$${distro_id},codename=$${distro_codename}-updates";
       };      
       Unattended-Upgrade::Automatic-Reboot "true";
       Unattended-Upgrade::Automatic-Reboot-Time "04:00";
