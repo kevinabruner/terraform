@@ -77,7 +77,7 @@ write_files:
 
   # Unattended apt updates for every vm with a custom configuration for Ubuntu 24.04.
   # Debian doesn't need the config, it's fine as-is for updates
-  %{ if os == "ubuntu24" ~}
+%{ if os == "ubuntu24" ~}
   - path: /etc/apt/apt.conf.d/99-terraform-custom
     owner: root:root
     permissions: '0644'
