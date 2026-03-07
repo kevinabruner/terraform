@@ -54,6 +54,44 @@ write_files:
     content: |
       Acquire::ForceIPv4 "true";
 
+%{ if role == "Database" ~}
+  - path: /etc/mysql/conf.d/galera.conf
+    permissions: '0644'
+    content: |
+      [mysqld]
+      plugin-load-add=auth_socket.so
+      binlog_format=ROW
+      default-storage-engine=innodb
+      innodb_autoinc_lock_mode=2
+      bind-address=0.0.0.0
+      port=3306
+      max_allowed_packet=512M
+
+      log-error=/var/log/mysqld.log
+
+      wait_timeout=300
+      interactive_timeout=300
+
+      # Galera Provider Configuration
+      wsrep_on=ON
+      wsrep_provider=/usr/lib/galera/libgalera_smm.so
+
+      ### Galera Cluster Configuration
+
+      # Using the group name (dev or prod) as the cluster name
+      wsrep_cluster_name="mariadb-${env}"
+
+      # If this is the first node in the group list, you could optionally handle bootstrap logic
+      wsrep_cluster_address="gcomm://${ peer_ip | join(',') }"
+
+      # Galera Synchronization Configuration
+      wsrep_sst_method=rsync
+
+      # Galera Node Configuration
+      wsrep_node_address="${local_ip}"
+      wsrep_node_name="${name}"
+%{ endif ~}
+
   # Environmental variables for every VM
   - path: /etc/environment
     content: |
