@@ -82,7 +82,7 @@ write_files:
       wsrep_cluster_name="mariadb-${env}"
 
       # If this is the first node in the group list, you could optionally handle bootstrap logic
-      wsrep_cluster_address="gcomm://${peer_ip}"
+      wsrep_cluster_address="gcomm://${peer_ips_csv}"
 
       # Galera Synchronization Configuration
       wsrep_sst_method=rsync

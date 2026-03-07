@@ -122,6 +122,12 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
       for name, v in local.vm_configs : v.primary_iface.ip 
       if v.role == each.value.role && v.env == each.value.env && v.name != each.value.name
     ][0])[0], "127.0.0.1")
+
+    # find all peers and return as a string (for db servers)
+    peer_ips_csv = join(",", [
+      for name, v in local.vm_configs : split("/", v.primary_iface.ip)[0]
+      if v.role == each.value.role && v.env == each.value.env && v.name != each.value.name
+    ])
   })
 
   
