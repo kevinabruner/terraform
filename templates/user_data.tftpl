@@ -1,12 +1,27 @@
 #cloud-config
+%{ if os == "ubuntu24" ~}
 apt:
   primary:
     - arches: [default]
-      uri: ${mirror_url}
+      uri: ${mirror_url}/ubuntu
   security:
     - arches: [default]    
-      uri: ${mirror_url}
+      uri: ${mirror_url}/ubuntu
   preserve_sources_list: ${!use_mirror}
+%{ else ~}
+apt:
+  primary:
+    - arches: [default]
+      uri: ${mirror_url}/debian
+  security:
+    - arches: [default]    
+      uri: ${mirror_url}/debian-security
+  preserve_sources_list: ${!use_mirror}
+  sources_list: |
+    deb $mirror trixie main contrib non-free non-free-firmware
+    deb $mirror trixie-updates main contrib non-free non-free-firmware
+    deb $security trixie-security main contrib non-free non-free-firmware
+%{ endif ~}
 
 users:
   - name: ${username}
@@ -33,6 +48,50 @@ packages:
 %{ endfor ~}
 
 write_files:
+  #Force apt ipv4
+  - path: /etc/apt/apt.conf.d/99force-ipv4
+    permissions: '0644'
+    content: |
+      Acquire::ForceIPv4 "true";
+
+%{ if role == "Database" ~}
+  - path: /etc/mysql/conf.d/galera.cnf
+    permissions: '0644'
+    content: |
+      [mysqld]
+      plugin-load-add=auth_socket.so
+      binlog_format=ROW
+      default-storage-engine=innodb
+      innodb_autoinc_lock_mode=2
+      bind-address=0.0.0.0
+      port=3306
+      max_allowed_packet=512M
+
+      log-error=/var/log/mysqld.log
+
+      wait_timeout=300
+      interactive_timeout=300
+
+      # Galera Provider Configuration
+      wsrep_on=ON
+      wsrep_provider=/usr/lib/galera/libgalera_smm.so
+
+      ### Galera Cluster Configuration
+
+      # Using the group name (dev or prod) as the cluster name
+      wsrep_cluster_name="mariadb-${env}"
+
+      # If this is the first node in the group list, you could optionally handle bootstrap logic
+      wsrep_cluster_address="gcomm://${peer_ips_csv}"
+
+      # Galera Synchronization Configuration
+      wsrep_sst_method=rsync
+
+      # Galera Node Configuration
+      wsrep_node_address="${local_ip}"
+      wsrep_node_name="${name}"
+%{ endif ~}
+
   # Environmental variables for every VM
   - path: /etc/environment
     content: |
@@ -54,7 +113,9 @@ write_files:
       
 %{ endif ~}
 
-  # Unattended apt updates for every VM
+  # Unattended upgrades config for Ubuntu 24.04.
+  # Debian doesn't need the config, it comes with one
+%{ if os == "ubuntu24" ~}
   - path: /etc/apt/apt.conf.d/99-terraform-custom
     owner: root:root
     permissions: '0644'
@@ -69,7 +130,7 @@ write_files:
       Unattended-Upgrade::Automatic-Reboot "true";
       Unattended-Upgrade::Automatic-Reboot-Time "04:00";
       Unattended-Upgrade::Remove-Unused-Dependencies "true";
-
+%{ endif ~}
 %{ for file in extra_files ~}
   - path: ${file.path}
     content: |
@@ -81,6 +142,8 @@ runcmd:
 %{ for cmd in extra_commands ~}
   - ${cmd}
 %{ endfor ~}
+  - sed -i '/\/media\/cdrom/s/^/#/' /etc/fstab || true
+  - systemctl daemon-reload
 
 #sets ceph backups on the 1st prod server
 %{ if is_drupal_master ~}

@@ -61,19 +61,19 @@ locals {
     }
     "Reverse proxy" = {
       has_keepalived = true
-      packages       = []
+      packages       = ["unattended-upgrades"]
       commands       = ["systemctl restart keepalived"]
       files          = []
     }
     "Database proxy" = {
       has_keepalived = true
-      packages       = []
+      packages       = ["unattended-upgrades"]
       commands       = ["systemctl restart keepalived"]
       files          = []
     }
     "Default" = { 
       has_keepalived = false
-      packages = []
+      packages = ["unattended-upgrades"]
       commands = []
       files    = [] 
     }
@@ -101,6 +101,8 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     env      = each.value.env
     use_mirror   = each.value.use_mirror
     mirror_url   = var.mirror_url
+    os           = each.value.os
+    role         = each.value.role
 
     # 2. Extract Role Data from Locals
     extra_packages = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).packages
@@ -120,6 +122,12 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
       for name, v in local.vm_configs : v.primary_iface.ip 
       if v.role == each.value.role && v.env == each.value.env && v.name != each.value.name
     ][0])[0], "127.0.0.1")
+
+    # find all peers and return as a string (for db servers)
+    peer_ips_csv = join(",", [
+      for name, v in local.vm_configs : split("/", v.primary_iface.ip)[0]
+      if v.role == each.value.role && v.env == each.value.env && v.name != each.value.name
+    ])
   })
 
   
@@ -133,12 +141,11 @@ ethernets:
     addresses:
       - ${iface.ip}
 %{ if iface.is_primary ~}
-    gateway4: ${each.value.gateway}
     nameservers:
       addresses: [192.168.11.99]
       search: [jfkhome]
     routes:
-      - to: default
+      - to: 0.0.0.0/0
         via: ${each.value.gateway}
 %{ endif ~}
 %{ endfor ~}
