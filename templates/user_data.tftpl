@@ -55,7 +55,7 @@ write_files:
       Acquire::ForceIPv4 "true";
 
 %{ if role == "Database" ~}
-  - path: /etc/mysql/conf.d/galera.conf
+  - path: /etc/mysql/conf.d/galera.cnf
     permissions: '0644'
     content: |
       [mysqld]
