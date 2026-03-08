@@ -71,6 +71,12 @@ locals {
       commands       = ["systemctl restart keepalived"]
       files          = []
     }
+    "DNS resolver" = {
+      has_keepalived = true
+      packages       = ["unattended-upgrades"]
+      commands       = ["systemctl restart keepalived"]
+      files          = []
+    }
     "Default" = { 
       has_keepalived = false
       packages = ["unattended-upgrades"]
