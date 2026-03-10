@@ -55,6 +55,16 @@ write_files:
       Acquire::ForceIPv4 "true";
 
 %{ if role == "psql server" ~}
+  - path: /etc/systemd/system/etcd.service.d/override.conf
+    content: |
+      [Service]
+      # Clear existing values
+      Environment=ETCD_NAME=
+      Environment=ETCD_DATA_DIR=
+      # Pass the variables into DAEMON_ARGS effectively
+      ExecStart=
+      ExecStart=/usr/bin/etcd
+
   - path: /etc/default/etcd
     permissions: '0644'
     content: |
