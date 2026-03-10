@@ -118,8 +118,22 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     node_ip_with_cidr = each.value.primary_iface.ip
     subnet            = cidrsubnet(each.value.primary_iface.ip, 0, 0)    
 
-    etcd_content = templatefile("${path.module}/templates/_etcd.tftpl")
-    patroni_content = templatefile("${path.module}/templates/_patroni.yml.tftpl")
+    # 3. RENDER ETCD SUBTEMPLATE
+    etcd_content = templatefile("${path.module}/templates/_etcd.tftpl", {
+      node_name       = each.value.name
+      node_ip         = split("/", each.value.primary_iface.ip)[0]
+      cluster_members = {
+        for k, v in local.vm_configs : k => v
+        if v.role == each.value.role && v.env == each.value.env
+      }
+    })
+
+    # 4. RENDER PATRONI SUBTEMPLATE 
+    patroni_content = templatefile("${path.module}/templates/_patroni.conf.tftpl", {
+      node_name = each.value.name
+      node_ip   = split("/", each.value.primary_iface.ip)[0]
+      subnet            = cidrsubnet(each.value.primary_iface.ip, 0, 0)    
+    })
 
     # 2. Extract Role Data from Locals
     extra_packages = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).packages
