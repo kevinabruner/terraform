@@ -129,7 +129,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     })
 
     # 4. RENDER PATRONI SUBTEMPLATE 
-    patroni_content = templatefile("${path.module}/templates/_patroni.conf.tftpl", {
+    patroni_content = templatefile("${path.module}/templates/_patroni.yaml.tftpl", {
       name = each.value.name
       local_ip   = split("/", each.value.primary_iface.ip)[0]
       subnet            = cidrsubnet(each.value.primary_iface.ip, 0, 0)    
