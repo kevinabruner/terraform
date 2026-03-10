@@ -71,6 +71,12 @@ locals {
       commands       = ["systemctl restart keepalived"]
       files          = []
     }
+    "psql server" = {
+      has_keepalived = false
+      packages       = ["unattended-upgrades"]
+      commands       = ["systemctl restart etcd patroni"]
+      files          = []
+    }
     "DNS resolver" = {
       has_keepalived = true
       packages       = ["unattended-upgrades"]
@@ -109,6 +115,9 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     mirror_url   = var.mirror_url
     os           = each.value.os
     role         = each.value.role
+    node_ip_with_cidr = each.value.primary_iface.ip
+    subnet = "${cidrsubnet(node_ip_with_cidr, 0, 0)}"
+    
 
     # 2. Extract Role Data from Locals
     extra_packages = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).packages
@@ -134,6 +143,13 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
       for name, v in local.vm_configs : split("/", v.primary_iface.ip)[0]
       if v.role == each.value.role && v.env == each.value.env && v.name != each.value.name
     ])
+
+    # --- THE ETCD CLUSTER LOGIC ---
+    # This filters all VMs to find peers in the same role and environment
+    cluster_members = {
+      for k, v in local.vm_configs : k => v
+      if v.role == each.value.role && v.env == each.value.env
+    }
   })
 
   
@@ -160,6 +176,7 @@ EOT
 
 }
 
+
 resource "proxmox_vm_qemu" "proxmox_vms" {
   for_each           = local.vm_configs
   name               = each.value.name
@@ -173,12 +190,16 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
   clone              = each.value.image
   full_clone         = true
   clone_wait         = 15
+  subnet             = "${cidrsubnet(node_ip_with_cidr, 0, 0)}"
 
   os_type            = "ubuntu"
   scsihw             = "virtio-scsi-pci"
   boot               = "order=scsi0;net0;ide3;ide2"
   vm_state           = each.value.status
   define_connection_info = false
+
+  etcd_content = file("${path.module}/templates/_etcd.tftpl")
+  patroni_content = file("${path.module}/templates/_patroni.yml.tftpl")
 
   serial {
     id   = 0

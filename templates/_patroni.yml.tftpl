@@ -1,0 +1,64 @@
+# Managed by Ansible
+scope: netbox-pg
+namespace: /db/
+name: "${name}"
+
+restapi:
+  listen: 0.0.0.0:8008
+  # Using ansible_host to ensure the API points to the IP
+  connect_address: "${local_ip}:8008"
+
+etcd3:
+  hosts:
+%{ for name, v in cluster_members ~}
+    - ${split("/", v.primary_iface.ip)[0]}:2379
+%{ endfor ~}
+
+bootstrap:
+  method: initdb
+  dcs:
+    ttl: 30
+    loop_wait: 10
+    retry_timeout: 10
+    maximum_lag_on_failover: 1048576
+    postgresql:
+      use_pg_rewind: true
+      pg_hba:
+        - local   all             postgres                                trust
+        - local   netbox          netbox                                  trust  
+        - host    all             postgres        127.0.0.1/32            trust
+        - host    replication     replicator      ${subnet}         md5
+        - host    all             all             ${subnet}         scram-sha-256
+      parameters:
+        max_connections: 500
+        wal_level: replica
+        hot_standby: "on"
+        max_wal_senders: 10
+        max_replication_slots: 10
+        synchronous_commit: "off"
+  initdb:
+    - encoding: UTF8
+    - data-checksums
+
+postgresql:
+  listen: 0.0.0.0:5432
+  # Critical for replication: Patroni needs the IP to reach this node
+  connect_address: "${local_ip}:5432"
+  data_dir: /var/lib/postgresql/16/main
+  bin_dir: /usr/lib/postgresql/16/bin
+
+  parameters:
+    max_connections: 200
+    shared_buffers: 1GB
+
+  authentication:
+    superuser:
+      username: postgres
+      password: "${password}"
+    replication:
+      username: replicator
+      password: "${password}"
+
+tags:
+  nofailover: false
+  noloadbalance: false

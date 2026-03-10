@@ -1,0 +1,18 @@
+# Managed by Terraform
+
+ETCD_NAME="${name}"
+ETCD_DATA_DIR="/var/lib/etcd"
+
+# Generate the cluster list: name=http://ip:2380
+ETCD_INITIAL_CLUSTER="${join(",", [for k, v in cluster_members : "${v.name}=http://${split("/", v.primary_iface.ip)[0]}:2380"])}"
+
+ETCD_INITIAL_CLUSTER_TOKEN="netbox-pg"
+
+# Current node advertisement
+ETCD_INITIAL_ADVERTISE_PEER_URLS="http://${local_ip}:2380"
+ETCD_ADVERTISE_CLIENT_URLS="http://${local_ip}:2379"
+
+ETCD_LISTEN_PEER_URLS="http://0.0.0.0:2380"
+ETCD_LISTEN_CLIENT_URLS="http://0.0.0.0:2379"
+
+ETCD_INITIAL_CLUSTER_STATE="${is_bootstrap ? "new" : "existing"}"
