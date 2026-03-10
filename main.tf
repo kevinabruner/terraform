@@ -74,7 +74,11 @@ locals {
     "psql server" = {
       has_keepalived = false
       packages       = ["unattended-upgrades"]
-      commands       = ["systemctl restart etcd patroni"]
+      commands       = [
+        "systemctl restart etcd",
+        "sleep 10",
+        "systemctl restart patroni"
+      ]
       files          = []
     }
     "DNS resolver" = {
