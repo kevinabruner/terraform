@@ -15,4 +15,4 @@ ETCD_ADVERTISE_CLIENT_URLS="http://${local_ip}:2379"
 ETCD_LISTEN_PEER_URLS="http://0.0.0.0:2380"
 ETCD_LISTEN_CLIENT_URLS="http://0.0.0.0:2379"
 
-ETCD_INITIAL_CLUSTER_STATE="${is_bootstrap ? "new" : "existing"}"
+ETCD_INITIAL_CLUSTER_STATE="existing"s
