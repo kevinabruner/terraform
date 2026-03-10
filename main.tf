@@ -75,7 +75,9 @@ locals {
       has_keepalived = false
       packages       = ["unattended-upgrades"]
       commands       = [
-        "systemctl restart etcd",
+        "rm -rf /var/lib/etcd/*",
+        "systemctl enable etcd",
+        "systemctl start etcd",        
         "sleep 10",
         "systemctl reset-failed patroni",
         "systemctl restart patroni"
