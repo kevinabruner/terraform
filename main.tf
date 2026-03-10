@@ -120,8 +120,8 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
 
     # 3. RENDER ETCD SUBTEMPLATE
     etcd_content = templatefile("${path.module}/templates/_etcd.tftpl", {
-      node_name       = each.value.name
-      node_ip         = split("/", each.value.primary_iface.ip)[0]
+      name       = each.value.name
+      local_ip         = split("/", each.value.primary_iface.ip)[0]
       cluster_members = {
         for k, v in local.vm_configs : k => v
         if v.role == each.value.role && v.env == each.value.env
@@ -130,8 +130,8 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
 
     # 4. RENDER PATRONI SUBTEMPLATE 
     patroni_content = templatefile("${path.module}/templates/_patroni.conf.tftpl", {
-      node_name = each.value.name
-      node_ip   = split("/", each.value.primary_iface.ip)[0]
+      name = each.value.name
+      local_ip   = split("/", each.value.primary_iface.ip)[0]
       subnet            = cidrsubnet(each.value.primary_iface.ip, 0, 0)    
     })
 
