@@ -137,6 +137,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
         for k, v in local.vm_configs : k => v
         if v.role == each.value.role && v.env == each.value.env
       }   
+      password = var.vm_password
     })
 
     # 2. Extract Role Data from Locals
