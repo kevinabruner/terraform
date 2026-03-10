@@ -54,7 +54,7 @@ write_files:
     content: |
       Acquire::ForceIPv4 "true";
 
-|%{ if role == "psql server" ~}
+%{ if role == "psql server" ~}
   - path: /etc/default/etcd
     permissions: '0644'
     content: |
