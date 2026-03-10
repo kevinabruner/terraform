@@ -116,7 +116,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     os           = each.value.os
     role         = each.value.role
     node_ip_with_cidr = each.value.primary_iface.ip
-    subnet = "${cidrsubnet(node_ip_with_cidr, 0, 0)}"
+    subnet = cidrsubnet(node_ip_with_cidr, 0, 0)
     
 
     # 2. Extract Role Data from Locals
@@ -190,7 +190,6 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
   clone              = each.value.image
   full_clone         = true
   clone_wait         = 15
-  subnet             = "${cidrsubnet(node_ip_with_cidr, 0, 0)}"
 
   os_type            = "ubuntu"
   scsihw             = "virtio-scsi-pci"
