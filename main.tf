@@ -77,6 +77,7 @@ locals {
       commands       = [
         "systemctl restart etcd",
         "sleep 10",
+        "systemctl reset-failed patroni",
         "systemctl restart patroni"
       ]
       files          = []
