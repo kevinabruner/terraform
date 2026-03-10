@@ -116,8 +116,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     os           = each.value.os
     role         = each.value.role
     node_ip_with_cidr = each.value.primary_iface.ip
-    subnet = cidrsubnet(node_ip_with_cidr, 0, 0)
-    
+    subnet            = cidrsubnet(each.value.primary_iface.ip, 0, 0)    
 
     # 2. Extract Role Data from Locals
     extra_packages = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).packages
