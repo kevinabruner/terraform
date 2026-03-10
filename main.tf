@@ -118,6 +118,9 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     node_ip_with_cidr = each.value.primary_iface.ip
     subnet            = cidrsubnet(each.value.primary_iface.ip, 0, 0)    
 
+    etcd_content = file("${path.module}/templates/_etcd.tftpl")
+    patroni_content = file("${path.module}/templates/_patroni.yml.tftpl")
+
     # 2. Extract Role Data from Locals
     extra_packages = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).packages
     extra_files    = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).files
@@ -195,9 +198,6 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
   boot               = "order=scsi0;net0;ide3;ide2"
   vm_state           = each.value.status
   define_connection_info = false
-
-  etcd_content = file("${path.module}/templates/_etcd.tftpl")
-  patroni_content = file("${path.module}/templates/_patroni.yml.tftpl")
 
   serial {
     id   = 0
