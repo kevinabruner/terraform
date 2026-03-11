@@ -309,7 +309,7 @@ resource "null_resource" "etcd_lifecycle" {
     }
     inline = [
       # Reference 'self.triggers.node_name' instead of 'each.value'
-      "ansible-playbook /home/kevin/psql/etcd_ops.yaml --extra-vars 'state=absent node_name=${self.triggers.node_name}'"
+      "ansible-playbook /home/kevin/psql/etcd_ops.yaml --vault-password-file /home/kevin/.vaultpass --extra-vars 'state=absent node_name=${self.triggers.node_name}'"
     ]
   }
 
@@ -323,7 +323,7 @@ resource "null_resource" "etcd_lifecycle" {
     }
     inline = [
       # During creation, we can reference the VM resource directly for the IP
-      "ansible-playbook /home/kevin/psql/etcd_ops.yaml --extra-vars 'state=present node_name=${self.triggers.node_name} node_ip=${proxmox_vm_qemu.proxmox_vms[each.key].default_ipv4_address}'"
+      "ansible-playbook /home/kevin/psql/etcd_ops.yaml --vault-password-file /home/kevin/.vaultpass  --extra-vars 'state=present node_name=${self.triggers.node_name} node_ip=${proxmox_vm_qemu.proxmox_vms[each.key].default_ipv4_address}'"
     ]
   }
 }
