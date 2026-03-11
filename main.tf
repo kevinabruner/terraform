@@ -293,10 +293,10 @@ resource "null_resource" "etcd_lifecycle" {
   }
 
   triggers = {
-    vm_id     = proxmox_vm_qemu.proxmox_vms[each.key].id
-    node_name = each.value.name
-    # FIX: Extract the IP from the nested primary_iface and strip the CIDR /xx
-    node_ip   = split("/", each.value.primary_iface.ip)[0]
+    vm_id        = proxmox_vm_qemu.proxmox_vms[each.key].id
+    node_name    = each.value.name
+    node_ip      = split("/", each.value.primary_iface.ip)[0]
+    netbox_token = var.netbox_api_token_secret
   }
 
   connection {
@@ -306,11 +306,12 @@ resource "null_resource" "etcd_lifecycle" {
     private_key = file("~/.ssh/id_rsa")
   }
 
-# STEP 1: BEFORE DESTROY
+  # STEP 1: BEFORE DESTROY
   provisioner "remote-exec" {
     when = destroy
     inline = [
-      "export NETBOX_API_TOKEN=${var.netbox_api_token_secret}",
+      # Access the token via self.triggers
+      "export NETBOX_API_TOKEN=${self.triggers.netbox_token}",
       "ansible-playbook -i /home/kevin/ansible/inventory.yaml /home/kevin/psql/etcd_ops.yaml --vault-password-file /home/kevin/.vaultpass --extra-vars 'state=absent node_name=${self.triggers.node_name}'"
     ]
   }
@@ -318,7 +319,8 @@ resource "null_resource" "etcd_lifecycle" {
   # STEP 2: AFTER CREATE
   provisioner "remote-exec" {
     inline = [
-      "export NETBOX_API_TOKEN=${var.netbox_api_token_secret}",
+      # Access the token via self.triggers
+      "export NETBOX_API_TOKEN=${self.triggers.netbox_token}",
       "ansible-playbook -i /home/kevin/ansible/inventory.yaml /home/kevin/psql/etcd_ops.yaml --vault-password-file /home/kevin/.vaultpass --extra-vars 'state=present node_name=${self.triggers.node_name} node_ip=${self.triggers.node_ip}'"
     ]
   }
