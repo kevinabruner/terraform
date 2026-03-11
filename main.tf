@@ -306,18 +306,20 @@ resource "null_resource" "etcd_lifecycle" {
     private_key = file("~/.ssh/id_rsa")
   }
 
-  # STEP 1: BEFORE DESTROY
+# STEP 1: BEFORE DESTROY
   provisioner "remote-exec" {
     when = destroy
     inline = [
-      "export $(cat /etc/environment | xargs) && ansible-playbook /home/kevin/psql/etcd_ops.yaml ..."
+      "export NETBOX_API_TOKEN=${var.netbox_api_token_secret}",
+      "ansible-playbook -i /home/kevin/ansible/inventory.yaml /home/kevin/psql/etcd_ops.yaml --vault-password-file /home/kevin/.vaultpass --extra-vars 'state=absent node_name=${self.triggers.node_name}'"
     ]
   }
 
   # STEP 2: AFTER CREATE
   provisioner "remote-exec" {
     inline = [
-      "export $(cat /etc/environment | xargs) && ansible-playbook /home/kevin/psql/etcd_ops.yaml --vault-password-file /home/kevin/.vaultpass --extra-vars 'state=present node_name=${self.triggers.node_name} node_ip=${self.triggers.node_ip}'"
+      "export NETBOX_API_TOKEN=${var.netbox_api_token_secret}",
+      "ansible-playbook -i /home/kevin/ansible/inventory.yaml /home/kevin/psql/etcd_ops.yaml --vault-password-file /home/kevin/.vaultpass --extra-vars 'state=present node_name=${self.triggers.node_name} node_ip=${self.triggers.node_ip}'"
     ]
   }
 }

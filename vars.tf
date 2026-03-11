@@ -14,6 +14,7 @@ variable "proxmox_api_url" {
     default = "https://pve.thejfk.ca/api2/json"
 }
 
+
 variable "proxmox_api_token_id" {
     type = string
     default = "terraform@pam!main_terraform"
