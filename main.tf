@@ -312,6 +312,9 @@ resource "null_resource" "etcd_lifecycle" {
     inline = [
       "export NETBOX_API_TOKEN='${self.triggers.netbox_token}'",
       "export ANSIBLE_HOST_KEY_CHECKING=False",
+      # Wait for the VM to actually be on the network before calling Ansible
+      "echo 'Waiting for ${self.triggers.node_ip} to wake up...'",
+      "timeout 60s bash -c 'until ping -c 1 ${self.triggers.node_ip} > /dev/null 2>&1; do sleep 5; done' || echo 'Ping failed, trying playbook anyway...'",
       "cd /home/kevin/psql && ansible-playbook -i /home/kevin/ansible/inventory.yaml etcd_ops.yaml \
         --vault-password-file /home/kevin/.vaultpass \
         --ssh-extra-args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' \
@@ -324,6 +327,9 @@ resource "null_resource" "etcd_lifecycle" {
     inline = [
       "export NETBOX_API_TOKEN='${self.triggers.netbox_token}'",
       "export ANSIBLE_HOST_KEY_CHECKING=False",
+      # Wait for the VM to actually be on the network before calling Ansible
+      "echo 'Waiting for ${self.triggers.node_ip} to wake up...'",
+      "timeout 60s bash -c 'until ping -c 1 ${self.triggers.node_ip} > /dev/null 2>&1; do sleep 5; done' || echo 'Ping failed, trying playbook anyway...'",
       "cd /home/kevin/psql && ansible-playbook -i /home/kevin/ansible/inventory.yaml etcd_ops.yaml \
         --vault-password-file /home/kevin/.vaultpass \
         --ssh-extra-args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' \
