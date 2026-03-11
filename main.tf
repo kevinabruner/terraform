@@ -74,14 +74,7 @@ locals {
     "psql server" = {
       has_keepalived = false
       packages       = ["unattended-upgrades"]
-      commands       = [
-        "rm -rf /var/lib/etcd/*",
-        "systemctl enable etcd",
-        "systemctl start etcd",        
-        "sleep 10",
-        "systemctl reset-failed patroni",
-        "systemctl restart patroni"
-      ]
+      commands       = []
       files          = []
     }
     "DNS resolver" = {
@@ -98,6 +91,7 @@ locals {
     }
   }
 }
+
 
 resource "proxmox_cloud_init_disk" "ci_configs" {
   for_each = local.vm_configs
@@ -291,6 +285,34 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
       full_clone,
     ]
   }
+  %{ if role == "psql server" ~}
+# STEP 1: BEFORE DESTROY - Graceful Remove
+  provisioner "remote-exec" {
+    when = destroy
+    connection {
+      type = "ssh"
+      host = "ansible.jfkhome"
+      user = kevin
+    }
+    inline = [
+      "ansible-playbook /home/kevin/psql/etcd_ops.yml --extra-vars 'state=absent node_name=${self.name}'"
+    ]
+  }
+
+  # STEP 2: AFTER CREATE - Graceful Add
+  provisioner "remote-exec" {
+    connection {
+      type = "ssh"
+      host = "ansible.jfkhome"
+      user = var.ansible_ssh_user
+    }
+    inline = [
+      "ansible-playbook /home/kevin/psql/etcd_ops.yml --extra-vars 'state=present node_name=${self.name} node_ip=${self.default_ipv4_address}'"
+    ]
+  }
+
+%{ endif ~}
+
 }
 resource "local_file" "debug_rendered_yaml" {
   for_each = local.vm_configs
