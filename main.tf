@@ -309,19 +309,19 @@ resource "null_resource" "etcd_lifecycle" {
   # STEP 1: BEFORE DESTROY
   provisioner "remote-exec" {
     when = destroy
-    inline = [
-      "export NETBOX_API_TOKEN='${self.triggers.netbox_token}'",
-      "export ANSIBLE_HOST_KEY_CHECKING=False",
-      "cd /home/kevin/psql && ansible-playbook -i /home/kevin/ansible/inventory.yaml etcd_ops.yaml --vault-password-file /home/kevin/.vaultpass --ssh-extra-args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' --extra-vars \"state=present node_name=${self.triggers.node_name} node_ip=${self.triggers.node_ip}\""
-    ]
-  }
+  #   inline = [
+  #     "export NETBOX_API_TOKEN='${self.triggers.netbox_token}'",
+  #     "export ANSIBLE_HOST_KEY_CHECKING=False",
+  #     "cd /home/kevin/psql && ansible-playbook -i /home/kevin/ansible/inventory.yaml etcd_ops.yaml --vault-password-file /home/kevin/.vaultpass --ssh-extra-args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' --extra-vars \"state=present node_name=${self.triggers.node_name} node_ip=${self.triggers.node_ip}\""
+  #   ]
+  # }
 
   # STEP 2: AFTER CREATE
   provisioner "remote-exec" {
-    inline = [
-      "export NETBOX_API_TOKEN='${self.triggers.netbox_token}'",
-      "export ANSIBLE_HOST_KEY_CHECKING=False",
-      "cd /home/kevin/psql && ansible-playbook -i /home/kevin/ansible/inventory.yaml etcd_ops.yaml --vault-password-file /home/kevin/.vaultpass --ssh-extra-args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' --extra-vars 'state=present node_name=${self.triggers.node_name} node_ip=${self.triggers.node_ip}'"
+    # inline = [
+    #   "export NETBOX_API_TOKEN='${self.triggers.netbox_token}'",
+    #   "export ANSIBLE_HOST_KEY_CHECKING=False",
+    #   "cd /home/kevin/psql && ansible-playbook -i /home/kevin/ansible/inventory.yaml etcd_ops.yaml --vault-password-file /home/kevin/.vaultpass --ssh-extra-args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' --extra-vars 'state=present node_name=${self.triggers.node_name} node_ip=${self.triggers.node_ip}'"
     ]
   }
 }
