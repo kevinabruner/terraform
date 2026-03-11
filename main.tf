@@ -305,7 +305,8 @@ resource "null_resource" "etcd_lifecycle" {
       type = "ssh"
       host = "ansible.jfkhome"
       user = "kevin"
-      private_key = file("~/.ssh/id_rsa")    }
+      private_key = file("~/.ssh/id_rsa")
+    }
     inline = [
       # Reference 'self.triggers.node_name' instead of 'each.value'
       "ansible-playbook /home/kevin/psql/etcd_ops.yaml --extra-vars 'state=absent node_name=${self.triggers.node_name}'"
