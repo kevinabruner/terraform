@@ -295,36 +295,29 @@ resource "null_resource" "etcd_lifecycle" {
   triggers = {
     vm_id     = proxmox_vm_qemu.proxmox_vms[each.key].id
     node_name = each.value.name
-    # CRITICAL: Pull the IP from your local map, NOT the Proxmox resource
-    node_ip   = each.value.ip_address 
+    # FIX: Extract the IP from the nested primary_iface and strip the CIDR /xx
+    node_ip   = split("/", each.value.primary_iface.ip)[0]
   }
 
-  # STEP 1: BEFORE DESTROY - Graceful Remove
+  connection {
+    type        = "ssh"
+    host        = "ansible.jfkhome"
+    user        = "kevin"
+    private_key = file("~/.ssh/id_rsa")
+  }
+
+  # STEP 1: BEFORE DESTROY
   provisioner "remote-exec" {
     when = destroy
-    connection {
-      type = "ssh"
-      host = "ansible.jfkhome"
-      user = "kevin"
-      private_key = file("~/.ssh/id_rsa")
-    }
     inline = [
-      # Reference 'self.triggers.node_name' instead of 'each.value'
       "ansible-playbook /home/kevin/psql/etcd_ops.yaml --vault-password-file /home/kevin/.vaultpass --extra-vars 'state=absent node_name=${self.triggers.node_name}'"
     ]
   }
 
-  # STEP 2: AFTER CREATE - Graceful Add
+  # STEP 2: AFTER CREATE
   provisioner "remote-exec" {
-    connection {
-      type = "ssh"
-      host = "ansible.jfkhome"
-      user = "kevin"
-      private_key = file("~/.ssh/id_rsa")
-    }
     inline = [
-      # During creation, we can reference the VM resource directly for the IP
-      "ansible-playbook /home/kevin/psql/etcd_ops.yaml --vault-password-file /home/kevin/.vaultpass  --extra-vars 'state=present node_name=${self.triggers.node_name} node_ip=${proxmox_vm_qemu.proxmox_vms[each.key].default_ipv4_address}'"
+      "ansible-playbook /home/kevin/psql/etcd_ops.yaml --vault-password-file /home/kevin/.vaultpass --extra-vars 'state=present node_name=${self.triggers.node_name} node_ip=${self.triggers.node_ip}'"
     ]
   }
 }
