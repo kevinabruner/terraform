@@ -295,7 +295,7 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
       user = kevin
     }
     inline = [
-      "ansible-playbook /home/kevin/psql/etcd_ops.yml --extra-vars 'state=absent node_name=${self.name}'"
+      "ansible-playbook /home/kevin/psql/etcd_ops.yaml --extra-vars 'state=absent node_name=${self.name}'"
     ]
   }
 
@@ -307,7 +307,7 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
       user = var.ansible_ssh_user
     }
     inline = [
-      "ansible-playbook /home/kevin/psql/etcd_ops.yml --extra-vars 'state=present node_name=${self.name} node_ip=${self.default_ipv4_address}'"
+      "ansible-playbook /home/kevin/psql/etcd_ops.yaml --extra-vars 'state=present node_name=${self.name} node_ip=${self.default_ipv4_address}'"
     ]
   }
 
