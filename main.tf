@@ -310,14 +310,14 @@ resource "null_resource" "etcd_lifecycle" {
   provisioner "remote-exec" {
     when = destroy
     inline = [
-      "ansible-playbook /home/kevin/psql/etcd_ops.yaml --vault-password-file /home/kevin/.vaultpass --extra-vars 'state=absent node_name=${self.triggers.node_name}'"
+      "sudo export $(cat /etc/environment | xargs) && ansible-playbook /home/kevin/psql/etcd_ops.yaml ..."
     ]
   }
 
   # STEP 2: AFTER CREATE
   provisioner "remote-exec" {
     inline = [
-      "ansible-playbook /home/kevin/psql/etcd_ops.yaml --vault-password-file /home/kevin/.vaultpass --extra-vars 'state=present node_name=${self.triggers.node_name} node_ip=${self.triggers.node_ip}'"
+      "sudo export $(cat /etc/environment | xargs) && ansible-playbook /home/kevin/psql/etcd_ops.yaml --vault-password-file /home/kevin/.vaultpass --extra-vars 'state=present node_name=${self.triggers.node_name} node_ip=${self.triggers.node_ip}'"
     ]
   }
 }
