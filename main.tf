@@ -285,18 +285,31 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
       full_clone,
     ]
   }
-  
-%{ if role == "psql server" ~}
-# STEP 1: BEFORE DESTROY - Graceful Remove
+}
+resource "null_resource" "etcd_lifecycle" {
+  # Only create this for VMs where role is "psql server"
+  for_each = {
+    for k, v in local.vm_configs : k => v 
+    if v.role == "psql server"
+  }
+
+  triggers = {
+    # This ensures the provisioner re-runs if the VM is recreated
+    vm_id = proxmox_vm_qemu.proxmox_vms[each.key].id
+  }
+
+  # STEP 1: BEFORE DESTROY - Graceful Remove
   provisioner "remote-exec" {
     when = destroy
     connection {
       type = "ssh"
+      # Using the name from the trigger since self.name isn't available in destroy for null_resource
       host = "ansible.jfkhome"
-      user = kevin
+      user = "kevin" 
     }
+    # Note: We use 'each.value.name' here because 'self' refers to the null_resource
     inline = [
-      "ansible-playbook /home/kevin/psql/etcd_ops.yaml --extra-vars 'state=absent node_name=${self.name}'"
+      "ansible-playbook /home/kevin/psql/etcd_ops.yaml --extra-vars 'state=absent node_name=${each.value.name}'"
     ]
   }
 
@@ -305,15 +318,12 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
     connection {
       type = "ssh"
       host = "ansible.jfkhome"
-      user = var.ansible_ssh_user
+      user = "kevin"
     }
     inline = [
-      "ansible-playbook /home/kevin/psql/etcd_ops.yaml --extra-vars 'state=present node_name=${self.name} node_ip=${self.default_ipv4_address}'"
+      "ansible-playbook /home/kevin/psql/etcd_ops.yaml --extra-vars 'state=present node_name=${each.value.name} node_ip=${proxmox_vm_qemu.proxmox_vms[each.key].default_ipv4_address}'"
     ]
   }
-
-%{ endif ~}
-
 }
 resource "local_file" "debug_rendered_yaml" {
   for_each = local.vm_configs
