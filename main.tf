@@ -292,8 +292,10 @@ resource "null_resource" "etcd_lifecycle" {
     if v.role == "psql server"
   }
 
+
   triggers = {
     node_name = each.value.name
+    instance_version = proxmox_cloud_init_disk.ci_configs[each.key].id
     node_ip   = split("/", each.value.primary_iface.ip)[0]
     # Capture the username here
     ssh_user  = var.vm_username
