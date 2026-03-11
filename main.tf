@@ -287,15 +287,15 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
   }
 }
 resource "null_resource" "etcd_lifecycle" {
-  # Only create this for VMs where role is "psql server"
   for_each = {
     for k, v in local.vm_configs : k => v 
     if v.role == "psql server"
   }
 
+  # Store everything we need for the destroy phase here
   triggers = {
-    # This ensures the provisioner re-runs if the VM is recreated
-    vm_id = proxmox_vm_qemu.proxmox_vms[each.key].id
+    vm_id     = proxmox_vm_qemu.proxmox_vms[each.key].id
+    node_name = each.value.name
   }
 
   # STEP 1: BEFORE DESTROY - Graceful Remove
@@ -303,13 +303,13 @@ resource "null_resource" "etcd_lifecycle" {
     when = destroy
     connection {
       type = "ssh"
-      # Using the name from the trigger since self.name isn't available in destroy for null_resource
       host = "ansible.jfkhome"
-      user = "kevin" 
+      user = "kevin"
+      # You might need to specify your private key path here if not using an agent
     }
-    # Note: We use 'each.value.name' here because 'self' refers to the null_resource
     inline = [
-      "ansible-playbook /home/kevin/psql/etcd_ops.yaml --extra-vars 'state=absent node_name=${each.value.name}'"
+      # Reference 'self.triggers.node_name' instead of 'each.value'
+      "ansible-playbook /home/kevin/psql/etcd_ops.yaml --extra-vars 'state=absent node_name=${self.triggers.node_name}'"
     ]
   }
 
@@ -321,7 +321,8 @@ resource "null_resource" "etcd_lifecycle" {
       user = "kevin"
     }
     inline = [
-      "ansible-playbook /home/kevin/psql/etcd_ops.yaml --extra-vars 'state=present node_name=${each.value.name} node_ip=${proxmox_vm_qemu.proxmox_vms[each.key].default_ipv4_address}'"
+      # During creation, we can reference the VM resource directly for the IP
+      "ansible-playbook /home/kevin/psql/etcd_ops.yaml --extra-vars 'state=present node_name=${self.triggers.node_name} node_ip=${proxmox_vm_qemu.proxmox_vms[each.key].default_ipv4_address}'"
     ]
   }
 }
