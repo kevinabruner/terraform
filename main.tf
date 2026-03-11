@@ -292,10 +292,11 @@ resource "null_resource" "etcd_lifecycle" {
     if v.role == "psql server"
   }
 
-  # Store everything we need for the destroy phase here
   triggers = {
     vm_id     = proxmox_vm_qemu.proxmox_vms[each.key].id
     node_name = each.value.name
+    # CRITICAL: Pull the IP from your local map, NOT the Proxmox resource
+    node_ip   = each.value.ip_address 
   }
 
   # STEP 1: BEFORE DESTROY - Graceful Remove
