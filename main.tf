@@ -293,68 +293,21 @@ resource "null_resource" "etcd_lifecycle" {
   }
 
   triggers = {
-    # This captures the VM's name; if you want to force a run, 
-    # you can add a 'revision' variable here or use the VM's state.
-    node_name = each.value.name
-    node_ip   = split("/", each.value.primary_iface.ip)[0]
-    ssh_user  = var.vm_username
-    peer_ips  = join(" ", [
+    # This is the "Magic Link". 
+    # Even if the VMID is 172, Terraform sees this resource as "newly created" 
+    # during the apply phase, which forces the null_resource to follow suit.
+    vm_instance = proxmox_vm_qemu.proxmox_vms[each.key].id
+    
+    node_name   = each.value.name
+    node_ip     = split("/", each.value.primary_iface.ip)[0]
+    ssh_user    = var.vm_username
+    peer_ips    = join(" ", [
       for k, v in local.vm_configs : split("/", v.primary_iface.ip)[0]
       if v.role == "psql server" && v.env == each.value.env && v.name != each.value.name
     ])
   }
 
-  # --- CREATE PHASE (Join) ---
-  # We still SSH into the NEW node to tell it to join.
-  connection {
-    type        = "ssh"
-    host        = self.triggers.node_ip
-    user        = self.triggers.ssh_user
-    private_key = file("~/.ssh/id_rsa")
-    timeout     = "5m"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      <<-EOT
-      # Wait for etcd to be installed/ready if this is a fresh boot
-      until command -v etcdctl >/dev/null 2>&1; do echo "Waiting for etcdctl..."; sleep 5; done
-      
-      HEALTHY_PEER=""
-      for peer in ${self.triggers.peer_ips}; do
-        if curl -s --connect-timeout 2 http://$peer:2379/health | grep -q '{"health":"true"}'; then
-          HEALTHY_PEER=$peer
-          break
-        fi
-      done
-
-      if [ -n "$HEALTHY_PEER" ]; then
-        echo "Joining cluster via $HEALTHY_PEER"
-        etcdctl --endpoints=http://$HEALTHY_PEER:2379 member add ${self.triggers.node_name} --peer-urls=http://${self.triggers.node_ip}:2380 || true
-      fi
-      EOT
-    ]
-  }
-
-  # --- DESTROY PHASE (Remove) ---
-  # IMPORTANT: We run this LOCALLY because the node being destroyed might be gone.
-  provisioner "local-exec" {
-    when    = destroy
-    command = <<-EOT
-      for peer in ${self.triggers.peer_ips}; do
-        # Try to find a survivor to execute the removal
-        if curl -s --connect-timeout 2 http://$peer:2379/health | grep -q '{"health":"true"}'; then
-          echo "Removing ${self.triggers.node_name} from cluster via peer $peer"
-          MEMBER_ID=$(ssh -o StrictHostKeyChecking=no ${self.triggers.ssh_user}@$peer "etcdctl member list | grep '${self.triggers.node_name}' | cut -d',' -f1")
-          if [ -n "$MEMBER_ID" ]; then
-            ssh -o StrictHostKeyChecking=no ${self.triggers.ssh_user}@$peer "etcdctl member remove $MEMBER_ID"
-            exit 0
-          fi
-        fi
-      done
-      echo "No survivors found or member already removed."
-    EOT
-  }
+  # ... connection and provisioners ...
 }
 resource "local_file" "debug_rendered_yaml" {
   for_each = local.vm_configs
