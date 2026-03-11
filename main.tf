@@ -310,20 +310,24 @@ resource "null_resource" "etcd_lifecycle" {
   provisioner "remote-exec" {
     when = destroy
     inline = [
-      # Access the token via self.triggers
-      "export NETBOX_API_TOKEN=${self.triggers.netbox_token}",
+      "export NETBOX_API_TOKEN='${self.triggers.netbox_token}'",
       "export ANSIBLE_HOST_KEY_CHECKING=False",
-      "ansible-playbook -i /home/kevin/ansible/inventory.yaml /home/kevin/psql/etcd_ops.yaml --vault-password-file /home/kevin/.vaultpass --extra-vars 'state=absent node_name=${self.triggers.node_name}'"
+      "cd /home/kevin/psql && ansible-playbook -i /home/kevin/ansible/inventory.yaml etcd_ops.yaml \
+        --vault-password-file /home/kevin/.vaultpass \
+        --ssh-extra-args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' \
+        --extra-vars \"state=present node_name=${self.triggers.node_name} node_ip=${self.triggers.node_ip}\""
     ]
   }
 
   # STEP 2: AFTER CREATE
   provisioner "remote-exec" {
     inline = [
-      # Access the token via self.triggers
-      "export NETBOX_API_TOKEN=${self.triggers.netbox_token}",
+      "export NETBOX_API_TOKEN='${self.triggers.netbox_token}'",
       "export ANSIBLE_HOST_KEY_CHECKING=False",
-      "ansible-playbook -i /home/kevin/ansible/inventory.yaml /home/kevin/psql/etcd_ops.yaml --vault-password-file /home/kevin/.vaultpass --extra-vars 'state=present node_name=${self.triggers.node_name} node_ip=${self.triggers.node_ip}'"
+      "cd /home/kevin/psql && ansible-playbook -i /home/kevin/ansible/inventory.yaml etcd_ops.yaml \
+        --vault-password-file /home/kevin/.vaultpass \
+        --ssh-extra-args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' \
+        --extra-vars 'state=present node_name=${self.triggers.node_name} node_ip=${self.triggers.node_ip}'"
     ]
   }
 }
