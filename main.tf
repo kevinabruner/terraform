@@ -286,29 +286,7 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
     ]
   }
 }
-resource "null_resource" "etcd_lifecycle" {
-  for_each = {
-    for k, v in local.vm_configs : k => v 
-    if v.role == "psql server"
-  }
 
-  triggers = {
-    # This is the "Magic Link". 
-    # Even if the VMID is 172, Terraform sees this resource as "newly created" 
-    # during the apply phase, which forces the null_resource to follow suit.
-    vm_instance = proxmox_vm_qemu.proxmox_vms[each.key].id
-    
-    node_name   = each.value.name
-    node_ip     = split("/", each.value.primary_iface.ip)[0]
-    ssh_user    = var.vm_username
-    peer_ips    = join(" ", [
-      for k, v in local.vm_configs : split("/", v.primary_iface.ip)[0]
-      if v.role == "psql server" && v.env == each.value.env && v.name != each.value.name
-    ])
-  }
-
-  # ... connection and provisioners ...
-}
 resource "local_file" "debug_rendered_yaml" {
   for_each = local.vm_configs
   content  = proxmox_cloud_init_disk.ci_configs[each.key].user_data
