@@ -285,7 +285,8 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
       full_clone,
     ]
   }
-  %{ if role == "psql server" ~}
+  
+%{ if role == "psql server" ~}
 # STEP 1: BEFORE DESTROY - Graceful Remove
   provisioner "remote-exec" {
     when = destroy
