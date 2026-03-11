@@ -305,8 +305,7 @@ resource "null_resource" "etcd_lifecycle" {
       type = "ssh"
       host = "ansible.jfkhome"
       user = "kevin"
-      # You might need to specify your private key path here if not using an agent
-    }
+      private_key = file("~/.ssh/id_rsa")    }
     inline = [
       # Reference 'self.triggers.node_name' instead of 'each.value'
       "ansible-playbook /home/kevin/psql/etcd_ops.yaml --extra-vars 'state=absent node_name=${self.triggers.node_name}'"
@@ -319,6 +318,7 @@ resource "null_resource" "etcd_lifecycle" {
       type = "ssh"
       host = "ansible.jfkhome"
       user = "kevin"
+      private_key = file("~/.ssh/id_rsa")
     }
     inline = [
       # During creation, we can reference the VM resource directly for the IP
