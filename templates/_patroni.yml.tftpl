@@ -44,8 +44,8 @@ postgresql:
   listen: 0.0.0.0:5432
   # Critical for replication: Patroni needs the IP to reach this node
   connect_address: "${local_ip}:5432"
-  data_dir: /var/lib/postgresql/16/main
-  bin_dir: /usr/lib/postgresql/16/bin
+  data_dir: /var/lib/postgresql/17/main
+  bin_dir: /usr/lib/postgresql/17/bin
 
   parameters:
     max_connections: 200
