@@ -83,6 +83,19 @@ locals {
       commands       = ["systemctl restart keepalived"]
       files          = []
     }
+    "Netbox" = {
+      has_keepalived = true
+      packages       = ["unattended-upgrades"]
+      commands       = [
+        "/opt/netbox/upgrade.sh",
+        "cp /opt/netbox/contrib/gunicorn.py /opt/netbox/gunicorn.py",
+        "cp /opt/netbox/contrib/*.service /etc/systemd/system/",
+        "systemctl daemon-reload",
+        "systemctl enable --now apache2 netbox netbox-rq",
+        "systemctl restart apache2 netbox netbox-rq"
+      ]
+      files          = []
+    }
     "Default" = { 
       has_keepalived = false
       packages = ["unattended-upgrades"]
