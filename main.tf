@@ -84,7 +84,7 @@ locals {
       files          = []
     }
     "Netbox" = {
-      has_keepalived = true
+      has_keepalived = false
       packages       = ["unattended-upgrades"]
       commands       = [
         "/opt/netbox/upgrade.sh",
@@ -93,6 +93,15 @@ locals {
         "systemctl daemon-reload",
         "systemctl enable --now apache2 netbox netbox-rq",
         "systemctl restart apache2 netbox netbox-rq"
+      ]
+      files          = []
+    }
+    "Sonarr" = {
+      has_keepalived = false
+      packages       = ["unattended-upgrades"]
+      commands       = [
+        "/bin/bash /home/kevin/install.sh",
+        "reboot 0"
       ]
       files          = []
     }
