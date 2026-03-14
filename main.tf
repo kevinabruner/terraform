@@ -108,6 +108,7 @@ locals {
     "Plex" = {
       has_keepalived = false
       packages       = ["unattended-upgrades"]
+      commands          = []
       # commands       = [
       #   "sudo apt-get install -y libnsl2 ",
       #   "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y /home/kevin/plexmediaserver.deb",  
