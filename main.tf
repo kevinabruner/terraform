@@ -109,6 +109,7 @@ locals {
       has_keepalived = false
       packages       = ["unattended-upgrades"]
       commands       = [
+        "sudo apt-get install -y libnsl2 libpurgatory0",
         "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y /home/kevin/plexmediaserver.deb",  
         "/usr/bin/id -u plex >/dev/null 2>&1 && (/usr/bin/pkill -u plex || true; /usr/sbin/userdel -f plex || true)",
         "sudo apt-get install -f -y",      
