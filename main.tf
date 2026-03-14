@@ -116,7 +116,7 @@ locals {
         "sed -i '/^ExecStart=/i ExecStartPre=/bin/sleep 90' /lib/systemd/system/tautulli.service",
         "systemctl daemon-reload",
         "systemctl enable tautulli.service plexmediaserver.service",
-        "systemctl start plexmediaserver.service tautulli.service"
+        "reboot 0"
       ]
       files          = []
     }
