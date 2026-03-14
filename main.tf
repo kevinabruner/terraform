@@ -105,6 +105,19 @@ locals {
       ]
       files          = []
     }
+    "Plex" = {
+      has_keepalived = false
+      packages       = ["unattended-upgrades"]
+      commands       = [
+        "apt-get install -f -y /home/kevin/plexmediaserver.deb",
+        "cp /opt/Tautulli/init-scripts/init.systemd /lib/systemd/system/tautulli.service",
+        "sed -i '/^ExecStart=/i ExecStartPre=/bin/sleep 90' /lib/systemd/system/tautulli.service",
+        "systemctl daemon-reload",
+        "systemctl enable tautulli.service plexmediaserver.service",
+        "systemctl start plexmediaserver.service tautulli.service"
+      ]
+      files          = []
+    }
     "Default" = { 
       has_keepalived = false
       packages = ["unattended-upgrades"]
