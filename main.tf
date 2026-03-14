@@ -109,14 +109,14 @@ locals {
       has_keepalived = false
       packages       = ["unattended-upgrades"]
       commands          = []
-      # commands       = [
-      #   "DEBIAN_FRONTEND=noninteractive apt-get install -y /home/kevin/plexmediaserver.deb",  
-      #   "cp /opt/Tautulli/init-scripts/init.systemd /lib/systemd/system/tautulli.service",
-      #   "sed -i '/^ExecStart=/i ExecStartPre=/bin/sleep 90' /lib/systemd/system/tautulli.service",
-      #   "systemctl daemon-reload",
-      #   "systemctl enable tautulli.service plexmediaserver.service",
-      #   "reboot 0"
-      # ]
+      commands       = [
+        "DEBIAN_FRONTEND=noninteractive apt-get install -y /home/kevin/plexmediaserver.deb",  
+        "cp /opt/Tautulli/init-scripts/init.systemd /lib/systemd/system/tautulli.service",
+        "sed -i '/^ExecStart=/i ExecStartPre=/bin/sleep 90' /lib/systemd/system/tautulli.service",
+        "systemctl daemon-reload",
+        "systemctl enable plexmediaserver.service tautulli.service",
+        "systemctl start plexmediaserver.service tautulli.service"
+      ]
       files          = []
     }
     "Default" = { 
