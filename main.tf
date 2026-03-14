@@ -110,10 +110,7 @@ locals {
       packages       = ["unattended-upgrades"]
       commands          = []
       # commands       = [
-      #   "sudo apt-get install -y libnsl2 ",
-      #   "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y /home/kevin/plexmediaserver.deb",  
-      #   "/usr/bin/id -u plex >/dev/null 2>&1 && (/usr/bin/pkill -u plex || true; /usr/sbin/userdel -f plex || true)",
-      #   "sudo apt-get install -f -y",      
+      #   "DEBIAN_FRONTEND=noninteractive apt-get install -y /home/kevin/plexmediaserver.deb",  
       #   "cp /opt/Tautulli/init-scripts/init.systemd /lib/systemd/system/tautulli.service",
       #   "sed -i '/^ExecStart=/i ExecStartPre=/bin/sleep 90' /lib/systemd/system/tautulli.service",
       #   "systemctl daemon-reload",
