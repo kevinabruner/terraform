@@ -110,7 +110,7 @@ locals {
       packages       = ["unattended-upgrades"]
       commands       = [
         "DEBIAN_FRONTEND=noninteractive apt-get install -y /home/kevin/plexmediaserver.deb",  
-        "/user/sbin/userdel plex",
+        "/usr/bin/id -u plex >/dev/null 2>&1 && (/usr/bin/pkill -u plex || true; /usr/sbin/userdel -f plex || true)",
         "apt-get install -f -y",      
         "cp /opt/Tautulli/init-scripts/init.systemd /lib/systemd/system/tautulli.service",
         "sed -i '/^ExecStart=/i ExecStartPre=/bin/sleep 90' /lib/systemd/system/tautulli.service",
