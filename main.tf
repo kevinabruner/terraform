@@ -58,30 +58,49 @@ locals {
           content = "SetEnv environment \"$${env}\"" 
         }
       ]
+      users          = []
     }
     "Reverse proxy" = {
       has_keepalived = true
       packages       = ["unattended-upgrades"]
       commands       = ["systemctl restart keepalived"]
       files          = []
+      users          = []
     }
     "Database proxy" = {
       has_keepalived = true
       packages       = ["unattended-upgrades"]
       commands       = ["systemctl restart keepalived"]
       files          = []
+      users          = []
     }
     "psql server" = {
       has_keepalived = false
       packages       = ["unattended-upgrades"]
       commands       = []
       files          = []
+      users          = []
+    }
+    "ssvp" = {
+      has_keepalived = false
+      packages       = ["unattended-upgrades", "nginx"]
+      commands       = ["systemctl restart nginx"]
+      files          = []
+      users = [
+        {
+          name    = "ryan"
+          groups  = "sudo"
+          shell   = "/bin/bash"
+          ssh_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDkqBd5887aEu8t1hhSdlhkHR/UH4VV+zY6ZT6KqPDNc ryan@fedora"
+        }
+      ]
     }
     "DNS resolver" = {
       has_keepalived = true
       packages       = ["unattended-upgrades"]
       commands       = ["systemctl restart keepalived"]
       files          = []
+      users          = []
     }
     "Netbox" = {
       has_keepalived = false
@@ -95,6 +114,7 @@ locals {
         "systemctl restart apache2 netbox netbox-rq"
       ]
       files          = []
+      users          = []
     }
     "Sonarr" = {
       has_keepalived = false
@@ -104,6 +124,7 @@ locals {
         "reboot 0"
       ]
       files          = []
+      users          = []
     }
     "Plex" = {
       has_keepalived = false
@@ -118,12 +139,14 @@ locals {
         "systemctl start plexmediaserver.service tautulli.service"
       ]
       files          = []
+      users          = []
     }
     "Default" = { 
       has_keepalived = false
       packages = ["unattended-upgrades"]
       commands = []
       files    = [] 
+      users          = []
     }
   }
 }

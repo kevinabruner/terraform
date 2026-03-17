@@ -33,6 +33,14 @@ users:
 %{ for key in ssh_keys ~}
       - ${trimspace(key)}
 %{ endfor ~}
+%{ for user in users ~}
+  - name: ${user.name}
+    groups: ${user.groups}
+    shell: ${user.shell}
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    ssh_authorized_keys:
+      - ${user.ssh_key}
+%{ endfor ~}
 
 package_update: true
 package_upgrade: true
