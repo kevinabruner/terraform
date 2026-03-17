@@ -204,6 +204,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     extra_packages = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).packages
     extra_files    = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).files
     extra_commands = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).commands
+    users          = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).users
     
     # 3. Boolean for all *-prod1 instances
     is_drupal_master = (each.value.role == "Drupal" && each.value.env == "prod" && endswith(each.value.name, "1"))
