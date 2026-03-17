@@ -83,8 +83,8 @@ locals {
     }
     "ssvp" = {
       has_keepalived = false
-      packages       = ["unattended-upgrades", "nginx"]
-      commands       = ["systemctl restart nginx"]
+      packages       = ["unattended-upgrades"]
+      commands       = []
       files          = []
       users = [
         {
