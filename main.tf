@@ -30,6 +30,15 @@ provider "proxmox" {
 
 locals {
   vms = jsondecode(data.http.netbox_export.response_body)
+
+  # DYNAMIC IMPORT:
+  # 1. Look at all .yaml files in /roles
+  # 2. Decode them
+  # 3. Create a map where the KEY is the "name" defined inside the YAML
+  role_configs = {
+    for f in fileset("${path.module}/roles", "*.yaml") :
+    yamldecode(file("${path.module}/roles/${f}")).name => yamldecode(file("${path.module}/roles/${f}"))
+  }
   
   # Merge in VM Data with computed network data
   vm_configs = {
@@ -39,92 +48,6 @@ locals {
       # Construct Gateway from Primary IP
       gateway = "${join(".", slice(split(".", [for i in vm.interfaces : i.ip if i.is_primary][0]), 0, 3))}.1"
     }) if vm.name != ""
-  }
-
-  # Role-based configurations
-  role_configs = {
-    "Drupal" = {
-      has_keepalived = false
-      packages = ["apache2"]
-      commands = [
-        "a2enconf Drupal-env || true", 
-        "systemctl restart apache2 || true",
-        "sed -i 's/,noauto//g' /etc/fstab || true",
-        "mount -a || true"
-      ]
-      files    = [
-        {
-          path    = "/etc/apache2/conf-available/Drupal-env.conf"
-          content = "SetEnv environment \"$${env}\"" 
-        }
-      ]
-    }
-    "Reverse proxy" = {
-      has_keepalived = true
-      packages       = ["unattended-upgrades"]
-      commands       = ["systemctl restart keepalived"]
-      files          = []
-    }
-    "Database proxy" = {
-      has_keepalived = true
-      packages       = ["unattended-upgrades"]
-      commands       = ["systemctl restart keepalived"]
-      files          = []
-    }
-    "psql server" = {
-      has_keepalived = false
-      packages       = ["unattended-upgrades"]
-      commands       = []
-      files          = []
-    }
-    "DNS resolver" = {
-      has_keepalived = true
-      packages       = ["unattended-upgrades"]
-      commands       = ["systemctl restart keepalived"]
-      files          = []
-    }
-    "Netbox" = {
-      has_keepalived = false
-      packages       = ["unattended-upgrades"]
-      commands       = [
-        "/opt/netbox/upgrade.sh",
-        "cp /opt/netbox/contrib/gunicorn.py /opt/netbox/gunicorn.py",
-        "cp /opt/netbox/contrib/*.service /etc/systemd/system/",
-        "systemctl daemon-reload",
-        "systemctl enable --now apache2 netbox netbox-rq",
-        "systemctl restart apache2 netbox netbox-rq"
-      ]
-      files          = []
-    }
-    "Sonarr" = {
-      has_keepalived = false
-      packages       = ["unattended-upgrades"]
-      commands       = [
-        "/bin/bash /home/kevin/install.sh",
-        "reboot 0"
-      ]
-      files          = []
-    }
-    "Plex" = {
-      has_keepalived = false
-      packages       = ["unattended-upgrades"]
-      commands          = []
-      commands       = [
-        "DEBIAN_FRONTEND=noninteractive apt-get install -y /home/kevin/plexmediaserver.deb",  
-        "cp /opt/Tautulli/init-scripts/init.systemd /lib/systemd/system/tautulli.service",
-        "sed -i '/^ExecStart=/i ExecStartPre=/bin/sleep 90' /lib/systemd/system/tautulli.service",
-        "systemctl daemon-reload",
-        "systemctl enable plexmediaserver.service tautulli.service",
-        "systemctl start plexmediaserver.service tautulli.service"
-      ]
-      files          = []
-    }
-    "Default" = { 
-      has_keepalived = false
-      packages = ["unattended-upgrades"]
-      commands = []
-      files    = [] 
-    }
   }
 }
 
@@ -181,6 +104,8 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     extra_packages = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).packages
     extra_files    = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).files
     extra_commands = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).commands
+    users          = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).users
+    mounts         = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).mounts
     
     # 3. Boolean for all *-prod1 instances
     is_drupal_master = (each.value.role == "Drupal" && each.value.env == "prod" && endswith(each.value.name, "1"))

@@ -1,0 +1,15 @@
+name: "Drupal"
+has_keepalived: false
+packages:
+  - "unattended-upgrades"
+  - "apache2"
+commands:
+  - "a2enconf Drupal-env || true"
+  - "systemctl restart apache2 || true"
+  - "sed -i 's/,noauto//g' /etc/fstab || true"
+  - "mount -a || true"
+files:
+  - path: "/etc/apache2/conf-available/Drupal-env.conf"
+    content: 'SetEnv environment "${env}"'
+users: []
+mounts: []

@@ -1,0 +1,10 @@
+name: "psql server"
+has_keepalived: false
+packages:
+  - "unattended-upgrades"
+commands:
+  - "sed -i 's/,noauto//g' /etc/fstab || true"
+  - "mount -a || true"
+files: []
+users: []
+mounts: []
