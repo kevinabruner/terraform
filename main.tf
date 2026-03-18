@@ -59,9 +59,7 @@ locals {
         }
       ]
       users          = []
-      mounts         = [
-        [ "nas.jfkhome:/mnt/yes/gitbuilds/ssvp/", "/media/nfs", "nfs", "defaults,nofail", "0", "0" ]
-      ]
+      mounts         = []
     }
     "Reverse proxy" = {
       has_keepalived = true
@@ -100,7 +98,16 @@ locals {
           ssh_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDkqBd5887aEu8t1hhSdlhkHR/UH4VV+zY6ZT6KqPDNc ryan@fedora"
         }
       ]
-      mounts         = []
+      mounts = [
+        [ 
+          "nas.jfkhome:/mnt/yes/gitbuilds/ssvp/",
+          "/media/nfs", 
+          "nfs", 
+          "defaults,nofail", 
+          "0", 
+          "0" 
+        ]
+      ]
     }
     "DNS resolver" = {
       has_keepalived = true
