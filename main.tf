@@ -87,7 +87,7 @@ locals {
     }
     "ssvp" = {
       has_keepalived = false
-      packages       = ["unattended-upgrades", "nfs-common"]
+      packages       = ["unattended-upgrades", "nfs-common", "mariadb-client"]
       commands       = []
       files          = []
       users = [
