@@ -4,6 +4,8 @@ packages:
   - "unattended-upgrades"
   - "nfs-common"
   - "mariadb-client"
+  - "php"
+  - "php-common"
 commands: [
   "sed -i 's/,noauto//g' /etc/fstab || true",
   "mount -a || true"
