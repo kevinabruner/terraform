@@ -106,6 +106,30 @@ locals {
           "defaults,nofail", 
           "0", 
           "0" 
+        ],
+        [ 
+          "nas.jfkhome:/mnt/yes/gitbuilds/db-server/ssvpu22/",
+          "/media/db-dumps/ssvpu22", 
+          "nfs", 
+          "defaults,nofail", 
+          "0", 
+          "0" 
+        ],
+        [ 
+          "nas.jfkhome:/mnt/yes/gitbuilds/db-server/ssvpu24/",
+          "/media/db-dumps/ssvpu24", 
+          "nfs", 
+          "defaults,nofail", 
+          "0", 
+          "0" 
+        ],
+        [ 
+          "nas.jfkhome:/mnt/yes/gitbuilds/db-server/ssvpd13/",
+          "/media/db-dumps/ssvpd13", 
+          "nfs", 
+          "defaults,nofail", 
+          "0", 
+          "0" 
         ]
       ]
     }
