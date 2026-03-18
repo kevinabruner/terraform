@@ -4,6 +4,7 @@ packages:
   - "unattended-upgrades"
   - "nfs-common"
   - "mariadb-client"
+  - "apache2"
   - "php"
   - "php-common"
 commands: [
