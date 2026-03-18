@@ -130,6 +130,14 @@ locals {
           "defaults,nofail", 
           "0", 
           "0" 
+        ],
+        [ 
+          "nas.jfkhome:/mnt/yes/gitbuilds/db-server/ssvp/",
+          "/media/db-dumps/ssvp", 
+          "nfs", 
+          "defaults,nofail", 
+          "0", 
+          "0" 
         ]
       ]
     }
