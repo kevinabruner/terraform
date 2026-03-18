@@ -80,7 +80,10 @@ locals {
     "psql server" = {
       has_keepalived = false
       packages       = ["unattended-upgrades"]
-      commands       = []
+      commands       = [
+        "sed -i 's/,noauto//g' /etc/fstab || true",
+        "mount -a || true"
+      ]
       files          = []
       users          = []
       mounts         = []
@@ -91,8 +94,11 @@ locals {
         "unattended-upgrades", 
         "nfs-common", 
         "mariadb-client"
+        ]
+      commands       = [
+        "sed -i 's/,noauto//g' /etc/fstab || true",
+        "mount -a || true"
       ]
-      commands       = ["mount -t nfs"]
       files          = []
       users = [
         {
@@ -162,7 +168,9 @@ locals {
         "cp /opt/netbox/contrib/*.service /etc/systemd/system/",
         "systemctl daemon-reload",
         "systemctl enable --now apache2 netbox netbox-rq",
-        "systemctl restart apache2 netbox netbox-rq"
+        "systemctl restart apache2 netbox netbox-rq",
+        "sed -i 's/,noauto//g' /etc/fstab || true",
+        "mount -a || true"
       ]
       files          = []
       users          = []
@@ -172,6 +180,8 @@ locals {
       has_keepalived = false
       packages       = ["unattended-upgrades"]
       commands       = [
+        "sed -i 's/,noauto//g' /etc/fstab || true",
+        "mount -a || true",
         "/bin/bash /home/kevin/install.sh",
         "reboot 0"
       ]
@@ -184,6 +194,8 @@ locals {
       packages       = ["unattended-upgrades"]
       commands          = []
       commands       = [
+        "sed -i 's/,noauto//g' /etc/fstab || true",
+        "mount -a || true",
         "DEBIAN_FRONTEND=noninteractive apt-get install -y /home/kevin/plexmediaserver.deb",  
         "cp /opt/Tautulli/init-scripts/init.systemd /lib/systemd/system/tautulli.service",
         "sed -i '/^ExecStart=/i ExecStartPre=/bin/sleep 90' /lib/systemd/system/tautulli.service",
@@ -198,7 +210,10 @@ locals {
     "Default" = { 
       has_keepalived = false
       packages = ["unattended-upgrades"]
-      commands = []
+      commands       = [
+        "sed -i 's/,noauto//g' /etc/fstab || true",
+        "mount -a || true"
+      ]
       files    = [] 
       users          = []
       mounts         = []
