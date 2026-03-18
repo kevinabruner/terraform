@@ -55,6 +55,11 @@ packages:
   - ${pkg}
 %{ endfor ~}
 
+mounts:
+%{ for mount in mounts ~}
+  - ${jsonencode(mount)}
+%{ endfor ~}
+
 write_files:
   #Force apt ipv4
   - path: /etc/apt/apt.conf.d/99force-ipv4

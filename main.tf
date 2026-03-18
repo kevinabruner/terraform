@@ -59,6 +59,9 @@ locals {
         }
       ]
       users          = []
+      mounts         = [
+        [ "nas.jfkhome:/mnt/yes/gitbuilds/ssvp/", "/media/nfs", "nfs", "defaults,nofail", "0", "0" ]
+      ]
     }
     "Reverse proxy" = {
       has_keepalived = true
@@ -66,6 +69,7 @@ locals {
       commands       = ["systemctl restart keepalived"]
       files          = []
       users          = []
+      mounts         = []
     }
     "Database proxy" = {
       has_keepalived = true
@@ -73,6 +77,7 @@ locals {
       commands       = ["systemctl restart keepalived"]
       files          = []
       users          = []
+      mounts         = []
     }
     "psql server" = {
       has_keepalived = false
@@ -80,10 +85,11 @@ locals {
       commands       = []
       files          = []
       users          = []
+      mounts         = []
     }
     "ssvp" = {
       has_keepalived = false
-      packages       = ["unattended-upgrades"]
+      packages       = ["unattended-upgrades", "nfs-common"]
       commands       = []
       files          = []
       users = [
@@ -94,6 +100,7 @@ locals {
           ssh_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDkqBd5887aEu8t1hhSdlhkHR/UH4VV+zY6ZT6KqPDNc ryan@fedora"
         }
       ]
+      mounts         = []
     }
     "DNS resolver" = {
       has_keepalived = true
@@ -101,6 +108,7 @@ locals {
       commands       = ["systemctl restart keepalived"]
       files          = []
       users          = []
+      mounts         = []
     }
     "Netbox" = {
       has_keepalived = false
@@ -115,6 +123,7 @@ locals {
       ]
       files          = []
       users          = []
+      mounts         = []
     }
     "Sonarr" = {
       has_keepalived = false
@@ -125,6 +134,7 @@ locals {
       ]
       files          = []
       users          = []
+      mounts         = []
     }
     "Plex" = {
       has_keepalived = false
@@ -140,6 +150,7 @@ locals {
       ]
       files          = []
       users          = []
+      mounts         = []
     }
     "Default" = { 
       has_keepalived = false
@@ -147,6 +158,7 @@ locals {
       commands = []
       files    = [] 
       users          = []
+      mounts         = []
     }
   }
 }
@@ -205,6 +217,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
     extra_files    = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).files
     extra_commands = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).commands
     users          = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).users
+    mounts         = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).mounts
     
     # 3. Boolean for all *-prod1 instances
     is_drupal_master = (each.value.role == "Drupal" && each.value.env == "prod" && endswith(each.value.name, "1"))
