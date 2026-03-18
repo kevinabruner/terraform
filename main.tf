@@ -30,6 +30,15 @@ provider "proxmox" {
 
 locals {
   vms = jsondecode(data.http.netbox_export.response_body)
+
+  # DYNAMIC IMPORT:
+  # 1. Look at all .yaml files in /roles
+  # 2. Decode them
+  # 3. Create a map where the KEY is the "name" defined inside the YAML
+  role_configs = {
+    for f in fileset("${path.module}/roles", "*.yaml") :
+    yamldecode(file("${path.module}/roles/${f}")).name => yamldecode(file("${path.module}/roles/${f}"))
+  }
   
   # Merge in VM Data with computed network data
   vm_configs = {
@@ -39,185 +48,6 @@ locals {
       # Construct Gateway from Primary IP
       gateway = "${join(".", slice(split(".", [for i in vm.interfaces : i.ip if i.is_primary][0]), 0, 3))}.1"
     }) if vm.name != ""
-  }
-
-  # Role-based configurations
-  role_configs = {
-    "Drupal" = {
-      has_keepalived = false
-      packages = ["apache2"]
-      commands = [
-        "a2enconf Drupal-env || true", 
-        "systemctl restart apache2 || true",
-        "sed -i 's/,noauto//g' /etc/fstab || true",
-        "mount -a || true"
-      ]
-      files    = [
-        {
-          path    = "/etc/apache2/conf-available/Drupal-env.conf"
-          content = "SetEnv environment \"$${env}\"" 
-        }
-      ]
-      users          = []
-      mounts         = []
-    }
-    "Reverse proxy" = {
-      has_keepalived = true
-      packages       = ["unattended-upgrades"]
-      commands       = ["systemctl restart keepalived"]
-      files          = []
-      users          = []
-      mounts         = []
-    }
-    "Database proxy" = {
-      has_keepalived = true
-      packages       = ["unattended-upgrades"]
-      commands       = ["systemctl restart keepalived"]
-      files          = []
-      users          = []
-      mounts         = []
-    }
-    "psql server" = {
-      has_keepalived = false
-      packages       = ["unattended-upgrades"]
-      commands       = [
-        "sed -i 's/,noauto//g' /etc/fstab || true",
-        "mount -a || true"
-      ]
-      files          = []
-      users          = []
-      mounts         = []
-    }
-    "ssvp" = {
-      has_keepalived = false
-      packages       = [
-        "unattended-upgrades", 
-        "nfs-common", 
-        "mariadb-client"
-        ]
-      commands       = [
-        "sed -i 's/,noauto//g' /etc/fstab || true",
-        "mount -a || true"
-      ]
-      files          = []
-      users = [
-        {
-          name    = "ryan"
-          groups  = "sudo"
-          shell   = "/bin/bash"
-          ssh_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDkqBd5887aEu8t1hhSdlhkHR/UH4VV+zY6ZT6KqPDNc ryan@fedora"
-        }
-      ]
-      mounts = [
-        [ 
-          "nas.jfkhome:/mnt/yes/gitbuilds/ssvp/",
-          "/media/nfs", 
-          "nfs", 
-          "defaults,nofail", 
-          "0", 
-          "0" 
-        ],
-        [ 
-          "nas.jfkhome:/mnt/yes/gitbuilds/db-server/ssvpu22/",
-          "/media/db-dumps/ssvpu22", 
-          "nfs", 
-          "defaults,nofail", 
-          "0", 
-          "0" 
-        ],
-        [ 
-          "nas.jfkhome:/mnt/yes/gitbuilds/db-server/ssvpu24/",
-          "/media/db-dumps/ssvpu24", 
-          "nfs", 
-          "defaults,nofail", 
-          "0", 
-          "0" 
-        ],
-        [ 
-          "nas.jfkhome:/mnt/yes/gitbuilds/db-server/ssvpd13/",
-          "/media/db-dumps/ssvpd13", 
-          "nfs", 
-          "defaults,nofail", 
-          "0", 
-          "0" 
-        ],
-        [ 
-          "nas.jfkhome:/mnt/yes/gitbuilds/db-server/ssvp/",
-          "/media/db-dumps/ssvp", 
-          "nfs", 
-          "defaults,nofail", 
-          "0", 
-          "0" 
-        ]
-      ]
-    }
-    "DNS resolver" = {
-      has_keepalived = true
-      packages       = ["unattended-upgrades"]
-      commands       = ["systemctl restart keepalived"]
-      files          = []
-      users          = []
-      mounts         = []
-    }
-    "Netbox" = {
-      has_keepalived = false
-      packages       = ["unattended-upgrades"]
-      commands       = [
-        "/opt/netbox/upgrade.sh",
-        "cp /opt/netbox/contrib/gunicorn.py /opt/netbox/gunicorn.py",
-        "cp /opt/netbox/contrib/*.service /etc/systemd/system/",
-        "systemctl daemon-reload",
-        "systemctl enable --now apache2 netbox netbox-rq",
-        "systemctl restart apache2 netbox netbox-rq",
-        "sed -i 's/,noauto//g' /etc/fstab || true",
-        "mount -a || true"
-      ]
-      files          = []
-      users          = []
-      mounts         = []
-    }
-    "Sonarr" = {
-      has_keepalived = false
-      packages       = ["unattended-upgrades"]
-      commands       = [
-        "sed -i 's/,noauto//g' /etc/fstab || true",
-        "mount -a || true",
-        "/bin/bash /home/kevin/install.sh",
-        "reboot 0"
-      ]
-      files          = []
-      users          = []
-      mounts         = []
-    }
-    "Plex" = {
-      has_keepalived = false
-      packages       = ["unattended-upgrades"]
-      commands          = []
-      commands       = [
-        "sed -i 's/,noauto//g' /etc/fstab || true",
-        "mount -a || true",
-        "DEBIAN_FRONTEND=noninteractive apt-get install -y /home/kevin/plexmediaserver.deb",  
-        "cp /opt/Tautulli/init-scripts/init.systemd /lib/systemd/system/tautulli.service",
-        "sed -i '/^ExecStart=/i ExecStartPre=/bin/sleep 90' /lib/systemd/system/tautulli.service",
-        "systemctl daemon-reload",
-        "systemctl enable plexmediaserver.service tautulli.service",
-        "systemctl start plexmediaserver.service tautulli.service"
-      ]
-      files          = []
-      users          = []
-      mounts         = []
-    }
-    "Default" = { 
-      has_keepalived = false
-      packages = ["unattended-upgrades"]
-      commands       = [
-        "sed -i 's/,noauto//g' /etc/fstab || true",
-        "mount -a || true"
-      ]
-      files    = [] 
-      users          = []
-      mounts         = []
-    }
   }
 }
 

@@ -1,0 +1,12 @@
+name: "Sonarr"
+has_keepalived: false
+packages:
+  - "unattended-upgrades"
+commands:
+  - "sed -i 's/,noauto//g' /etc/fstab || true"
+  - "mount -a || true"
+  - "/bin/bash /home/kevin/install.sh"
+  - "reboot 0"
+files: []
+users: []
+mounts: []

@@ -1,0 +1,22 @@
+name: "ssvp"
+has_keepalived: false
+packages:
+  - "unattended-upgrades"
+  - "nfs-common"
+  - "mariadb-client"
+commands: [
+  "sed -i 's/,noauto//g' /etc/fstab || true",
+  "mount -a || true"
+]
+files: []
+users:
+  - name: "ryan"
+    groups: "sudo"
+    shell: "/bin/bash"
+    ssh_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDkqBd5887aEu8t1hhSdlhkHR/UH4VV+zY6ZT6KqPDNc ryan@fedora"
+mounts:
+  - ["nas.jfkhome:/mnt/yes/gitbuilds/ssvp/", "/media/nfs", "nfs", "defaults,nofail", "0", "0"]
+  - ["nas.jfkhome:/mnt/yes/gitbuilds/db-server/ssvpu22/", "/media/db-dumps/ssvpu22", "nfs", "defaults,nofail", "0", "0"]
+  - ["nas.jfkhome:/mnt/yes/gitbuilds/db-server/ssvpu24/", "/media/db-dumps/ssvpu24", "nfs", "defaults,nofail", "0", "0"]
+  - ["nas.jfkhome:/mnt/yes/gitbuilds/db-server/ssvpu22/", "/media/db-dumps/ssvpu22", "nfs", "defaults,nofail", "0", "0"]
+  - ["nas.jfkhome:/mnt/yes/gitbuilds/db-server/ssvpd13/", "/media/db-dumps/ssvpd13", "nfs", "defaults,nofail", "0", "0"]
