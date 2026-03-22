@@ -16,7 +16,7 @@ users:
   - name: "ryan"
     groups: "sudo"
     shell: "/bin/bash"
-    ssh_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDkqBd5887aEu8t1hhSdlhkHR/UH4VV+zY6ZT6KqPDNc ryan@fedora"
+    ssh_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDYPhVpxUxaxJbDzPuo9eV6gbon2hhp29U0nxpj+HMg1SiS0L/TMlIybXC79BYSziHilaIOF9luOHUmHp/kmfxvYgFUn4l+hUUaujxMsIVNIbTaz4nQaBuSR4iZHgzj7Q++wUBOk63lmuOetwFeBygqcSMkQyQJ7OSVo6n3bjTHGs7ZKyppRr2IpDhUpA3YWl1nkBKTw/fHElQxMtNk7cjgoOXcJXtBd/7JcBm+SfF65yryOhxYGUWBy32Lmb1zmQ6ATVWk5sDKmlBEotzimvFF6QzBFZy/RNhkj3/h7pv6YF46K5pZFFrpvd8PYs1qrBxzeTZtWuag2tndSJSfd+h4/YgmVdjMkiGH/vwbgrbj5Fsaq6bU5LHLXN0ObtOaTEU712XrTu0zeskUHw/WMT1C1Fr66eRM3vMpXktRnMtomUqrOGdfSTO+b/z85toLDm1jIO8VTOe6yEDQDCpKVtBReDoMItVhlsZKo2aJjuAHaF7bBJ+RWqxdYwv+gd57y48= paranyi@DESKTOP-OQSAT6Q"
 mounts:
   - ["nas.jfkhome:/mnt/yes/gitbuilds/ssvp/", "/media/nfs", "nfs", "defaults,nofail", "0", "0"]
   - ["nas.jfkhome:/mnt/yes/gitbuilds/db-server/ssvp/", "/media/db-dumps/ssvp", "nfs", "defaults,nofail", "0", "0"]
