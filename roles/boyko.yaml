@@ -1,0 +1,19 @@
+name: "boyko"
+has_keepalived: false
+packages:
+  - "unattended-upgrades"
+  - "nfs-common"
+  - "postgresql-client"    
+commands: [
+  "sed -i 's/,noauto//g' /etc/fstab || true",
+  "mount -a || true"
+]
+files: []
+users:
+  - name: "nboyko"
+    groups: "sudo"
+    shell: "/bin/bash"
+    ssh_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEa+/PGsc1zbjkuiXQv7bF5LAxjEP7alghpbbje1aBDV nboyko@kevinsmachine"
+mounts:
+  - ["nas.jfkhome:/mnt/yes/gitbuilds/boyko/", "/media/nfs", "nfs", "defaults,nofail", "0", "0"]
+  - ["nas.jfkhome:/mnt/yes/gitbuilds/db-server/boyko/", "/media/db-dumps/boyko", "nfs", "defaults,nofail", "0", "0"]
