@@ -1,8 +1,4 @@
 #cloud-config
-bootcmd:
-  - apt-get update
-  - apt-get install -y nfs-common
-
 %{ if os == "ubuntu24" ~}
 apt:
   primary:
@@ -26,6 +22,10 @@ apt:
     deb $mirror trixie-updates main contrib non-free non-free-firmware
     deb $security trixie-security main contrib non-free non-free-firmware
 %{ endif ~}
+
+bootcmd:
+  - apt-get update
+  - apt-get install -y nfs-common
 
 users:
   - name: ${username}
@@ -58,7 +58,6 @@ packages:
   - curl
   - htop
   - vim
-  - nfs-common
 %{ for pkg in extra_packages ~}
   - ${pkg}
 %{ endfor ~}
