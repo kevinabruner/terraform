@@ -57,6 +57,7 @@ users:
 %{ endfor ~}
 %{ for user in users ~}
   - name: ${user.name}
+%{ endfor ~}
 %{ if lookup(user, "groups", "") != "" ~}
     groups: ${user.groups}
 %{ endif ~}
