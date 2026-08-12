@@ -12,6 +12,7 @@ apt:
     - arches: [default]    
       uri: ${mirror_url}/ubuntu
   preserve_sources_list: ${!use_mirror}
+%{ endif ~}
 %{ if os == "debian12" ~}
 apt:
   primary:
@@ -25,6 +26,7 @@ apt:
     deb ${mirror_url}/debian bookworm main contrib non-free non-free-firmware
     deb ${mirror_url}/debian bookworm-updates main contrib non-free non-free-firmware
     deb ${mirror_url}/debian-security bookworm-security main contrib non-free non-free-firmware
+%{ endif ~}
 %{ if os == "debian13" ~}
 apt:
   primary:
