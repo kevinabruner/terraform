@@ -53,14 +53,10 @@ users:
       - ${trimspace(key)}
 %{ endfor ~}
 %{ for user in users ~}
-      - ${trimspace(${user.key})}
-%{ endfor ~}
-%{ for user in users ~}
   - name: ${user.name}
-%{ endfor ~}
-%{ if lookup(user, "groups", "") != "" ~}
+%{   if lookup(user, "groups", "") != "" ~}
     groups: ${user.groups}
-%{ endif ~}
+%{   endif ~}
     shell: ${lookup(user, "shell", "/bin/bash")}
     sudo: ALL=(ALL) NOPASSWD:ALL
     lock_passwd: true
