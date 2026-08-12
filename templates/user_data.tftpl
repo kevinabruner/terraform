@@ -12,7 +12,7 @@ apt:
     - arches: [default]    
       uri: ${mirror_url}/ubuntu
   preserve_sources_list: ${!use_mirror}
-%{ else if os == "debian12" ~}
+%{ if os == "debian12" ~}
 apt:
   primary:
     - arches: [default]
