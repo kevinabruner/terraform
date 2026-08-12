@@ -52,6 +52,9 @@ users:
 %{ for key in ssh_keys ~}
       - ${trimspace(key)}
 %{ endfor ~}
+%{ for key in user.ssh_key ~}
+      - ${trimspace(key)}
+%{ endfor ~}
 %{ for user in users ~}
   - name: ${user.name}
 %{ if lookup(user, "groups", "") != "" ~}
