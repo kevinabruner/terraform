@@ -8,6 +8,19 @@ apt:
     - arches: [default]    
       uri: ${mirror_url}/ubuntu
   preserve_sources_list: ${!use_mirror}
+%{ else if os == "debian12" ~}
+apt:
+  primary:
+    - arches: [default]
+      uri: ${mirror_url}/debian
+  security:
+    - arches: [default]    
+      uri: ${mirror_url}/debian-security
+  preserve_sources_list: ${!use_mirror}
+  sources_list: |
+    deb ${mirror_url}/debian bookworm main contrib non-free non-free-firmware
+    deb ${mirror_url}/debian bookworm-updates main contrib non-free non-free-firmware
+    deb ${mirror_url}/debian-security bookworm-security main contrib non-free non-free-firmware
 %{ else ~}
 apt:
   primary:
@@ -18,9 +31,9 @@ apt:
       uri: ${mirror_url}/debian-security
   preserve_sources_list: ${!use_mirror}
   sources_list: |
-    deb $mirror trixie main contrib non-free non-free-firmware
-    deb $mirror trixie-updates main contrib non-free non-free-firmware
-    deb $security trixie-security main contrib non-free non-free-firmware
+    deb ${mirror_url}/debian trixie main contrib non-free non-free-firmware
+    deb ${mirror_url}/debian trixie-updates main contrib non-free non-free-firmware
+    deb ${mirror_url}/debian-security trixie-security main contrib non-free non-free-firmware
 %{ endif ~}
 
 users:
