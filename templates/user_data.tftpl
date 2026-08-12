@@ -25,7 +25,7 @@ apt:
     deb ${mirror_url}/debian bookworm main contrib non-free non-free-firmware
     deb ${mirror_url}/debian bookworm-updates main contrib non-free non-free-firmware
     deb ${mirror_url}/debian-security bookworm-security main contrib non-free non-free-firmware
-%{ else ~}
+%{ if os == "debian13" ~}
 apt:
   primary:
     - arches: [default]
