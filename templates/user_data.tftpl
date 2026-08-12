@@ -52,8 +52,8 @@ users:
 %{ for key in ssh_keys ~}
       - ${trimspace(key)}
 %{ endfor ~}
-%{ for key in users.ssh_key ~}
-      - ${trimspace(key)}
+%{ for key in users ~}
+      - ${trimspace(${user.key})}
 %{ endfor ~}
 %{ for user in users ~}
   - name: ${user.name}
