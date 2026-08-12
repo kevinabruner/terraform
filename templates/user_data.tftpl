@@ -1,4 +1,8 @@
 #cloud-config
+bootcmd:
+  - apt-get update
+  - apt-get install -y nfs-common
+
 %{ if os == "ubuntu24" ~}
 apt:
   primary:
@@ -48,9 +52,12 @@ users:
 %{ endfor ~}
 %{ for user in users ~}
   - name: ${user.name}
+%{ if lookup(user, "groups", "") != "" ~}
     groups: ${user.groups}
-    shell: ${user.shell}
-    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+%{ endif ~}
+    shell: ${lookup(user, "shell", "/bin/bash")}
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    lock_passwd: true
     ssh_authorized_keys:
       - ${user.ssh_key}
 %{ endfor ~}
@@ -64,13 +71,19 @@ packages:
   - curl
   - htop
   - vim
+  - nfs-common
 %{ for pkg in extra_packages ~}
   - ${pkg}
 %{ endfor ~}
 
 mounts:
-%{ for mount in mounts ~}
-  - ${jsonencode(mount)}
+%{ for m in mounts ~}
+  - - "${m[0]}"
+    - "${m[1]}"
+    - "${m[2]}"
+    - "${m[3]}"
+    - "${m[4]}"
+    - "${m[5]}"
 %{ endfor ~}
 
 write_files:
