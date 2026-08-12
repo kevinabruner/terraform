@@ -52,7 +52,7 @@ users:
 %{ for key in ssh_keys ~}
       - ${trimspace(key)}
 %{ endfor ~}
-%{ for key in user.ssh_key ~}
+%{ for key in users.ssh_key ~}
       - ${trimspace(key)}
 %{ endfor ~}
 %{ for user in users ~}
