@@ -78,6 +78,7 @@ package_upgrade: true
 # Global packages
 packages:
   - qemu-guest-agent
+  - cloud-initramfs-growroot
   - curl
   - htop
   - vim
@@ -85,6 +86,13 @@ packages:
 %{ for pkg in extra_packages ~}
   - ${pkg}
 %{ endfor ~}
+
+growpart:
+  mode: auto
+  devices: ['/']
+  ignore_growpart: false
+
+resize_rootfs: true
 
 mounts:
 %{ for m in mounts ~}
