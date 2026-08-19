@@ -53,15 +53,23 @@ users:
       - ${trimspace(key)}
 %{ endfor ~}
 %{ for user in users ~}
+%{   if lookup(user, "ssh_key", "") != "" ~}
+      - ${trimspace(user.ssh_key)}
+%{   endif ~}
+%{ endfor ~}
+
+%{ for user in users ~}
   - name: ${user.name}
-%{ if lookup(user, "groups", "") != "" ~}
+%{   if lookup(user, "groups", "") != "" ~}
     groups: ${user.groups}
-%{ endif ~}
+%{   endif ~}
     shell: ${lookup(user, "shell", "/bin/bash")}
     sudo: ALL=(ALL) NOPASSWD:ALL
     lock_passwd: true
+%{   if lookup(user, "ssh_key", "") != "" ~}
     ssh_authorized_keys:
-      - ${user.ssh_key}
+      - ${trimspace(user.ssh_key)}
+%{   endif ~}
 %{ endfor ~}
 
 package_update: true
