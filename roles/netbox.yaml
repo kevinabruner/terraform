@@ -11,6 +11,7 @@ commands:
   - "systemctl restart apache2 netbox netbox-rq"
   - "sed -i 's/,noauto//g' /etc/fstab || true"
   - "mount -a || true"
+  - "/opt/netbox/venv/bin/python3 /opt/netbox/netbox/manage.py collectstatic --no-input"
 files: []
 users: []
 mounts: []
