@@ -1,8 +1,0 @@
-name: "psql server"
-has_keepalived: false
-packages:
-  - "unattended-upgrades"
-commands: []
-files: []
-users: []
-mounts: []

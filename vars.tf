@@ -30,6 +30,16 @@ variable "mirror_url" {
     default = "http://mirror.jfkhome"
 }
 
+variable "keepalived_members" { 
+    type        = list(string)
+    default     = [
+        "DNS resolver",
+        "Database proxy",
+        "Reverse proxy"
+    ]
+}
+
+
 variable "vm_password" { 
     type = string 
     sensitive = true 

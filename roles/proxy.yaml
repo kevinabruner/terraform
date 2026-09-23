@@ -1,8 +1,0 @@
-name: "Reverse proxy"
-has_keepalived: true
-packages:
-  - "unattended-upgrades"
-commands: [systemctl restart keepalived]
-files: []
-users: []
-mounts: []

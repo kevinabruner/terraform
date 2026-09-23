@@ -109,7 +109,7 @@ resource "proxmox_cloud_init_disk" "ci_configs" {
 
     
     # Keepalived Logic
-    has_keepalived = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).has_keepalived
+    has_keepalived = contains(var.keepalived_members, each.value.role)
     is_vrrp_master = endswith(each.value.name, "1")
     local_ip       = split("/", each.value.primary_iface.ip)[0] # Strip CIDR mask
     
