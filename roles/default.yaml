@@ -2,10 +2,7 @@ name: "Default"
 has_keepalived: false
 packages:
   - "unattended-upgrades"
-commands: [
-  "sed -i 's/,noauto//g' /etc/fstab || true",
-  "mount -a || true"
-]
+commands: []
 files: []
 users: []
 mounts: []
