@@ -1,7 +1,6 @@
 name: "Default"
 has_keepalived: false
-packages:
-  - "unattended-upgrades"
+packages: []
 commands: []
 files: []
 users: []
