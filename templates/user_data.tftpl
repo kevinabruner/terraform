@@ -127,7 +127,7 @@ write_files:
     content: |
       ${indent(6, etcd_content)}
   
-  - path: /etc/environment/peers
+  - path: /etc/peers
     permission: '0644'
     content: |
       ${peer_ips_csv}
