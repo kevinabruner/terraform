@@ -126,6 +126,11 @@ write_files:
     permissions: '0644'
     content: |
       ${indent(6, etcd_content)}
+  
+  - path: /etc/environment/peers
+    permission: '0644'
+    content: |
+      ${peer_ips_csv}
 
   - path: /etc/patroni/config.yml
     permissions: '0644'
