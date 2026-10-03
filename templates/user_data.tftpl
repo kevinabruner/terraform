@@ -144,6 +144,8 @@ write_files:
     permissions: '0644'
     content: |
       [mysqld]
+      require_secure_transport = OFF
+      ssl = 0
       plugin-load-add=auth_socket.so
       binlog_format=ROW
       default-storage-engine=innodb
