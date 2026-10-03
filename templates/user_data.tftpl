@@ -143,7 +143,7 @@ write_files:
   - path: /etc/mysql/conf.d/galera.cnf
     permissions: '0644'
     content: |
-      # [mysqld]
+      [mysqld]
       # require_secure_transport = OFF
       # ssl = 0
       plugin-load-add=auth_socket.so
