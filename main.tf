@@ -158,7 +158,7 @@ resource "proxmox_virtual_environment_vm" "proxmox_vms" {
   description = each.value.desc
   pool_id     = each.value.pool != "" ? each.value.pool : null
   on_boot     = each.value.start_at_node_boot
-  started     = each.value.status == "running" ? true : false
+  started     = each.value.status == "running"
 
   agent {
     enabled = true
@@ -178,16 +178,18 @@ resource "proxmox_virtual_environment_vm" "proxmox_vms" {
 
   serial_device {}
 
+  # Reads the dynamically resolved integer template VMID from NetBox
   clone {
-    vm_id = tonumber(each.value.image) # Assumes `image` from NetBox is the template's VMID (e.g. 9000)
+    vm_id = each.value.template_vmid
     full  = true
   }
 
+  # Reads the integer disk size from NetBox directly
   disk {
     datastore_id = each.value.storage
     size         = each.value.disk_size
     interface    = "scsi0"
-    file_format  = "raw" # Changed from 'format' to 'file_format'
+    file_format  = "raw"
   }
 
   dynamic "network_device" {
@@ -205,7 +207,6 @@ resource "proxmox_virtual_environment_vm" "proxmox_vms" {
     network_data_file_id = proxmox_virtual_environment_file.network_config[each.key].id
   }
 
-  # Replaced 'timeouts {}' block with top-level attributes (in seconds):
   timeout_create = 900
   timeout_clone  = 900
 
