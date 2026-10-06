@@ -26,6 +26,14 @@ provider "proxmox" {
   insecure  = false
 }
 
+# Fetch all VM templates currently registered in Proxmox
+data "proxmox_virtual_environment_vms" "templates" {
+  filter {
+    name   = "template"
+    values = ["true"]
+  }
+}
+
 locals {
   vms = jsondecode(data.http.netbox_export.response_body)
 
@@ -39,6 +47,12 @@ locals {
       primary_iface = [for i in vm.interfaces : i if i.is_primary][0]
       gateway       = "${join(".", slice(split(".", [for i in vm.interfaces : i.ip if i.is_primary][0]), 0, 3))}.1"
     }) if vm.name != ""
+  }
+
+  # Build a map of template_name -> template_vmid
+  template_ids = {
+    for vm in data.proxmox_virtual_environment_vms.templates.vms :
+    vm.name => vm.vm_id
   }
 }
 
@@ -178,16 +192,18 @@ resource "proxmox_virtual_environment_vm" "proxmox_vms" {
 
   serial_device {}
 
+  # Look up VM ID by template name (or fall back to numeric conversion if an ID string was passed)
   clone {
-    vm_id = tonumber(each.value.image) # Assumes `image` from NetBox is the template's VMID (e.g. 9000)
+    vm_id = try(tonumber(each.value.image), local.template_ids[each.value.image])
     full  = true
   }
 
   disk {
     datastore_id = each.value.storage
-    size         = each.value.disk_size
+    # Strips 'G' or 'GB' from strings like "20G" or "20GB" and casts to integer
+    size         = tonumber(trimsuffix(trimsuffix(each.value.disk_size, "G"), "GB"))
     interface    = "scsi0"
-    file_format  = "raw" # Changed from 'format' to 'file_format'
+    file_format  = "raw"
   }
 
   dynamic "network_device" {
