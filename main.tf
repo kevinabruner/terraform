@@ -187,7 +187,7 @@ resource "proxmox_virtual_environment_vm" "proxmox_vms" {
     datastore_id = each.value.storage
     size         = each.value.disk_size
     interface    = "scsi0"
-    format       = "raw"
+    file_format  = "raw" # Changed from 'format' to 'file_format'
   }
 
   dynamic "network_device" {
@@ -205,10 +205,9 @@ resource "proxmox_virtual_environment_vm" "proxmox_vms" {
     network_data_file_id = proxmox_virtual_environment_file.network_config[each.key].id
   }
 
-  timeouts {
-    create = "15m"
-    delete = "15m"
-  }
+  # Replaced 'timeouts {}' block with top-level attributes (in seconds):
+  timeout_create = 900
+  timeout_clone  = 900
 
   lifecycle {
     ignore_changes = [
