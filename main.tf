@@ -220,6 +220,7 @@ resource "proxmox_virtual_environment_vm" "proxmox_vms" {
     ignore_changes = [
       tags,
       startup,
+      usb,
       clone,          # Prevents Terraform from recreating imported VMs when clone options are set
       initialization, # Prevents recreation when cloud-init snippet IDs shift
     ]
