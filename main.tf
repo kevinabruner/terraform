@@ -210,10 +210,12 @@ resource "proxmox_virtual_environment_vm" "proxmox_vms" {
   timeout_create = 900
   timeout_clone  = 900
 
-  lifecycle {
+lifecycle {
     ignore_changes = [
       tags,
       startup,
+      clone,          # Prevents Terraform from recreating imported VMs when clone options are set
+      initialization, # Prevents recreation when cloud-init snippet IDs shift
     ]
   }
 }
