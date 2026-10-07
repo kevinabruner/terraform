@@ -21,9 +21,15 @@ data "http" "netbox_export" {
 
 provider "proxmox" {
   endpoint  = var.proxmox_api_url
-  # BPG combines token ID and secret into one string separated by '='
   api_token = "${var.proxmox_api_token_id}=${var.proxmox_api_token_secret}"
   insecure  = false
+
+  ssh {
+    agent    = true
+    username = "root"
+    # Optional: use explicit key file if not using ssh-agent
+    # private_key = file("~/.ssh/id_rsa")
+  }
 }
 
 locals {
