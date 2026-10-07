@@ -19,12 +19,6 @@ data "http" "netbox_export" {
   }
 }
 
-import {
-  for_each = local.vm_configs
-  to       = proxmox_virtual_environment_vm.proxmox_vms[each.key]
-  id       = "${each.value.node}/${each.value.vmid}"
-}
-
 provider "proxmox" {
   endpoint  = var.proxmox_api_url
   # BPG combines token ID and secret into one string separated by '='
