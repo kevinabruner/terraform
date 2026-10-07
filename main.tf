@@ -26,7 +26,7 @@ provider "proxmox" {
 
   ssh {
     agent    = true
-    username = "root"
+    username = "kevin"
     # Optional: use explicit key file if not using ssh-agent
     # private_key = file("~/.ssh/id_rsa")
   }
