@@ -56,7 +56,7 @@ locals {
 resource "proxmox_virtual_environment_file" "user_data" {
   for_each     = local.vm_configs
   content_type = "snippets"
-  datastore_id = each.value.storage # Ensure this storage supports the "snippets" content type in PVE
+  datastore_id = "truenas-nfs" # Ensure this storage supports the "snippets" content type in PVE
   node_name    = each.value.node
 
   source_raw {
@@ -208,7 +208,7 @@ resource "proxmox_virtual_environment_vm" "proxmox_vms" {
 
   # Native BPG Cloud-Init drive integration
   initialization {
-    datastore_id         = each.value.storage
+    datastore_id         = "truenas-nfs"
     user_data_file_id    = proxmox_virtual_environment_file.user_data[each.key].id
     network_data_file_id = proxmox_virtual_environment_file.network_config[each.key].id
   }
