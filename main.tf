@@ -1,8 +1,8 @@
 terraform {
   required_providers {
     proxmox = {
-      source  = "telmate/proxmox"
-      version = "3.0.2-rc07"
+      source  = "bpg/proxmox"
+      version = "~> 0.60"
     }
     netbox = {
       source  = "e-breuninger/netbox"
@@ -20,122 +20,116 @@ data "http" "netbox_export" {
 }
 
 provider "proxmox" {
-  pm_api_url          = var.proxmox_api_url
-  pm_api_token_id     = var.proxmox_api_token_id
-  pm_api_token_secret = var.proxmox_api_token_secret
-  pm_tls_insecure     = false
-  pm_parallel         = 3
-}
+  endpoint  = var.proxmox_api_url
+  api_token = "${var.proxmox_api_token_id}=${var.proxmox_api_token_secret}"
+  insecure  = false
 
+  ssh {
+    agent       = true
+    username    = "root"
+    private_key = file("~/.ssh/id_rsa")
+  }
+}
 
 locals {
   vms = jsondecode(data.http.netbox_export.response_body)
 
-  # DYNAMIC IMPORT:
-  # 1. Look at all .yaml files in /roles
-  # 2. Decode them
-  # 3. Create a map where the KEY is the "name" defined inside the YAML
   role_configs = {
     for f in fileset("${path.module}/roles", "*.yaml") :
     yamldecode(file("${path.module}/roles/${f}")).name => yamldecode(file("${path.module}/roles/${f}"))
   }
-  
-  # Merge in VM Data with computed network data
+
   vm_configs = {
     for vm in local.vms : vm.name => merge(vm, {
-      # Extract Primary Interface
       primary_iface = [for i in vm.interfaces : i if i.is_primary][0]
-      # Construct Gateway from Primary IP
-      gateway = "${join(".", slice(split(".", [for i in vm.interfaces : i.ip if i.is_primary][0]), 0, 3))}.1"
+      gateway       = "${join(".", slice(split(".", [for i in vm.interfaces : i.ip if i.is_primary][0]), 0, 3))}.1"
     }) if vm.name != ""
   }
 }
 
+# ------------------------------------------------------------------------------
+# CLOUD-INIT SNIPPETS
+# Uploaded to "truenas-nfs" storage (must support the "snippets" content type)
+# ------------------------------------------------------------------------------
 
-resource "proxmox_cloud_init_disk" "ci_configs" {
-  for_each = local.vm_configs
-  name     = "${each.value.vmid}-cidata"
-  pve_node = each.value.node
-  storage  = "local"
+resource "proxmox_virtual_environment_file" "user_data" {
+  for_each     = local.vm_configs
+  content_type = "snippets"
+  datastore_id = "truenas-nfs"
+  node_name    = each.value.node
 
-  meta_data = <<-EOT
-    instance-id: ${each.value.name}
-    local-hostname: ${each.value.name}
-  EOT
+  source_raw {
+    data = templatefile("${path.module}/templates/user_data.tftpl", {
+      username          = var.vm_username
+      password          = var.vm_password
+      ssh_keys          = split("\n", trimspace(each.value.ssh_keys))
+      name              = each.value.name
+      vmid              = each.value.vmid
+      env               = each.value.env
+      use_mirror        = each.value.use_mirror
+      mirror_url        = var.mirror_url
+      os                = each.value.os
+      role              = each.value.role
+      node_ip_with_cidr = each.value.primary_iface.ip
+      subnet            = cidrsubnet(each.value.primary_iface.ip, 0, 0)
 
-  user_data = templatefile("${path.module}/templates/user_data.tftpl", {
-    # 1. Basic Identity
-    username = var.vm_username
-    password = var.vm_password
-    ssh_keys = split("\n", trimspace(each.value.ssh_keys))
-    name     = each.value.name
-    vmid     = each.value.vmid
-    env      = each.value.env
-    use_mirror   = each.value.use_mirror
-    mirror_url   = var.mirror_url
-    os           = each.value.os
-    role         = each.value.role
-    node_ip_with_cidr = each.value.primary_iface.ip
-    subnet            = cidrsubnet(each.value.primary_iface.ip, 0, 0)    
+      etcd_content = templatefile("${path.module}/templates/_etcd.tftpl", {
+        name     = each.value.name
+        local_ip = split("/", each.value.primary_iface.ip)[0]
+        cluster_members = {
+          for k, v in local.vm_configs : k => v
+          if v.role == each.value.role && v.env == each.value.env
+        }
+      })
 
-    # 3. RENDER ETCD SUBTEMPLATE
-    etcd_content = templatefile("${path.module}/templates/_etcd.tftpl", {
-      name       = each.value.name
-      local_ip         = split("/", each.value.primary_iface.ip)[0]
+      patroni_content = templatefile("${path.module}/templates/_patroni.yml.tftpl", {
+        name     = each.value.name
+        local_ip = split("/", each.value.primary_iface.ip)[0]
+        subnet   = cidrsubnet(each.value.primary_iface.ip, 0, 0)
+        cluster_members = {
+          for k, v in local.vm_configs : k => v
+          if v.role == each.value.role && v.env == each.value.env
+        }
+        password = "87Josie*"
+      })
+
+      extra_packages = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).packages
+      extra_files    = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).files
+      extra_commands = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).commands
+      users          = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).users
+      mounts         = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).mounts
+
+      has_keepalived = contains(var.keepalived_members, each.value.role)
+      is_vrrp_master = endswith(each.value.name, "1")
+      local_ip       = split("/", each.value.primary_iface.ip)[0]
+
+      peer_ip = try(split("/", [
+        for name, v in local.vm_configs : v.primary_iface.ip
+        if v.role == each.value.role && v.env == each.value.env && v.name != each.value.name
+      ][0])[0], "127.0.0.1")
+
+      peer_ips_csv = join(",", [
+        for name, v in local.vm_configs : split("/", v.primary_iface.ip)[0]
+        if v.role == each.value.role && v.env == each.value.env && v.name != each.value.name
+      ])
+
       cluster_members = {
         for k, v in local.vm_configs : k => v
         if v.role == each.value.role && v.env == each.value.env
       }
     })
+    file_name = "${each.value.name}-user-data.yaml"
+  }
+}
 
-    # 4. RENDER PATRONI SUBTEMPLATE 
-    patroni_content = templatefile("${path.module}/templates/_patroni.yml.tftpl", {
-      name = each.value.name
-      local_ip   = split("/", each.value.primary_iface.ip)[0]
-      subnet            = cidrsubnet(each.value.primary_iface.ip, 0, 0) 
-      cluster_members = {
-        for k, v in local.vm_configs : k => v
-        if v.role == each.value.role && v.env == each.value.env
-      }   
-      password = "87Josie*"
-    })
+resource "proxmox_virtual_environment_file" "network_config" {
+  for_each     = local.vm_configs
+  content_type = "snippets"
+  datastore_id = "truenas-nfs"
+  node_name    = each.value.node
 
-    # 2. Extract Role Data from Locals
-    extra_packages = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).packages
-    extra_files    = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).files
-    extra_commands = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).commands
-    users          = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).users
-    mounts         = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).mounts
-
-    
-    # Keepalived Logic
-    has_keepalived = contains(var.keepalived_members, each.value.role)
-    is_vrrp_master = endswith(each.value.name, "1")
-    local_ip       = split("/", each.value.primary_iface.ip)[0] # Strip CIDR mask
-    
-    # Peer IP Search: Find the OTHER node with same role and env
-    peer_ip = try(split("/", [
-      for name, v in local.vm_configs : v.primary_iface.ip 
-      if v.role == each.value.role && v.env == each.value.env && v.name != each.value.name
-    ][0])[0], "127.0.0.1")
-
-    # find all peers and return as a string (for db servers)
-    peer_ips_csv = join(",", [
-      for name, v in local.vm_configs : split("/", v.primary_iface.ip)[0]
-      if v.role == each.value.role && v.env == each.value.env && v.name != each.value.name
-    ])
-
-    # --- THE ETCD CLUSTER LOGIC ---
-    # This filters all VMs to find peers in the same role and environment
-    cluster_members = {
-      for k, v in local.vm_configs : k => v
-      if v.role == each.value.role && v.env == each.value.env
-    }
-  })
-
-  
-  #Dynamically generate network config based on interfaces in Netbox
-  network_config = <<-EOT
+  source_raw {
+    data = <<-EOT
 version: 2
 ethernets:
 %{ for index, iface in each.value.interfaces ~}
@@ -153,39 +147,26 @@ ethernets:
 %{ endif ~}
 %{ endfor ~}
 EOT
-
-
+    file_name = "${each.value.name}-network-config.yaml"
+  }
 }
 
+# ------------------------------------------------------------------------------
+# VIRTUAL MACHINE RESOURCE
+# ------------------------------------------------------------------------------
 
-resource "proxmox_vm_qemu" "proxmox_vms" {
-  for_each           = local.vm_configs
-  name               = each.value.name
-  vmid               = each.value.vmid
-  target_node        = each.value.node
-  description        = each.value.desc
-  pool               = each.value.pool != "" ? each.value.pool : null
-  start_at_node_boot = each.value.start_at_node_boot
-  agent              = 1
-  memory             = each.value.memory
-  clone              = each.value.image
-  full_clone         = true
-  clone_wait         = 15
+resource "proxmox_virtual_environment_vm" "proxmox_vms" {
+  for_each    = local.vm_configs
+  name        = each.value.name
+  vm_id       = each.value.vmid
+  node_name   = each.value.node
+  description = each.value.desc
+  pool_id     = each.value.pool != "" ? each.value.pool : null
+  on_boot     = each.value.start_at_node_boot
+  started     = each.value.status == "running"
 
-  os_type            = "ubuntu"
-  scsihw             = "virtio-scsi-pci"
-  boot               = "order=scsi0;net0;ide3;ide2"
-  vm_state           = each.value.status
-  define_connection_info = false
-
-  serial {
-    id   = 0
-    type = "socket"
-  }
-
-  timeouts {
-    create = "15m"
-    delete = "15m"
+  agent {
+    enabled = true
   }
 
   cpu {
@@ -194,82 +175,52 @@ resource "proxmox_vm_qemu" "proxmox_vms" {
     type    = "host"
   }
 
-  dynamic "network" {
+  memory {
+    dedicated = each.value.memory
+  }
+
+  scsi_hardware = "virtio-scsi-pci"
+
+  serial_device {}
+
+  clone {
+    vm_id = each.value.template_vmid
+    full  = true
+  }
+
+  # Uses the storage backend passed in from NetBox / local variables
+  disk {
+    datastore_id = each.value.storage
+    size         = each.value.disk_size
+    interface    = "scsi0"
+    file_format  = "raw"
+  }
+
+  dynamic "network_device" {
     for_each = each.value.interfaces
     content {
-      id     = network.key
-      model  = "virtio"
-      bridge = network.value.bridge
-      tag    = network.value.vlan > 0 ? network.value.vlan : null
+      bridge  = network_device.value.bridge
+      vlan_id = network_device.value.vlan > 0 ? network_device.value.vlan : null
     }
   }
 
-  disks {
-    scsi {
-      scsi0 {
-        disk {
-          storage   = each.value.storage
-          size      = each.value.disk_size
-          replicate = true
-          format    = "raw"
-        }
-      }
-    }
-    ide {
-      ide2 {
-        cdrom {
-          passthrough = false
-        }
-      }
-      ide3 {
-        cdrom {
-          iso = proxmox_cloud_init_disk.ci_configs[each.key].id
-        }
-      }
-    }
+  # Stores Cloud-Init drive ISO metadata on truenas-nfs
+  initialization {
+    datastore_id         = "truenas-nfs"
+    user_data_file_id    = proxmox_virtual_environment_file.user_data[each.key].id
+    network_data_file_id = proxmox_virtual_environment_file.network_config[each.key].id
   }
 
+  timeout_create = 900
+  timeout_clone  = 900
 
   lifecycle {
     ignore_changes = [
-      qemu_os,
-      hagroup,
-      boot,
-      hastate,
-      agent,
-      usbs,
       tags,
-      startup_shutdown,
+      startup,
+      usb,
       clone,
-      full_clone,
+      initialization,
     ]
   }
 }
-
-# resource "local_file" "debug_rendered_yaml" {
-#   for_each = local.vm_configs
-#   content  = proxmox_cloud_init_disk.ci_configs[each.key].user_data
-#   filename = "${path.module}/debug/${each.key}_cloud_init.yaml"
-# }
-# resource "local_file" "debug_network_config" {
-#   for_each = local.vm_configs
-#   content  = <<-EOT
-# version: 2
-# ethernets:
-# %{ for index, iface in each.value.interfaces ~}
-#   ens${18 + index}:
-#     addresses:
-#       - ${iface.ip}
-# %{ if iface.is_primary ~}
-#     gateway4: ${each.value.gateway}
-#     nameservers:
-#       addresses: [192.168.11.99]
-#       search: [jfkhome]
-#     routes:
-#       - to: default
-#         via: ${each.value.gateway}
-# %{ endif ~}
-# %{ endfor ~}
-# EOT
-#   filename = "${path.module}/debug/debug_${each.key}.yaml"
-# }
