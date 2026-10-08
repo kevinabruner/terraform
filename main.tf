@@ -230,7 +230,7 @@ resource "proxmox_virtual_environment_vm" "proxmox_vms" {
 
 resource "proxmox_virtual_environment_container" "proxmox_cts" {
   for_each      = { for k, v in local.vm_configs : k => v if try(v.vm_type, "") == "ct" }
-  node_name     = each.value.node # Dynamic target node from NetBox (nuc3, nuc1, etc.)
+  node_name     = each.value.node
   vm_id         = each.value.vmid
   description   = each.value.desc
   pool_id       = each.value.pool != "" ? each.value.pool : null
@@ -238,11 +238,10 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
   started       = each.value.status == "running"
   unprivileged  = true
 
-  clone {
-    vm_id        = each.value.template_vmid
-    node_name    = "pve"             # Source node where template 8014 resides
-    datastore_id = each.value.storage   # Target storage (local-lvm)
-    full         = true
+  # Deploy directly from custom OS tarball on shared NFS
+  operating_system {
+    template_file_id = "truenas-nfs:vztmpl/${each.value.template_name}.tar.zst"
+    type             = try(each.value.os_type, "debian")
   }
 
   cpu {
@@ -254,8 +253,8 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
   }
 
   disk {
-    datastore_id = each.value.storage
-    size         = each.value.disk_size
+    datastore_id = each.value.storage   # Target local storage (e.g., local-lvm)
+    size         = each.value.disk_size # Creates rootfs at full target size directly
   }
 
   initialization {
@@ -288,7 +287,6 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
       tags,
       startup,
       initialization,
-      clone,
     ]
   }
 }
