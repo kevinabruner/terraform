@@ -187,7 +187,6 @@ resource "proxmox_virtual_environment_vm" "proxmox_vms" {
   clone {
     vm_id = each.value.template_vmid
     full  = true
-    node_name = "pve"
   }
 
   disk {
@@ -242,6 +241,7 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
   # Clone from your LXC template VMID (e.g., 900, 1000, etc.)
   clone {
     vm_id = each.value.template_vmid
+    node_name = "pve"
   }
 
   cpu {
