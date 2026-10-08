@@ -241,7 +241,7 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
   # Clone from your LXC template VMID (e.g., 900, 1000, etc.)
   clone {
     vm_id = each.value.template_vmid
-    node_name = "pve"
+    node_name = each.value.node
     datastore_id = each.value.storage
     full = true
   }
