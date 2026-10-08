@@ -229,14 +229,19 @@ resource "proxmox_virtual_environment_vm" "proxmox_vms" {
 # ------------------------------------------------------------------------------
 
 resource "proxmox_virtual_environment_container" "proxmox_cts" {
-  for_each    = { for k, v in local.vm_configs : k => v if try(v.vm_type, "") == "ct" }
-  node_name   = each.value.node
-  vm_id       = each.value.vmid
-  description = each.value.desc
-  pool_id     = each.value.pool != "" ? each.value.pool : null
+  for_each      = { for k, v in local.vm_configs : k => v if try(v.vm_type, "") == "ct" }
+  node_name     = each.value.node
+  vm_id         = each.value.vmid
+  description   = each.value.desc
+  pool_id       = each.value.pool != "" ? each.value.pool : null
   start_on_boot = each.value.start_at_node_boot
-  started     = each.value.status == "running"
-  unprivileged = true
+  started       = each.value.status == "running"
+  unprivileged  = true
+
+  # Clone from your LXC template VMID (e.g., 900, 1000, etc.)
+  clone {
+    vm_id = each.value.template_vmid
+  }
 
   cpu {
     cores = each.value.cores
@@ -249,11 +254,6 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
   disk {
     datastore_id = each.value.storage
     size         = each.value.disk_size
-  }
-
-  operating_system {
-    template_file_id = each.value.template_vmid
-    type             = try(lower(each.value.os), "ubuntu")
   }
 
   initialization {
@@ -291,6 +291,7 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
       tags,
       startup,
       initialization,
+      clone,
     ]
   }
 }

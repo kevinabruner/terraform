@@ -1,7 +1,7 @@
- [
+[
   {%- set ns = namespace(first=true) -%}
   {%- for vm in queryset -%}
-  {%- if (vm.status == 'active' or vm.status == 'paused') and vm.custom_field_data.vm_type in ['vm', 'ct'] -%}   
+  {%- if (vm.status.value if vm.status.value is defined else vm.status) in ['active', 'paused'] and vm.custom_field_data.vm_type in ['vm', 'ct'] -%}   
       {{- "," if not ns.first -}}
       {%- set ns.first = false -%}
 
@@ -22,29 +22,41 @@
         {%- set ns_vm.ifaces = ns_vm.ifaces + [iface_entry] -%}
       {%- endfor -%}
 
+      {# DYNAMIC LOOKUP: Find template object in NetBox queryset by name #}
+      {%- set tpl_name = vm.custom_field_data.template or "" -%}
+      {%- set tpl_match = (queryset | selectattr('name', 'equalto', tpl_name) | list | first) if tpl_name else none -%}
+
+      {%- if tpl_match -%}
+        {%- set resolved_vmid = tpl_match.custom_field_data.vmid | default(0, true) | int -%}
+      {%- elif vm.custom_field_data.template_vmid -%}
+        {%- set resolved_vmid = vm.custom_field_data.template_vmid | int -%}
+      {%- elif tpl_name.isdigit() -%}
+        {%- set resolved_vmid = tpl_name | int -%}
+      {%- else -%}
+        {%- set resolved_vmid = 0 -%}
+      {%- endif -%}
+
       {
-        {# Basic variables #}
         "name": "{{ vm.name }}",
-        "status": "{{ 'running' if vm.status == 'active' else 'stopped' }}",
-        "ssh_keys": "{{ context.ssh_keys | join('\\n') if context.ssh_keys else '' }}",
-        "vmid": {{ vm.custom_field_data.vmid or 0 }},
+        "status": "{{ 'running' if (vm.status.value if vm.status.value is defined else vm.status) == 'active' else 'stopped' }}",
+        "ssh_keys": "{{ context.ssh_keys | join('\\n') if context and context.ssh_keys else '' }}",
+        "vmid": {{ vm.custom_field_data.vmid | default(0, true) | int }},
         "desc": "{{ vm.comments | replace('\n', ' ') | replace('"', '\\"') or 'Managed by NetBox' }}",
         "node": "{{ vm.device.name if vm.device else (vm.cluster.name if vm.cluster else 'pve') }}",
         "cores": {{ vm.vcpus | int if vm.vcpus else 1 }},
         "role": "{{ vm.role.name if vm.role else 'default' }}",
         "memory": {{ vm.memory or 1024 }},
-        "storage": "{{ vm.custom_field_data.storage_location or 'local-zfs' }}",
-        "env": "{{ vm.custom_field_data.environment or ' ' }}",
-        "disk_size": "{{ (vm.disk / 1000) | int if vm.disk else 8 }}G",
+        "storage": "{{ vm.custom_field_data.storage_location or 'local-lvm' }}",
+        "env": "{{ vm.custom_field_data.environment or 'prod' }}",
+        "disk_size": {{ (vm.disk / 1000) | int if vm.disk else 8 }},
         "pool": "{{ vm.custom_field_data.proxmox_pool or '' }}",
         "start_at_node_boot": {{ "true" if vm.start_on_boot == "on" else "false" }},
-        "os": "{{ vm.custom_field_data.os or "ubuntu24" }}",
+        "os": "{{ vm.custom_field_data.os or "debian13" }}",
         "use_mirror": {{ "true" if vm.custom_field_data.use_mirror else "false" }},
         "interfaces": {{ ns_vm.ifaces | tojson }},
         "vm_type": "{{ vm.custom_field_data.vm_type }}",
+        "template_vmid": {{ resolved_vmid }},
 
-
-        {# Image Logic #}
         {%- if vm.custom_field_data.prod_image -%}
           {%- set img = vm.custom_field_data.prod_image -%}
         {%- elif vm.custom_field_data.template == "ubuntu-2204-cloud" -%}
