@@ -242,6 +242,7 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
   clone {
     vm_id = each.value.template_vmid
     node_name = "pve"
+    full = true
   }
 
   cpu {
