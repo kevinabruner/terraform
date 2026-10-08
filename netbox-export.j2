@@ -1,23 +1,14 @@
-[
+ [
   {%- set ns = namespace(first=true) -%}
-  
-  {# 1. Dynamically map all template VM names to their numeric VMIDs #}
-  {%- set templates = {} -%}
-  {%- for t_vm in queryset -%}
-    {%- if t_vm.custom_field_data.vm_type == 'template' -%}
-      {%- set _ = templates.update({t_vm.name: (t_vm.custom_field_data.vmid | int)}) -%}
-    {%- endif -%}
-  {%- endfor -%}
-
-  {# 2. Export active VMs #}
   {%- for vm in queryset -%}
-    {%- if (vm.status == 'active' or vm.status == 'paused') and vm.custom_field_data.vm_type == 'vm' -%}
+  {%- if (vm.status == 'active' or vm.status == 'paused') and vm.custom_field_data.vm_type in ['vm', 'ct'] -%}   
       {{- "," if not ns.first -}}
       {%- set ns.first = false -%}
 
       {%- set context = vm.get_config_context() -%}
       {%- set ns_vm = namespace(ifaces=[]) -%}
 
+      {# Run through every interface and set networking information #}
       {%- for interface in vm.interfaces.all() -%}
         {%- set ip_obj = interface.ip_addresses.first() -%}
         {%- set ip_str = ip_obj.address | string if ip_obj else "" -%}
@@ -31,11 +22,8 @@
         {%- set ns_vm.ifaces = ns_vm.ifaces + [iface_entry] -%}
       {%- endfor -%}
 
-      {# 3. Resolve template VMID from the dynamic map #}
-      {%- set raw_template = vm.custom_field_data.prod_image or vm.custom_field_data.template or "" -%}
-      {%- set resolved_vmid = templates.get(raw_template, vm.custom_field_data.template_vmid or 0) -%}
-
       {
+        {# Basic variables #}
         "name": "{{ vm.name }}",
         "status": "{{ 'running' if vm.status == 'active' else 'stopped' }}",
         "ssh_keys": "{{ context.ssh_keys | join('\\n') if context.ssh_keys else '' }}",
@@ -47,13 +35,24 @@
         "memory": {{ vm.memory or 1024 }},
         "storage": "{{ vm.custom_field_data.storage_location or 'local-zfs' }}",
         "env": "{{ vm.custom_field_data.environment or ' ' }}",
-        "disk_size": {{ (vm.disk / 1000) | int if vm.disk else 8 }},
+        "disk_size": "{{ (vm.disk / 1000) | int if vm.disk else 8 }}G",
         "pool": "{{ vm.custom_field_data.proxmox_pool or '' }}",
         "start_at_node_boot": {{ "true" if vm.start_on_boot == "on" else "false" }},
         "os": "{{ vm.custom_field_data.os or "ubuntu24" }}",
         "use_mirror": {{ "true" if vm.custom_field_data.use_mirror else "false" }},
         "interfaces": {{ ns_vm.ifaces | tojson }},
-        "template_vmid": {{ resolved_vmid | int }},
+        "vm_type": "{{ vm.custom_field_data.vm_type }}",
+
+
+        {# Image Logic #}
+        {%- if vm.custom_field_data.prod_image -%}
+          {%- set img = vm.custom_field_data.prod_image -%}
+        {%- elif vm.custom_field_data.template == "ubuntu-2204-cloud" -%}
+          {%- set img = "ubuntu-cloud" -%}
+        {% else -%}
+          {% set img = vm.custom_field_data.template or "ubuntu-cloud" %}
+        {%- endif -%}
+        "image": "{{ img }}",
         "tags": "{{ vm.tags.all() | join(',') }}"
       }
 

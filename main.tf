@@ -48,12 +48,12 @@ locals {
 }
 
 # ------------------------------------------------------------------------------
-# CLOUD-INIT SNIPPETS
+# CLOUD-INIT SNIPPETS (VMs ONLY)
 # Uploaded to "truenas-nfs" storage (must support the "snippets" content type)
 # ------------------------------------------------------------------------------
 
 resource "proxmox_virtual_environment_file" "user_data" {
-  for_each     = local.vm_configs
+  for_each     = { for k, v in local.vm_configs : k => v if try(v.vm_type, "vm") == "vm" }
   content_type = "snippets"
   datastore_id = "truenas-nfs"
   node_name    = each.value.node
@@ -72,6 +72,7 @@ resource "proxmox_virtual_environment_file" "user_data" {
       role              = each.value.role
       node_ip_with_cidr = each.value.primary_iface.ip
       subnet            = cidrsubnet(each.value.primary_iface.ip, 0, 0)
+      vm_type           = each.value.vm_type
 
       etcd_content = templatefile("${path.module}/templates/_etcd.tftpl", {
         name     = each.value.name
@@ -123,7 +124,7 @@ resource "proxmox_virtual_environment_file" "user_data" {
 }
 
 resource "proxmox_virtual_environment_file" "network_config" {
-  for_each     = local.vm_configs
+  for_each     = { for k, v in local.vm_configs : k => v if try(v.vm_type, "vm") == "vm" }
   content_type = "snippets"
   datastore_id = "truenas-nfs"
   node_name    = each.value.node
@@ -152,11 +153,11 @@ EOT
 }
 
 # ------------------------------------------------------------------------------
-# VIRTUAL MACHINE RESOURCE
+# VIRTUAL MACHINE RESOURCE (vm_type = "vm")
 # ------------------------------------------------------------------------------
 
 resource "proxmox_virtual_environment_vm" "proxmox_vms" {
-  for_each    = local.vm_configs
+  for_each    = { for k, v in local.vm_configs : k => v if try(v.vm_type, "vm") == "vm" }
   name        = each.value.name
   vm_id       = each.value.vmid
   node_name   = each.value.node
@@ -188,7 +189,6 @@ resource "proxmox_virtual_environment_vm" "proxmox_vms" {
     full  = true
   }
 
-  # Uses the storage backend passed in from NetBox / local variables
   disk {
     datastore_id = each.value.storage
     size         = each.value.disk_size
@@ -204,7 +204,6 @@ resource "proxmox_virtual_environment_vm" "proxmox_vms" {
     }
   }
 
-  # Stores Cloud-Init drive ISO metadata on truenas-nfs
   initialization {
     datastore_id         = "truenas-nfs"
     user_data_file_id    = proxmox_virtual_environment_file.user_data[each.key].id
@@ -220,6 +219,77 @@ resource "proxmox_virtual_environment_vm" "proxmox_vms" {
       startup,
       usb,
       clone,
+      initialization,
+    ]
+  }
+}
+
+# ------------------------------------------------------------------------------
+# LXC CONTAINER RESOURCE (vm_type = "ct")
+# ------------------------------------------------------------------------------
+
+resource "proxmox_virtual_environment_container" "proxmox_cts" {
+  for_each    = { for k, v in local.vm_configs : k => v if try(v.vm_type, "") == "ct" }
+  node_name   = each.value.node
+  vm_id       = each.value.vmid
+  description = each.value.desc
+  pool_id     = each.value.pool != "" ? each.value.pool : null
+  start_on_boot = each.value.start_at_node_boot
+  started     = each.value.status == "running"
+  unprivileged = true
+
+  cpu {
+    cores = each.value.cores
+  }
+
+  memory {
+    dedicated = each.value.memory
+  }
+
+  disk {
+    datastore_id = each.value.storage
+    size         = each.value.disk_size
+  }
+
+  operating_system {
+    template_file_id = each.value.template_vmid
+    type             = try(lower(each.value.os), "ubuntu")
+  }
+
+  initialization {
+    hostname = each.value.name
+
+    ip_config {
+      ipv4 {
+        address = each.value.primary_iface.ip
+        gateway = each.value.gateway
+      }
+    }
+
+    user_account {
+      keys     = split("\n", trimspace(each.value.ssh_keys))
+      password = var.vm_password
+    }
+
+    dns {
+      servers = ["192.168.11.99"]
+      domain  = "jfkhome"
+    }
+  }
+
+  dynamic "network_interface" {
+    for_each = each.value.interfaces
+    content {
+      name    = "veth${network_interface.key}"
+      bridge  = network_interface.value.bridge
+      vlan_id = network_interface.value.vlan > 0 ? network_interface.value.vlan : null
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+      startup,
       initialization,
     ]
   }
