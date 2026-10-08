@@ -230,7 +230,7 @@ resource "proxmox_virtual_environment_vm" "proxmox_vms" {
 
 resource "proxmox_virtual_environment_container" "proxmox_cts" {
   for_each      = { for k, v in local.vm_configs : k => v if try(v.vm_type, "") == "ct" }
-  node_name     = each.value.node
+  node_name     = each.value.node # Dynamic target node from NetBox (nuc3, nuc1, etc.)
   vm_id         = each.value.vmid
   description   = each.value.desc
   pool_id       = each.value.pool != "" ? each.value.pool : null
@@ -238,12 +238,11 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
   started       = each.value.status == "running"
   unprivileged  = true
 
-  # Clone from your LXC template VMID (e.g., 900, 1000, etc.)
   clone {
-    vm_id = each.value.template_vmid
-    node_name = each.value.node
-    datastore_id = each.value.storage
-    full = true
+    vm_id        = each.value.template_vmid
+    node_name    = "pve"             # Source node where template 8014 resides
+    datastore_id = each.value.storage   # Target storage (local-lvm)
+    full         = true
   }
 
   cpu {
