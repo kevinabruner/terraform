@@ -187,6 +187,7 @@ resource "proxmox_virtual_environment_vm" "proxmox_vms" {
   clone {
     vm_id = each.value.template_vmid
     full  = true
+    node_name = "pve"
   }
 
   disk {
