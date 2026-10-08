@@ -25,9 +25,8 @@ provider "proxmox" {
   insecure  = false
 
   ssh {
-    agent    = true
-    username = "root"
-    # Optional: use explicit key file if not using ssh-agent
+    agent       = true
+    username    = "root"
     private_key = file("~/.ssh/id_rsa")
   }
 }
@@ -50,13 +49,13 @@ locals {
 
 # ------------------------------------------------------------------------------
 # CLOUD-INIT SNIPPETS
-# Replaces Telmate's proxmox_cloud_init_disk by uploading snippets to PVE storage
+# Uploaded to "truenas-nfs" storage (must support the "snippets" content type)
 # ------------------------------------------------------------------------------
 
 resource "proxmox_virtual_environment_file" "user_data" {
   for_each     = local.vm_configs
   content_type = "snippets"
-  datastore_id = "truenas-nfs" # Ensure this storage supports the "snippets" content type in PVE
+  datastore_id = "truenas-nfs"
   node_name    = each.value.node
 
   source_raw {
@@ -126,7 +125,7 @@ resource "proxmox_virtual_environment_file" "user_data" {
 resource "proxmox_virtual_environment_file" "network_config" {
   for_each     = local.vm_configs
   content_type = "snippets"
-  datastore_id = "local"
+  datastore_id = "truenas-nfs"
   node_name    = each.value.node
 
   source_raw {
@@ -184,13 +183,12 @@ resource "proxmox_virtual_environment_vm" "proxmox_vms" {
 
   serial_device {}
 
-  # Reads the dynamically resolved integer template VMID from NetBox
   clone {
     vm_id = each.value.template_vmid
     full  = true
   }
 
-  # Reads the integer disk size from NetBox directly
+  # Uses the storage backend passed in from NetBox / local variables
   disk {
     datastore_id = each.value.storage
     size         = each.value.disk_size
@@ -206,7 +204,7 @@ resource "proxmox_virtual_environment_vm" "proxmox_vms" {
     }
   }
 
-  # Native BPG Cloud-Init drive integration
+  # Stores Cloud-Init drive ISO metadata on truenas-nfs
   initialization {
     datastore_id         = "truenas-nfs"
     user_data_file_id    = proxmox_virtual_environment_file.user_data[each.key].id
@@ -221,8 +219,8 @@ resource "proxmox_virtual_environment_vm" "proxmox_vms" {
       tags,
       startup,
       usb,
-      clone,          # Prevents Terraform from recreating imported VMs when clone options are set
-      initialization, # Prevents recreation when cloud-init snippet IDs shift
+      clone,
+      initialization,
     ]
   }
 }
