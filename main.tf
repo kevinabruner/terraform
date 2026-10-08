@@ -240,8 +240,8 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
 
   # Deploy directly from custom OS tarball on shared NFS
   operating_system {
-    template_file_id = "truenas-nfs:vztmpl/${each.value.template_name}.tar.zst"
-    type             = try(each.value.os_type, "debian")
+    template_file_id = "truenas-nfs:vztmpl/${each.value.image}.tar.zst"
+    type             = "debian"
   }
 
   cpu {
