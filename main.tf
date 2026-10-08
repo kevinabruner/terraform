@@ -276,7 +276,7 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
   dynamic "network_interface" {
     for_each = each.value.interfaces
     content {
-      name    = "veth${network_interface.key}"
+      name    = network_interface.key == 0 ? "ens18" : "veth${network_interface.key}"      
       bridge  = network_interface.value.bridge
       vlan_id = network_interface.value.vlan > 0 ? network_interface.value.vlan : null
     }
