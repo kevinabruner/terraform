@@ -220,7 +220,7 @@ resource "proxmox_virtual_environment_vm" "proxmox_vms" {
       startup,
       usb,
       clone,
-      initialization,
+      #initialization,
     ]
   }
 }
