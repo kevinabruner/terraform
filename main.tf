@@ -267,11 +267,6 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
       }
     }
 
-    user_account {
-      keys     = split("\n", trimspace(each.value.ssh_keys))
-      password = var.vm_password
-    }
-
     dns {
       servers = ["192.168.11.99"]
       domain  = "jfkhome"
