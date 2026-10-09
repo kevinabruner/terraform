@@ -21,7 +21,9 @@ data "http" "netbox_export" {
 
 provider "proxmox" {
   endpoint  = var.proxmox_api_url
-  api_token = "${var.proxmox_api_token_id}=${var.proxmox_api_token_secret}"
+  #api_token = "${var.proxmox_api_token_id}=${var.proxmox_api_token_secret}"
+  username = "root@pam"
+  password = var.vm_password
   insecure  = false
 
   ssh {
