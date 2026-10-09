@@ -55,6 +55,7 @@
         "use_mirror": {{ "true" if vm.custom_field_data.use_mirror else "false" }},
         "interfaces": {{ ns_vm.ifaces | tojson }},
         "vm_type": "{{ vm.custom_field_data.vm_type }}",
+        "lxc_features": {{ (vm.custom_field_data.lxc_features or []) | tojson }},
         "template_vmid": {{ resolved_vmid }},
 
         {%- if vm.custom_field_data.prod_image -%}

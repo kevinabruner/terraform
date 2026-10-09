@@ -291,7 +291,7 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
   }
 
   features {
-    nesting = true
+    nesting = contains(try(each.value.lxc_features, []), "nesting")
   }
 
   lifecycle {
