@@ -21,15 +21,19 @@ data "http" "netbox_export" {
 
 provider "proxmox" {
   endpoint  = var.proxmox_api_url
-  #api_token = "${var.proxmox_api_token_id}=${var.proxmox_api_token_secret}"
+  api_token = "${var.proxmox_api_token_id}=${var.proxmox_api_token_secret}"
   username = "root@pam"
-  password = var.vm_password
+  password = var.vm_password  
   insecure  = false
 
   ssh {
     agent       = true
     username    = "root"
     private_key = file("~/.ssh/id_rsa")
+    node {
+      name    = "pve"
+      address = "192.168.11.15" # Replace with your PVE host internal IP
+    }
   }
 }
 
