@@ -288,6 +288,7 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
       tags,
       startup,
       initialization,
+      features,
     ]
   }
 }
