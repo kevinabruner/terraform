@@ -303,10 +303,7 @@ resource "null_resource" "enable_lxc_nesting" {
 
   provisioner "remote-exec" {
     inline = [
-      # Wait for any active creation/startup lock to clear
-      "while pct status ${each.value.vmid} 2>&1 | grep -q 'locked'; do sleep 2; done",
-      # Set nesting feature
-      "pct set ${each.value.vmid} --features nesting=1"
+      "pvesh set /nodes/${each.value.node}/lxc/${each.value.vmid}/config -features nesting=1"
     ]
 
     connection {
