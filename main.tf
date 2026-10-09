@@ -292,6 +292,8 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
 
   features {
     nesting = contains(try(each.value.lxc_features, []), "nesting")
+    keyctl  = contains(try(each.value.lxc_features, []), "keyctl")
+    fuse    = contains(try(each.value.lxc_features, []), "fuse")
   }
 
   lifecycle {
