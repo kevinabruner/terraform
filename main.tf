@@ -303,7 +303,8 @@ resource "null_resource" "enable_lxc_nesting" {
 
   provisioner "remote-exec" {
     inline = [
-      "pct set ${each.value.vmid} -features nesting=1"
+      "sleep 3",
+      "pct set ${each.value.vmid} --features nesting=1"
     ]
 
     connection {
