@@ -21,13 +21,20 @@ data "http" "netbox_export" {
 
 provider "proxmox" {
   endpoint  = var.proxmox_api_url
-  api_token = "${var.proxmox_api_token_id}=${var.proxmox_api_token_secret}"
-  insecure  = false
+  #api_token = "${var.proxmox_api_token_id}=${var.proxmox_api_token_secret}"
+  username = "root@pam"
+  password = var.vm_password # Or set var.vm_password if that is your root password
+  insecure = false
 
   ssh {
-    agent       = true
+    agent       = false
     username    = "root"
     private_key = file("~/.ssh/id_rsa")
+
+    node {
+      name    = "pve"
+      address = "192.168.11.15"
+    }
   }
 }
 
@@ -283,35 +290,15 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
     }
   }
 
+  features {
+    nesting = true
+  }
+
   lifecycle {
     ignore_changes = [
       tags,
       startup,
       initialization,
-      features,
     ]
-  }
-}
-
-resource "null_resource" "enable_lxc_nesting" {
-  for_each = { for k, v in local.vm_configs : k => v if try(v.vm_type, "") == "ct" }
-
-  depends_on = [proxmox_virtual_environment_container.proxmox_cts]
-
-  triggers = {
-    container_id = each.value.vmid
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "pvesh set /nodes/${each.value.node}/lxc/${each.value.vmid}/config -features nesting=1"
-    ]
-
-    connection {
-      type        = "ssh"
-      user        = "root"
-      private_key = file("~/.ssh/id_rsa")
-      host        = "192.168.11.15"
-    }
   }
 }
