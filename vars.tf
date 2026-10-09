@@ -17,7 +17,7 @@ variable "proxmox_api_url" {
 
 variable "proxmox_api_token_id" {
     type = string
-    default = "terraform@pam!main_terraform"
+    default = "root@pam!main_terraform"
 }
 
 variable "netbox_api_token_secret" { 
@@ -33,7 +33,6 @@ variable "mirror_url" {
 variable "keepalived_members" { 
     type        = list(string)
     default     = [
-        "DNS resolver",
         "Database proxy",
         "Reverse proxy"
     ]
