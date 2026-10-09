@@ -33,7 +33,6 @@ variable "mirror_url" {
 variable "keepalived_members" { 
     type        = list(string)
     default     = [
-        "DNS resolver",
         "Database proxy",
         "Reverse proxy"
     ]
