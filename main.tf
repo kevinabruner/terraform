@@ -184,9 +184,10 @@ resource "proxmox_virtual_environment_vm" "proxmox_vms" {
 
   serial_device {}
 
-  clone {
-    vm_id = each.value.template_vmid
-    full  = true
+clone {
+    vm_id     = each.value.template_vmid
+    node_name = "pve"
+    full      = true
   }
 
   disk {
