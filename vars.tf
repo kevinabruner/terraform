@@ -15,10 +15,10 @@ variable "proxmox_api_url" {
 }
 
 
-variable "proxmox_api_token_id" {
-    type = string
-    default = "root@pam!main_terraform"
-}
+# variable "proxmox_api_token_id" {
+#     type = string
+#     default = "root@pam!main_terraform"
+# }
 
 variable "netbox_api_token_secret" { 
     type = string
