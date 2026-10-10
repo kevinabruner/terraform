@@ -24,7 +24,7 @@ provider "proxmox" {
   #api_token = "${var.proxmox_api_token_id}=${var.proxmox_api_token_secret}"
   username = "root@pam"
   password = var.vm_password # Or set var.vm_password if that is your root password
-  insecure = false
+  insecure  = true
 
   ssh {
     agent       = false
