@@ -4,10 +4,10 @@
 #  or placed in /etc/environment            #
 ##--------------END BIG NOTE:-------------###
 
-variable "proxmox_api_token_secret" { 
-    type = string
-    sensitive = true 
-}
+# variable "proxmox_api_token_secret" { 
+#     type = string
+#     sensitive = true 
+# }
 
 variable "proxmox_api_url" {
     type = string
@@ -20,10 +20,10 @@ variable "proxmox_api_url" {
 #     default = "root@pam!main_terraform"
 # }
 
-# variable "netbox_api_token_secret" { 
-#     type = string
-#     sensitive = true 
-# }
+variable "netbox_api_token_secret" { 
+    type = string
+    sensitive = true 
+}
 
 variable "mirror_url" { 
     type = string 
