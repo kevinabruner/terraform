@@ -94,6 +94,7 @@ growpart:
 
 resize_rootfs: true
 
+%{ if length(mounts) > 0 ~}
 mounts:
 %{ for m in mounts ~}
   - - "${m[0]}"
@@ -103,6 +104,7 @@ mounts:
     - "${m[4]}"
     - "${m[5]}"
 %{ endfor ~}
+%{ endif ~}
 
 write_files:
   #Force apt ipv4
