@@ -15,7 +15,7 @@ etcd3:
 %{ endfor ~}
 
 bootstrap:
-  method: initdb
+  method: pgbackrest
   dcs:
     ttl: 30
     loop_wait: 10
@@ -37,16 +37,20 @@ bootstrap:
         max_replication_slots: 10
         synchronous_commit: "off"
 
+    pgbackrest:
+      command: "pgbackrest --stanza=db --delta restore"
+      keep_existing_recovery_conf: true
+      no_params: true
+      
 postgresql:
-  create_replica_methods:
-    - pgbackrest
-    - basebackup
-
   listen: 0.0.0.0:5432
-  # Critical for replication: Patroni needs the IP to reach this node
   connect_address: "${local_ip}:5432"
   data_dir: /var/lib/postgresql/17/main
   bin_dir: /usr/lib/postgresql/17/bin
+
+  create_replica_methods:
+    - pgbackrest
+    - basebackup
 
   pgbackrest:
     command: "pgbackrest --stanza=db --delta restore"
