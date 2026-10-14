@@ -246,7 +246,7 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
   started       = each.value.status == "running"
   unprivileged  = true
 
-  # Deploy directly from custom OS tarball on shared NFS
+  # Operating system, CPU, memory, and disk settings...
   operating_system {
     template_file_id = "truenas-nfs:vztmpl/${each.value.image}.tar.zst"
     type             = "debian"
@@ -261,8 +261,21 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
   }
 
   disk {
-    datastore_id = each.value.storage   # Target local storage (e.g., local-lvm)
-    size         = each.value.disk_size # Creates rootfs at full target size directly
+    datastore_id = each.value.storage
+    size         = each.value.disk_size
+  }
+
+  # Dynamic mount block matching keywords in container name
+  dynamic "mount_point" {
+    for_each = toset([
+      for dir in ["nerdperk", "recursioncomic", "koscinski"] : dir
+      if strcontains(each.value.name, dir)
+    ])
+    content {
+      volume = "/mnt/pve/cephfs/${mount_point.value}/files"
+      path   = "/var/www/html/sites/default/files/"
+      shared = true
+    }
   }
 
   initialization {
