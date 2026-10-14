@@ -36,16 +36,22 @@ bootstrap:
         max_wal_senders: 10
         max_replication_slots: 10
         synchronous_commit: "off"
-  initdb:
-    - encoding: UTF8
-    - data-checksums
 
 postgresql:
+  create_replica_methods:
+    - pgbackrest
+    - basebackup
+
   listen: 0.0.0.0:5432
   # Critical for replication: Patroni needs the IP to reach this node
   connect_address: "${local_ip}:5432"
   data_dir: /var/lib/postgresql/17/main
   bin_dir: /usr/lib/postgresql/17/bin
+
+  pgbackrest:
+    command: "pgbackrest --stanza=db --delta restore"
+    keep_data: true
+    no_params: true
 
   parameters:
     max_connections: 200
