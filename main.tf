@@ -272,7 +272,7 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
       if strcontains(each.value.name, dir)
     ])
     content {
-      volume = "/mnt/pve/cephfs/${mount_point.value}"
+      volume = "/mnt/pve/cephfs/${mount_point.value}/files"
       path   = "/var/www/html/sites/default/files/"
       shared = true
     }
