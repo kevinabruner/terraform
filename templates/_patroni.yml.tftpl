@@ -16,6 +16,10 @@ etcd3:
 
 bootstrap:
   method: pgbackrest
+  pgbackrest:
+    command: "pgbackrest --stanza=db --delta restore"
+    keep_existing_recovery_conf: true
+    no_params: true
   dcs:
     ttl: 30
     loop_wait: 10
@@ -36,11 +40,6 @@ bootstrap:
         max_wal_senders: 10
         max_replication_slots: 10
         synchronous_commit: "off"
-
-    pgbackrest:
-      command: "pgbackrest --stanza=db --delta restore"
-      keep_existing_recovery_conf: true
-      no_params: true
       
 postgresql:
   listen: 0.0.0.0:5432
