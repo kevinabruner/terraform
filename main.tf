@@ -265,15 +265,15 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
     size         = each.value.disk_size
   }
 
-  # Dynamic mount block matching keywords in container name
   dynamic "mount_point" {
     for_each = toset([
-      for dir in ["nerdperk", "recursioncomic", "koscinski"] : dir
+      for dir in ["nerdperk", "recursioncomic", "koscinski", "garage"] : dir
       if strcontains(each.value.name, dir)
     ])
+    //if garage, mount garage, otherwise drupal
     content {
-      volume = "/mnt/pve/cephfs/${mount_point.value}/files"
-      path   = "/var/www/html/sites/default/files/"
+      volume = mount_point.value == "garage" ? "/mnt/pve/cephfs/garage" : "/mnt/pve/cephfs/${mount_point.value}/files"  
+      path   = mount_point.value == "garage" ? "/var/lib/garage/data" : "/var/www/html/sites/default/files/"
       shared = true
     }
   }
