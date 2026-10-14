@@ -199,7 +199,7 @@ clone {
 
   disk {
     datastore_id = each.value.storage
-    size         = each.value.disk_size
+    size         = max(tonumber(each.value.disk_size), 8000) //min 8 gigs for vm disk size
     interface    = "scsi0"
     file_format  = "raw"
   }
