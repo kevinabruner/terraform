@@ -273,7 +273,7 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
     ])
     content {
       volume = "/mnt/pve/cephfs/${mount_point.value}"
-      path   = "/mnt/${mount_point.value}"
+      path   = "/var/www/html/sites/default/files/"
       shared = true
     }
   }
