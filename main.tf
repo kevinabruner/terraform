@@ -45,7 +45,7 @@ locals {
       path   = "/var/lib/garage/data"
     }
     psql = {
-      volume = "/mnt/pve/cephfs/psql/psql-dumps/db-dumps"
+      volume = "/mnt/pve/cephfs/psql-dumps/db-dumps"
       path   = "/home/kevin/admin"
     }
     nerdperk = {
