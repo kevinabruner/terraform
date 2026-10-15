@@ -52,6 +52,16 @@ locals {
       gateway       = "${join(".", slice(split(".", [for i in vm.interfaces : i.ip if i.is_primary][0]), 0, 3))}.1"
     }) if vm.name != ""
   }
+  psql_peer_names = {
+    for k, v in local.vm_configs : k => try(
+      [
+        for name, peer in local.vm_configs : peer.name
+        if peer.role == v.role && peer.env == v.env && peer.name != v.name
+      ][0],
+      ""
+    )
+    if v.role == "psql server"
+  }
 }
 
 # ------------------------------------------------------------------------------
@@ -321,7 +331,7 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
 resource "null_resource" "patroni_cluster_join" {
   for_each = {
     for k, v in local.vm_configs : k => v
-    if v.role == "psql server" # Adjust to match your exact Netbox role name if different
+    if v.role == "psql server"
   }
 
   triggers = {
@@ -329,7 +339,7 @@ resource "null_resource" "patroni_cluster_join" {
   }
 
   provisioner "local-exec" {
-    command = "ansible-playbook ../psql/join-node.yaml --extra-vars 'target_node=${each.value.name} target_env=${each.value.env}'"
+    command = "ansible-playbook -i inventory recreate-node.yaml --extra-vars 'target_node=${each.value.name} target_env=${each.value.env} target_peer=${local.psql_peer_names[each.key]}'"
   }
 
   depends_on = [
