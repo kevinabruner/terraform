@@ -116,16 +116,6 @@ write_files:
     content: |
       Acquire::ForceIPv4 "true";
 
-%{ if role == "psql server" ~}
-
-  - path: /etc/default/etcd
-    permissions: '0644'
-    content: |
-      ${indent(6, etcd_content)}
-  
-
-%{ endif ~}
-
 %{ if role == "Database" ~}
   - path: /etc/mysql/conf.d/galera.cnf
     permissions: '0644'
