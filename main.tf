@@ -352,7 +352,8 @@ resource "null_resource" "patroni_cluster_join" {
   }
 
   provisioner "local-exec" {
-    command = "ansible-playbook ../psql/join-node.yaml --extra-vars 'node_name=${each.value.name}'"
+    working_dir = "/home/kevin/ansible"
+    command     = "ansible-playbook ../psql/join-node.yaml --extra-vars 'node_name=${each.value.name}'"
   }
 
   depends_on = [
