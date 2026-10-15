@@ -39,6 +39,29 @@ provider "proxmox" {
 }
 
 locals {
+  ceph_mounts = {
+    garage = {
+      volume = "/mnt/pve/cephfs/garage"
+      path   = "/var/lib/garage/data"
+    }
+    psql = {
+      volume = "/mnt/pve/cephfs/psql/psql-dumps/db-dumps"
+      path   = "/home/kevin/admin"
+    }
+    nerdperk = {
+      volume = "/mnt/pve/cephfs/nerdperk/files"
+      path   = "/var/www/html/sites/default/files/"
+    }
+    recursioncomic = {
+      volume = "/mnt/pve/cephfs/recursioncomic/files"
+      path   = "/var/www/html/sites/default/files/"
+    }
+    koscinski = {
+      volume = "/mnt/pve/cephfs/koscinski/files"
+      path   = "/var/www/html/sites/default/files/"
+    }
+  }
+
   vms = jsondecode(data.http.netbox_export.response_body)
 
   role_configs = {
@@ -266,14 +289,14 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
   }
 
   dynamic "mount_point" {
-    for_each = toset([
-      for dir in ["nerdperk", "recursioncomic", "koscinski", "garage"] : dir
-      if strcontains(each.value.name, dir)
-    ])
-    //if garage, mount garage, otherwise drupal
+    for_each = {
+      for key, cfg in local.ceph_mounts : key => cfg
+      if strcontains(each.value.name, key)
+    }
+
     content {
-      volume = mount_point.value == "garage" ? "/mnt/pve/cephfs/garage" : "/mnt/pve/cephfs/${mount_point.value}/files"  
-      path   = mount_point.value == "garage" ? "/var/lib/garage/data" : "/var/www/html/sites/default/files/"
+      volume = mount_point.value.volume
+      path   = mount_point.value.path
       shared = true
     }
   }
