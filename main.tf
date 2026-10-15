@@ -341,23 +341,23 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
   }
 }
 
-resource "null_resource" "patroni_cluster_join" {
-  for_each = {
-    for k, v in local.vm_configs : k => v
-    if v.role == "psql server"
-  }
+# resource "null_resource" "patroni_cluster_join" {
+#   for_each = {
+#     for k, v in local.vm_configs : k => v
+#     if v.role == "psql server"
+#   }
 
-  triggers = {
-    node_id = lookup(proxmox_virtual_environment_vm.proxmox_vms, each.key, null) != null ? proxmox_virtual_environment_vm.proxmox_vms[each.key].id : proxmox_virtual_environment_container.proxmox_cts[each.key].id
-  }
+#   triggers = {
+#     node_id = lookup(proxmox_virtual_environment_vm.proxmox_vms, each.key, null) != null ? proxmox_virtual_environment_vm.proxmox_vms[each.key].id : proxmox_virtual_environment_container.proxmox_cts[each.key].id
+#   }
 
-  provisioner "local-exec" {
-    working_dir = "/home/kevin/psql"
-    command     = "sleep 5 && ansible-playbook ../psql/join-node.yaml --extra-vars 'node_name=${each.value.name}'"
-  }
+#   provisioner "local-exec" {
+#     working_dir = "/home/kevin/psql"
+#     command     = "sleep 5 && ansible-playbook ../psql/join-node.yaml --extra-vars 'node_name=${each.value.name}'"
+#   }
 
-  depends_on = [
-    proxmox_virtual_environment_vm.proxmox_vms,
-    proxmox_virtual_environment_container.proxmox_cts
-  ]
-}
+#   depends_on = [
+#     proxmox_virtual_environment_vm.proxmox_vms,
+#     proxmox_virtual_environment_container.proxmox_cts
+#   ]
+# }
