@@ -39,6 +39,13 @@ provider "proxmox" {
 }
 
 locals {
+
+  # Filter proxmox_cts to only include keys containing "psql"
+  psql_nodes = {
+    for k, v in proxmox_virtual_environment_container.proxmox_cts : k => v
+    if strcontains(k, "psql")
+  }
+
   ceph_mounts = {
     garage = {
       volume = "/mnt/pve/cephfs/garage"
@@ -322,7 +329,7 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
 }
 
 resource "null_resource" "node_bootstrap" {
-  for_each = proxmox_virtual_environment_container.proxmox_cts # Replace with your actual Proxmox container resource name
+  for_each = local.psql_nodes
 
   triggers = {
     # This ensures the script ONLY runs if the container itself is created, recreated, or its IP changes
