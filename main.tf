@@ -321,23 +321,32 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
   }
 }
 
-# resource "null_resource" "patroni_cluster_join" {
-#   for_each = {
-#     for k, v in local.vm_configs : k => v
-#     if v.role == "psql server"
-#   }
+resource "null_resource" "patroni_cluster_join" {
+  triggers = {
+    # Re-run if any node config changes
+    cluster_nodes = join(",", [for k, v in local.vm_configs : v.name if v.role == "psql server"])
+  }
 
-#   triggers = {
-#     node_id = lookup(proxmox_virtual_environment_vm.proxmox_vms, each.key, null) != null ? proxmox_virtual_environment_vm.proxmox_vms[each.key].id : proxmox_virtual_environment_container.proxmox_cts[each.key].id
-#   }
+  provisioner "local-exec" {
+    working_dir = "/home/kevin/psql"
+    command = <<EOT
+      echo "Waiting for VMs/containers to initialize..."
+      sleep 30
+      
+      %{for k, v in local.vm_configs ~}
+      %{if v.role == "psql server"}
+      echo "Running join playbook for ${v.name} (${v.env.value})..."
+      ansible-playbook join-node.yaml --extra-vars 'node_name=${v.name} target_env=${v.env.value}'
+      
+      echo "Pausing for Raft cluster stabilization..."
+      sleep 15
+      %{endif}
+      %{endfor}
+    EOT
+  }
 
-#   provisioner "local-exec" {
-#     working_dir = "/home/kevin/psql"
-#     command     = "ansible-playbook ../psql/join-node.yaml --extra-vars 'target_env=${each.value.env} node_name=${each.value.name}'"
-#   }
-
-#   depends_on = [
-#     proxmox_virtual_environment_vm.proxmox_vms,
-#     proxmox_virtual_environment_container.proxmox_cts
-#   ]
-# }
+  depends_on = [
+    proxmox_virtual_environment_container.proxmox_cts,
+    proxmox_virtual_environment_vm.proxmox_vms
+  ]
+}
