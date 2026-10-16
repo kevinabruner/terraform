@@ -337,6 +337,6 @@ resource "null_resource" "node_bootstrap" {
   }
 
   provisioner "local-exec" {
-    command = "/home/kevin/psql/redeploy.sh ${each.key}"
+    command = "/home/kevin/psql/replace_node.sh ${each.key}"
   }
 }
