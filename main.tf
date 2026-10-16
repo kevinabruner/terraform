@@ -39,6 +39,13 @@ provider "proxmox" {
 }
 
 locals {
+
+  # Filter proxmox_cts to only include keys containing "psql"
+  psql_nodes = {
+    for k, v in proxmox_virtual_environment_container.proxmox_cts : k => v
+    if strcontains(k, "psql")
+  }
+
   ceph_mounts = {
     garage = {
       volume = "/mnt/pve/cephfs/garage"
@@ -321,3 +328,14 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
   }
 }
 
+resource "null_resource" "node_bootstrap" {
+  for_each = local.psql_nodes
+
+  triggers = {    
+    container_id = each.value.id    
+  }
+
+  provisioner "local-exec" {
+    command = "/home/kevin/psql/join_node.sh ${each.key}"
+  }
+}
