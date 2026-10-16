@@ -321,3 +321,15 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
   }
 }
 
+resource "null_resource" "node_bootstrap" {
+  for_each = proxmox_virtual_environment_container.node # Replace with your actual Proxmox container resource name
+
+  triggers = {
+    # This ensures the script ONLY runs if the container itself is created, recreated, or its IP changes
+    container_id = each.value.id    
+  }
+
+  provisioner "local-exec" {
+    command = "/home/kevin/psql/redeploy.sh ${each.key}"
+  }
+}
