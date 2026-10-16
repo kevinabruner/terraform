@@ -335,8 +335,8 @@ resource "null_resource" "patroni_cluster_join" {
       
       %{for k, v in local.vm_configs ~}
       %{if v.role == "psql server"}
-      echo "Running join playbook for ${v.name} (${v.env.value})..."
-      ansible-playbook join-node.yaml --extra-vars 'node_name=${v.name} target_env=${v.env.value}'
+      echo "Running join playbook for ${v.name} (${v.env})..."
+      ansible-playbook join-node.yaml --extra-vars 'node_name=${v.name} target_env=${v.env}'
       
       echo "Pausing for Raft cluster stabilization..."
       sleep 15
