@@ -113,17 +113,6 @@ resource "proxmox_virtual_environment_file" "user_data" {
         }
       })
 
-      patroni_content = templatefile("${path.module}/templates/_patroni.yml.tftpl", {
-        name     = each.value.name
-        local_ip = split("/", each.value.primary_iface.ip)[0]
-        subnet   = cidrsubnet(each.value.primary_iface.ip, 0, 0)
-        cluster_members = {
-          for k, v in local.vm_configs : k => v
-          if v.role == each.value.role && v.env == each.value.env
-        }
-        password = "87Josie*"
-      })
-
       extra_packages = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).packages
       extra_files    = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).files
       extra_commands = lookup(local.role_configs, each.value.role, local.role_configs["Default"]).commands
