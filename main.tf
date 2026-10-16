@@ -55,6 +55,10 @@ locals {
       volume = "/mnt/pve/cephfs/psql-dumps/db-dumps"
       path   = "/home/kevin/admin"
     }
+    db-server = {
+      volume = "/mnt/pve/cephfs/galera-dumps/db-dumps"
+      path   = "/home/kevin/db-dumps"
+    }
     nerdperk = {
       volume = "/mnt/pve/cephfs/nerdperk/files"
       path   = "/var/www/html/sites/default/files/"
