@@ -321,32 +321,3 @@ resource "proxmox_virtual_environment_container" "proxmox_cts" {
   }
 }
 
-resource "null_resource" "patroni_cluster_join" {
-  triggers = {
-    # Re-run if any node config changes
-    cluster_nodes = join(",", [for k, v in local.vm_configs : v.name if v.role == "psql server"])
-  }
-
-  provisioner "local-exec" {
-    working_dir = "/home/kevin/psql"
-    command = <<EOT
-      echo "Waiting for VMs/containers to initialize..."
-      sleep 30
-      
-      %{for k, v in local.vm_configs ~}
-      %{if v.role == "psql server"}
-      echo "Running join playbook for ${v.name} (${v.env})..."
-      ansible-playbook join-node.yaml --extra-vars 'node_name=${v.name} target_env=${v.env}'
-      
-      echo "Pausing for Raft cluster stabilization..."
-      sleep 15
-      %{endif}
-      %{endfor}
-    EOT
-  }
-
-  depends_on = [
-    proxmox_virtual_environment_container.proxmox_cts,
-    proxmox_virtual_environment_vm.proxmox_vms
-  ]
-}
