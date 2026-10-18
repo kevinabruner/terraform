@@ -55,7 +55,7 @@ locals {
       volume = "/mnt/pve/cephfs/psql-dumps/db-dumps"
       path   = "/home/kevin/admin"
     }
-    db-server = {
+    db_server = {
       volume = "/mnt/pve/cephfs/galera-dumps/db-dumps"
       path   = "/home/kevin/db-dumps"
     }
