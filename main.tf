@@ -77,7 +77,7 @@ locals {
 
   vm_configs = {
     for vm in local.vms : vm.name => merge(vm, {
-      site          = try(vm.site.name, vm.site, "Cambridge")
+      site          = vm.node == "site-b" ? "Rockwood" : "Cambridge"
       vm_type       = try(vm.vm_type, try(vm.custom_fields.vm_type.value, "vm"))
       image         = try(vm.image, try(vm.custom_fields.template.value, ""))
       storage       = try(vm.storage, try(vm.custom_fields.storage_location.value, "local-zfs"))
