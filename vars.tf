@@ -21,7 +21,7 @@ variable "proxmox_api_url_cambridge" {
 
 variable "proxmox_api_url_rockwood" {
     type    = string
-    default = "https://pve-b.thejfk.ca/api2/json"
+    default = "https://10.10.10.15:8006/api2/json"
 }
 
 variable "rockwood_node_name" {
