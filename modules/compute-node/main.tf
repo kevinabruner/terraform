@@ -40,12 +40,24 @@ resource "proxmox_virtual_environment_file" "user_data" {
       users          = lookup(var.role_configs, var.vm_config.role, var.role_configs["Default"]).users
       mounts         = lookup(var.role_configs, var.vm_config.role, var.role_configs["Default"]).mounts
       
-      has_keepalived = false
-      is_vrrp_master = false
+     has_keepalived = contains(["db-prod", "db-dev"], var.vm_config.role) # Adjust to match your keepalived roles
+      is_vrrp_master = endswith(var.vm_config.name, "1")
       local_ip       = split("/", var.vm_config.primary_iface.ip)[0]
-      peer_ip        = "127.0.0.1"
-      peer_ips_csv   = ""
-      cluster_members = {}
+
+      peer_ip = try(split("/", [
+        for name, v in var.all_vms : v.primary_iface.ip
+        if v.role == var.vm_config.role && v.env == var.vm_config.env && v.name != var.vm_config.name
+      ][0])[0], "127.0.0.1")
+
+      peer_ips_csv = join(",", [
+        for name, v in var.all_vms : split("/", v.primary_iface.ip)[0]
+        if v.role == var.vm_config.role && v.env == var.vm_config.env && v.name != var.vm_config.name
+      ])
+
+      cluster_members = {
+        for k, v in var.all_vms : k => v
+        if v.role == var.vm_config.role && v.env == var.vm_config.env
+      }
     })
     file_name = "${var.vm_config.name}-user-data.yaml"
   }
