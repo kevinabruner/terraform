@@ -125,14 +125,15 @@ resource "proxmox_virtual_environment_container" "ct" {
     size         = var.vm_config.disk_size
   }
 
-  # ADD THIS DYNAMIC MOUNT POINT BLOCK BACK
   dynamic "mount_point" {
-    for_each = lookup(var.ceph_mounts, var.vm_config.name, {}) != {} ? [var.ceph_mounts[var.vm_config.name]] : []
+    for_each = {
+      for key, cfg in var.ceph_mounts : key => cfg
+      if strcontains(var.vm_config.name, key)
+    }
     content {
-      volume    = mount_point.value.volume
-      path      = mount_point.value.path
-      shared    = true
-      replicate = true
+      volume = mount_point.value.volume
+      path   = mount_point.value.path
+      shared = true
     }
   }
 
@@ -157,6 +158,12 @@ resource "proxmox_virtual_environment_container" "ct" {
       bridge  = network_interface.value.bridge
       vlan_id = network_interface.value.vlan > 0 ? network_interface.value.vlan : null
     }
+  }
+
+  features {
+    nesting = contains(try(var.vm_config.lxc_features, []), "nesting")
+    keyctl  = contains(try(var.vm_config.lxc_features, []), "keyctl")
+    fuse    = contains(try(var.vm_config.lxc_features, []), "fuse")
   }
 
   lifecycle { ignore_changes = [tags, startup, initialization] }
