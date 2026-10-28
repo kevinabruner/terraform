@@ -78,7 +78,6 @@ locals {
   vm_configs = {
     for vm in local.vms : vm.name => merge(vm, {
       site          = try(vm.site.name, vm.site, "Cambridge")
-      vm_type       = try(vm.vm_type.value, vm.vm_type, "vm")
       primary_iface = [for i in vm.interfaces : i if i.is_primary][0]
       gateway       = "${join(".", slice(split(".", [for i in vm.interfaces : i.ip if i.is_primary][0]), 0, 3))}.1"
     }) if vm.name != ""
@@ -95,7 +94,7 @@ locals {
 }
 
 # ------------------------------------------------------------------------------
-# DEPLOY CAMBRIDGE (SITE A) WORKLOADS
+# DEPLOY CAMBRIDGE (SITE A) WORKLOADS (Using your modular setup)
 # ------------------------------------------------------------------------------
 module "cambridge_nodes" {
   source   = "./modules/compute-node"
