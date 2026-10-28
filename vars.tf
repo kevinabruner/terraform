@@ -14,6 +14,10 @@ variable "proxmox_api_url" {
     default = "https://pve.thejfk.ca/api2/json"
 }
 
+variable "proxmox_api_url_rockwood" {
+    type = string
+    default = "https://pve-b.thejfk.ca/api2/json"
+}
 
 # variable "proxmox_api_token_id" {
 #     type = string
