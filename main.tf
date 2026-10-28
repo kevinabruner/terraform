@@ -137,7 +137,7 @@ resource "null_resource" "node_bootstrap" {
   for_each = { for k, v in local.cambridge_cts : k => v if strcontains(k, "psql") }
 
   triggers = {    
-    container_id = module.cambridge_nodes[each.key].proxmox_virtual_environment_container.ct[0].id    
+    container_id = module.cambridge_nodes[each.key].container_id
   }
 
   provisioner "local-exec" {
