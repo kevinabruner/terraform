@@ -98,6 +98,7 @@ locals {
 # DEPLOY CAMBRIDGE (SITE A) WORKLOADS
 # ------------------------------------------------------------------------------
 module "cambridge_nodes" {
+  for_each = { for k, v in local.vm_configs : k => v if v.site == "Cambridge" }
   source   = "./modules/compute-node"
   for_each = local.cambridge_workloads
 
@@ -116,6 +117,7 @@ module "cambridge_nodes" {
 # DEPLOY ROCKWOOD (SITE B) WORKLOADS
 # ------------------------------------------------------------------------------
 module "rockwood_nodes" {
+  for_each = { for k, v in local.vm_configs : k => v if v.site == "Rockwood" }
   source   = "./modules/compute-node"
   for_each = local.rockwood_workloads
 
