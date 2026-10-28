@@ -24,11 +24,6 @@ variable "proxmox_api_url_rockwood" {
 #     default = "root@pam!main_terraform"
 # }
 
-variable "netbox_api_token_secret" { 
-    type = string
-    sensitive = true 
-}
-
 variable "mirror_url" { 
     type = string 
     default = "http://mirror.jfkhome"
@@ -40,11 +35,6 @@ variable "keepalived_members" {
         "Database proxy",
         "Reverse proxy"
     ]
-}
-
-variable "proxmox_password" { 
-    type = string 
-    sensitive = true 
 }
 
 variable "vm_password" { 
