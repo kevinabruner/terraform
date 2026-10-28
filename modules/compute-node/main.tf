@@ -95,7 +95,7 @@ resource "proxmox_virtual_environment_vm" "vm" {
 
   initialization {
     datastore_id         = var.default_datastore
-    user_data_file_id    = proxmox_virtual_environment_file.user_data[0].id
+    user_data_file_id    = proxmox_virtual_environment_file.user_data.id
   }
 
   lifecycle { ignore_changes = [tags, startup, usb, clone, initialization] }
