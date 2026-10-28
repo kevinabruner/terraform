@@ -107,6 +107,7 @@ module "cambridge_nodes" {
   vm_config         = each.value
   all_vms           = local.vm_configs   
   ceph_mounts       = local.ceph_mounts
+  keepalived_members = var.keepalived_members   
   role_configs      = local.role_configs
   vm_username       = var.vm_username
   vm_password       = var.vm_password
@@ -130,6 +131,7 @@ module "rockwood_nodes" {
   vm_config         = each.value
   all_vms           = local.vm_configs   
   ceph_mounts       = local.ceph_mounts
+  keepalived_members = var.keepalived_members   
   role_configs      = local.role_configs
   vm_username       = var.vm_username
   vm_password       = var.vm_password
