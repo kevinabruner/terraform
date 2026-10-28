@@ -141,9 +141,9 @@ resource "proxmox_virtual_environment_container" "ct" {
   start_on_boot = var.vm_config.start_at_node_boot
   started       = var.vm_config.status == "running"
   unprivileged  = true
-
+  
   operating_system {
-    template_file_id = "${var.default_datastore}:vztmpl/${var.vm_config.image}.tar.zst"
+    template_file_id = "truenas-nfs:vztmpl/${var.vm_config.image}.tar.zst"
     type             = "debian"
   }
 
