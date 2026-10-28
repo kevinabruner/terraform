@@ -113,7 +113,7 @@ resource "proxmox_virtual_environment_container" "ct" {
   unprivileged  = true
 
   operating_system {
-    template_file_id = "${var.vm_config.storage}:vztmpl/${var.vm_config.image}.tar.zst"
+    template_file_id = "truenas-nfs:vztmpl/${var.vm_config.image}.tar.zst"
     type             = "debian"
   }
 
