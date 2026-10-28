@@ -77,11 +77,11 @@ locals {
 
   vm_configs = {
     for vm in local.vms : vm.name => merge(vm, {
-      site          = try(vm.site.name, try(vm.site.slug, vm.site), "Cambridge")
-      vm_type       = try(vm.custom_fields.vm_type.value, try(vm.vm_type.value, vm.vm_type, "vm"))
-      storage       = try(vm.custom_fields.storage_location.value, "local-zfs")
-      image         = try(vm.custom_fields.template.value, "")
-      pool          = try(vm.custom_fields.proxmox_pool.value, "")
+      site          = try(vm.site.name, vm.site, "Cambridge")
+      vm_type       = try(vm.vm_type, try(vm.custom_fields.vm_type.value, "vm"))
+      image         = try(vm.image, try(vm.custom_fields.template.value, ""))
+      storage       = try(vm.storage, try(vm.custom_fields.storage_location.value, "local-zfs"))
+      pool          = try(vm.pool, try(vm.custom_fields.proxmox_pool.value, ""))
       primary_iface = [for i in vm.interfaces : i if i.is_primary][0]
       gateway       = "${join(".", slice(split(".", [for i in vm.interfaces : i.ip if i.is_primary][0]), 0, 3))}.1"
     }) if vm.name != ""
