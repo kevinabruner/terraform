@@ -4,19 +4,34 @@
 #  or placed in /etc/environment            #
 ##--------------END BIG NOTE:-------------###
 
-# variable "proxmox_api_token_secret" { 
-#     type = string
-#     sensitive = true 
-# }
+variable "netbox_api_token_secret" { 
+    type      = string
+    sensitive = true 
+}
 
 variable "proxmox_api_url" {
-    type = string
+    type    = string
+    default = "https://pve.thejfk.ca/api2/json"
+}
+
+variable "proxmox_api_url_cambridge" {
+    type    = string
     default = "https://pve.thejfk.ca/api2/json"
 }
 
 variable "proxmox_api_url_rockwood" {
-    type = string
+    type    = string
     default = "https://pve-b.thejfk.ca/api2/json"
+}
+
+variable "rockwood_node_name" {
+    type    = string
+    default = "site-b"
+}
+
+variable "rockwood_node_address" {
+    type    = string
+    default = "10.10.10.15" # Update this to your Rockwood Proxmox/Tailscale IP if different
 }
 
 # variable "proxmox_api_token_id" {
@@ -25,30 +40,24 @@ variable "proxmox_api_url_rockwood" {
 # }
 
 variable "mirror_url" { 
-    type = string 
+    type    = string 
     default = "http://mirror.jfkhome"
 }
 
 variable "keepalived_members" { 
-    type        = list(string)
-    default     = [
+    type    = list(string)
+    default = [
         "Database proxy",
         "Reverse proxy"
     ]
 }
 
 variable "vm_password" { 
-    type = string 
+    type      = string 
     sensitive = true 
 }
 
 variable "vm_username" { 
-    type = string 
+    type    = string 
     default = "kevin"
 }
-variable "vm_config" { type = map(any) }
-variable "ceph_mounts" { type = map(any) }
-variable "role_configs" { type = map(any) }
-variable "default_dns" { type = string }
-variable "default_domain" { type = string }
-variable "default_datastore" { type = string }
