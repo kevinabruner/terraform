@@ -51,6 +51,36 @@ resource "proxmox_virtual_environment_file" "user_data" {
   }
 }
 
+# Cloud-Init Network Config (Handles VMs)
+resource "proxmox_virtual_environment_file" "network_config" {
+  count        = try(var.vm_config.vm_type, "vm") == "vm" ? 1 : 0
+  content_type = "snippets"
+  datastore_id = var.default_datastore
+  node_name    = var.vm_config.node
+
+  source_raw {
+    data = <<-EOT
+version: 2
+ethernets:
+%{ for index, iface in var.vm_config.interfaces ~}
+  ens${18 + index}:
+    optional: true
+    addresses:
+      - ${iface.ip}
+%{ if iface.is_primary ~}
+    nameservers:
+      addresses: [${var.default_dns}]
+      search: [${var.default_domain}]
+    routes:
+      - to: 0.0.0.0/0
+        via: ${var.vm_config.gateway}
+%{ endif ~}
+%{ endfor ~}
+EOT
+    file_name = "${var.vm_config.name}-network-config.yaml"
+  }
+}
+
 # VM Resource
 resource "proxmox_virtual_environment_vm" "vm" {
   count       = try(var.vm_config.vm_type, "vm") == "vm" ? 1 : 0
