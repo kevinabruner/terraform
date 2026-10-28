@@ -40,7 +40,7 @@ resource "proxmox_virtual_environment_file" "user_data" {
       users          = lookup(var.role_configs, var.vm_config.role, var.role_configs["Default"]).users
       mounts         = lookup(var.role_configs, var.vm_config.role, var.role_configs["Default"]).mounts
       
-     has_keepalived = contains(["db-prod", "db-dev"], var.vm_config.role) # Adjust to match your keepalived roles
+      has_keepalived = contains(var.keepalived_members, var.vm_config.role)
       is_vrrp_master = endswith(var.vm_config.name, "1")
       local_ip       = split("/", var.vm_config.primary_iface.ip)[0]
 
