@@ -1,3 +1,17 @@
+terraform {
+  required_version = ">= 1.5.0"
+  required_providers {
+    proxmox = {
+      source  = "bpg/proxmox"
+      version = "~> 0.116.0"
+    }
+    netbox = {
+      source  = "e-breuninger/netbox"
+      version = "~> 5.0"
+    }
+  }
+}
+
 # ------------------------------------------------------------------------------
 # DEPLOY CAMBRIDGE (SITE A) WORKLOADS
 # ------------------------------------------------------------------------------
