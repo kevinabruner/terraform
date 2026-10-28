@@ -132,3 +132,15 @@ module "rockwood_nodes" {
   default_domain    = "rockwood.local"
   default_datastore = each.value.storage
 }
+
+resource "null_resource" "node_bootstrap" {
+  for_each = { for k, v in local.cambridge_cts : k => v if strcontains(k, "psql") }
+
+  triggers = {    
+    container_id = module.cambridge_nodes[each.key].proxmox_virtual_environment_container.ct[0].id    
+  }
+
+  provisioner "local-exec" {
+    command = "/home/kevin/psql/join_node.sh ${each.key}"
+  }
+}
