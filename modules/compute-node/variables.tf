@@ -36,3 +36,8 @@ variable "default_domain" {
 variable "default_datastore" {
   type = any
 }
+
+variable "all_vms" {
+  type    = map(any)
+  default = {}
+}

@@ -105,6 +105,7 @@ module "cambridge_nodes" {
   for_each = local.cambridge_workloads
 
   vm_config         = each.value
+  all_vms           = local.vm_configs   
   ceph_mounts       = local.ceph_mounts
   role_configs      = local.role_configs
   vm_username       = var.vm_username
