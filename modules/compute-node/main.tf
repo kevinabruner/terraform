@@ -13,6 +13,7 @@ terraform {
 
 # Cloud-Init User Data (Handles VMs)
 resource "proxmox_virtual_environment_file" "user_data" {
+  count        = try(var.vm_config.vm_type, "vm") == "vm" ? 1 : 0
   content_type = "snippets"
   datastore_id = var.default_datastore
   node_name    = var.vm_config.node
@@ -39,7 +40,6 @@ resource "proxmox_virtual_environment_file" "user_data" {
       users          = lookup(var.role_configs, var.vm_config.role, var.role_configs["Default"]).users
       mounts         = lookup(var.role_configs, var.vm_config.role, var.role_configs["Default"]).mounts
       
-      # ... (keep your other template variables here)
       has_keepalived = false
       is_vrrp_master = false
       local_ip       = split("/", var.vm_config.primary_iface.ip)[0]
@@ -95,7 +95,7 @@ resource "proxmox_virtual_environment_vm" "vm" {
 
   initialization {
     datastore_id         = var.default_datastore
-    user_data_file_id    = proxmox_virtual_environment_file.user_data.id
+    user_data_file_id    = proxmox_virtual_environment_file.user_data[0].id
   }
 
   lifecycle { ignore_changes = [tags, startup, usb, clone, initialization] }
