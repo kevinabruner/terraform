@@ -1,15 +1,15 @@
 # modules/compute-node/variables.tf
 
 variable "vm_config" {
-  type = map(any)
+  type = any
 }
 
 variable "ceph_mounts" {
-  type = map(any)
+  type = any
 }
 
 variable "role_configs" {
-  type = map(any)
+  type = any
 }
 
 variable "vm_username" {
