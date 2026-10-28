@@ -1,3 +1,11 @@
+terraform {
+  required_providers {
+    proxmox = {
+      source  = "bpg/proxmox"
+    }
+  }
+}
+
 # Cloud-Init User Data (Handles VMs)
 resource "proxmox_virtual_environment_file" "user_data" {
   count        = try(var.vm_config.vm_type, "vm") == "vm" ? 1 : 0
