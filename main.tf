@@ -1,3 +1,40 @@
+# Default Provider (Cambridge / Site A)
+provider "proxmox" {
+  endpoint = var.proxmox_api_url_cambridge
+  username = "root@pam"
+  password = var.proxmox_password 
+  insecure = true
+
+  ssh {
+    agent       = false
+    username    = "root"
+    private_key = file("~/.ssh/id_rsa")
+    node {
+      name    = "pve"
+      address = "192.168.11.15"
+    }
+  }
+}
+
+# Aliased Provider (Rockwood / Site B)
+provider "proxmox" {
+  alias    = "rockwood"
+  endpoint = var.proxmox_api_url_rockwood # Make sure this variable is declared in your root variables.tf
+  username = "root@pam"
+  password = var.proxmox_password 
+  insecure = true
+
+  ssh {
+    agent       = false
+    username    = "root"
+    private_key = file("~/.ssh/id_rsa")
+    node {
+      name    = var.rockwood_node_name    # Or hardcode your Node name for Site B
+      address = var.rockwood_node_address # Or hardcode your Site B Proxmox IP/Tailscale IP
+    }
+  }
+}
+
 terraform {
   required_version = ">= 1.5.0"
   required_providers {
