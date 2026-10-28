@@ -29,8 +29,8 @@ provider "proxmox" {
     username    = "root"
     private_key = file("~/.ssh/id_rsa")
     node {
-      name    = var.rockwood_node_name    # Or hardcode your Node name for Site B
-      address = var.rockwood_node_address # Or hardcode your Site B Proxmox IP/Tailscale IP
+      name    = "site-b"    # Or hardcode your Node name for Site B
+      address = "10.10.10.15" # Or hardcode your Site B Proxmox IP/Tailscale IP
     }
   }
 }
