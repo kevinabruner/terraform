@@ -57,34 +57,6 @@ provider "proxmox" {
   }
 }
 
-# ------------------------------------------------------------------------------
-# STATE MIGRATION (MOVED BLOCKS)
-# ------------------------------------------------------------------------------
-
-# Cambridge VMs
-moved {
-  from = proxmox_virtual_environment_vm.proxmox_vms
-  to   = module.cambridge_nodes.proxmox_virtual_environment_vm.vm
-}
-
-# Cambridge Containers (if you had them under a flat resource before)
-moved {
-  from = proxmox_virtual_environment_lxc.proxmox_cts
-  to   = module.cambridge_nodes.proxmox_virtual_environment_lxc.container
-}
-
-# Rockwood VMs (if they were previously flat or under another name)
-moved {
-  from = proxmox_virtual_environment_vm.rockwood_vms
-  to   = module.rockwood_nodes.proxmox_virtual_environment_vm.vm
-}
-
-# Node Bootstrap Null Resources
-moved {
-  from = null_resource.node_bootstrap
-  to   = module.cambridge_nodes.null_resource.node_bootstrap
-}
-
 locals {
   ceph_mounts = {
     garage = { volume = "/mnt/pve/cephfs/garage", path = "/var/lib/garage/data" }
