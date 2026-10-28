@@ -133,15 +133,15 @@ resource "proxmox_virtual_environment_vm" "vm" {
 
 # LXC Container Resource
 resource "proxmox_virtual_environment_container" "ct" {
-  count         = try(var.vm_config.vm_type, "") == "ct" ? 1 : 0
+  count         = try(var.vm_config.vm_type, "vm") == "ct" ? 1 : 0
   node_name     = var.vm_config.node
   vm_id         = var.vm_config.vmid
   description   = var.vm_config.desc
-  pool_id       = var.vm_config.pool != "" ? var.vm_config.pool : null
+  pool_id       = try(var.vm_config.pool, "") != "" ? var.vm_config.pool : null
   start_on_boot = var.vm_config.start_at_node_boot
   started       = var.vm_config.status == "running"
   unprivileged  = true
-
+  
   operating_system {
     template_file_id = "truenas-nfs:vztmpl/${var.vm_config.image}.tar.zst"
     type             = "debian"
