@@ -51,7 +51,11 @@ resource "proxmox_virtual_environment_vm" "vm" {
   started     = var.vm_config.status == "running"
 
   agent { enabled = true }
-  cpu { cores = var.vm_config.cores; sockets = 1; type = "host" }
+  cpu { 
+    cores = var.vm_config.cores
+    sockets = 1
+    type = "host" 
+}
   memory { dedicated = var.vm_config.memory }
   scsi_hardware = "virtio-scsi-pci"
   serial_device {}
