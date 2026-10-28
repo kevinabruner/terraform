@@ -13,7 +13,6 @@ terraform {
 
 # Cloud-Init User Data (Handles VMs)
 resource "proxmox_virtual_environment_file" "user_data" {
-  count        = try(var.vm_config.vm_type, "vm") == "vm" ? 1 : 0
   content_type = "snippets"
   datastore_id = var.default_datastore
   node_name    = var.vm_config.node
