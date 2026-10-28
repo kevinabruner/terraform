@@ -1,0 +1,58 @@
+##----------------BIG NOTE:---------------###
+#  If there is no "default" value here,     #
+#  they will need to be exported manually   #
+#  or placed in /etc/environment            #
+##--------------END BIG NOTE:-------------###
+
+variable "netbox_api_token_secret" { 
+    type      = string
+    sensitive = true 
+}
+
+variable "proxmox_api_url" {
+    type    = string
+    default = "https://pve.thejfk.ca/api2/json"
+}
+
+variable "proxmox_api_url_cambridge" {
+    type    = string
+    default = "https://pve.thejfk.ca/api2/json"
+}
+
+variable "proxmox_api_url_rockwood" {
+    type    = string
+    default = "https://pve-b.thejfk.ca/api2/json"
+}
+
+variable "rockwood_node_name" {
+    type    = string
+    default = "site-b"
+}
+
+variable "rockwood_node_address" {
+    type    = string
+    default = "10.10.10.15"
+}
+
+variable "mirror_url" { 
+    type    = string 
+    default = "http://mirror.jfkhome"
+}
+
+variable "keepalived_members" { 
+    type    = list(string)
+    default = [
+        "Database proxy",
+        "Reverse proxy"
+    ]
+}
+
+variable "vm_password" { 
+    type      = string 
+    sensitive = true 
+}
+
+variable "vm_username" { 
+    type    = string 
+    default = "kevin"
+}
