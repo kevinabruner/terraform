@@ -56,3 +56,12 @@ variable "vm_username" {
     type = string 
     default = "kevin"
 }
+variable "vm_config" { type = map(any) }
+variable "ceph_mounts" { type = map(any) }
+variable "role_configs" { type = map(any) }
+variable "vm_username" { type = string }
+variable "vm_password" { type = string }
+variable "mirror_url" { type = string }
+variable "default_dns" { type = string }
+variable "default_domain" { type = string }
+variable "default_datastore" { type = string }
