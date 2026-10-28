@@ -41,3 +41,7 @@ variable "all_vms" {
   type    = map(any)
   default = {}
 }
+variable "keepalived_members" {
+  type    = list(string)
+  default = []
+}
