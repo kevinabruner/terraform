@@ -4,7 +4,6 @@ preserve_hostname: false
 
 bootcmd:
   - apt-get update
-  - apt-get install -y nfs-common
 
 %{ if os == "ubuntu24" ~}
 apt:
@@ -73,21 +72,6 @@ users:
     ssh_authorized_keys:
       - ${trimspace(user.ssh_key)}
 %{   endif ~}
-%{ endfor ~}
-
-package_update: true
-package_upgrade: true
-
-# Global packages
-packages:
-  - qemu-guest-agent
-  - cloud-initramfs-growroot
-  - curl
-  - htop
-  - vim
-  - nfs-common
-%{ for pkg in extra_packages ~}
-  - ${pkg}
 %{ endfor ~}
 
 growpart:
