@@ -138,7 +138,7 @@ module "rockwood_nodes" {
   mirror_url        = var.mirror_url
   default_dns       = "192.168.100.1"
   default_domain    = "rockwood.local"
-  default_datastore = each.value.storage
+  default_datastore = "truenas-nfs"
 }
 
 resource "null_resource" "node_bootstrap" {
