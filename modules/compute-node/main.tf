@@ -125,6 +125,17 @@ resource "proxmox_virtual_environment_container" "ct" {
     size         = var.vm_config.disk_size
   }
 
+  # ADD THIS DYNAMIC MOUNT POINT BLOCK BACK
+  dynamic "mount_point" {
+    for_each = lookup(var.ceph_mounts, var.vm_config.name, {}) != {} ? [var.ceph_mounts[var.vm_config.name]] : []
+    content {
+      volume    = mount_point.value.volume
+      path      = mount_point.value.path
+      shared    = true
+      replicate = true
+    }
+  }
+
   initialization {
     hostname = var.vm_config.name
     ip_config {
