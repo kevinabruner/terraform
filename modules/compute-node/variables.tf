@@ -13,26 +13,26 @@ variable "role_configs" {
 }
 
 variable "vm_username" {
-  type = string
+  type = any
 }
 
 variable "vm_password" {
-  type      = string
+  type      = any
   sensitive = true
 }
 
 variable "mirror_url" {
-  type = string
+  type = any
 }
 
 variable "default_dns" {
-  type = string
+  type = any
 }
 
 variable "default_domain" {
-  type = string
+  type = any
 }
 
 variable "default_datastore" {
-  type = string
+  type = any
 }
