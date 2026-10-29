@@ -136,7 +136,7 @@ module "rockwood_nodes" {
   vm_username       = var.vm_username
   vm_password       = var.vm_password
   mirror_url        = var.mirror_url
-  default_dns       = "10.10.10.91", "10.10.10.92", "10.10.10.93"
+  default_dns       = [ "10.10.10.91", "10.10.10.92", "10.10.10.93" ]
   default_domain    = "rockwood.local"
   default_datastore = "truenas-nfs"
 }
