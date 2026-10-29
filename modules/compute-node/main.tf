@@ -114,9 +114,9 @@ resource "proxmox_virtual_environment_vm" "vm" {
   scsi_hardware = "virtio-scsi-pci"
   serial_device {}
 
-  clone {
+clone {
     vm_id     = var.vm_config.template_vmid
-    node_name = "pve"
+    node_name = var.vm_config.site == "Rockwood" ? "pve-b" : "pve"
     full      = true
   }
 
