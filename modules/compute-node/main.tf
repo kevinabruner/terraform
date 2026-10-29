@@ -81,7 +81,7 @@ ethernets:
       - ${iface.ip}
 %{ if iface.is_primary ~}
     nameservers:
-      addresses: [${var.default_dns}]
+      addresses: ${var.default_dns}
       search: [${var.default_domain}]
     routes:
       - to: 0.0.0.0/0
@@ -188,7 +188,7 @@ resource "proxmox_virtual_environment_container" "ct" {
       }
     }
     dns {
-      servers = [var.default_dns]
+      servers = var.default_dns
       domain  = var.default_domain
     }
   }
