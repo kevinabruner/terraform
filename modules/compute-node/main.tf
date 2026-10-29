@@ -116,7 +116,7 @@ resource "proxmox_virtual_environment_vm" "vm" {
 
   clone {
     vm_id     = var.vm_config.template_vmid
-    node_name = var.vm_config.node
+    node_name = "pve"
     full      = true
   }
 
