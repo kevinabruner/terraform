@@ -211,10 +211,3 @@ resource "proxmox_virtual_environment_container" "ct" {
   lifecycle { ignore_changes = [tags, startup, initialization] }
 }
 
-post-processor "shell-local" {
-    inline = [
-      "ssh root@pve 'qm move_disk ${var.proxmox_vmid} scsi0 truenas-nfs --delete'",
-      # Loop over all active nodes so nuc3, site-b, and any others get the template config
-      "ssh root@pve 'for node in $(pvesh get /nodes --output-format json | jq -r \".[].node\"); do cp /etc/pve/nodes/pve/qemu-server/${var.proxmox_vmid}.conf /etc/pve/nodes/$node/qemu-server/ 2>/dev/null || true; done'"
-    ]
-  }
