@@ -116,7 +116,7 @@ resource "proxmox_virtual_environment_vm" "vm" {
 
 clone {
     vm_id     = var.vm_config.template_vmid
-    node_name = var.vm_config.site == "Rockwood" ? "pve-b" : "pve"
+    node_name = var.vm_config.site == "Rockwood" ? "site-b" : "pve"
     full      = true
   }
 
