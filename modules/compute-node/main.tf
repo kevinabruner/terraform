@@ -81,7 +81,7 @@ ethernets:
       - ${iface.ip}
 %{ if iface.is_primary ~}
     nameservers:
-      addresses: ${var.default_dns}
+      addresses: ${jsonencode(var.default_dns)}
       search: [${var.default_domain}]
     routes:
       - to: 0.0.0.0/0
