@@ -112,7 +112,7 @@ module "cambridge_nodes" {
   vm_username       = var.vm_username
   vm_password       = var.vm_password
   mirror_url        = var.mirror_url
-  default_dns       = [ "10.10.10.99, 192.168.11.99" ]
+  default_dns       = [ "10.10.10.99", "192.168.11.99" ]
   default_domain    = "jfkhome"
   default_datastore = "truenas-nfs"
 }
@@ -136,7 +136,7 @@ module "rockwood_nodes" {
   vm_username       = var.vm_username
   vm_password       = var.vm_password
   mirror_url        = var.mirror_url
-  default_dns       = [ "10.10.10.99, 102.168.11.99" ]
+  default_dns       = [ "10.10.10.99", "102.168.11.99" ]
   default_domain    = "rockwood.local"
   default_datastore = "truenas-nfs"
 }
