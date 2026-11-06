@@ -189,7 +189,7 @@ resource "proxmox_virtual_environment_container" "ct" {
       }
     }
     dns {
-      servers = var.default_dns
+      servers = ${jsonencode(var.default_dns)}
       domain  = var.default_domain
     }
   }
